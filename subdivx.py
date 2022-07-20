@@ -1,6 +1,7 @@
 import urllib3
 import pandas as pd
 import re
+import sys
 from bs4 import BeautifulSoup
 
 # Options pandas
@@ -9,7 +10,7 @@ pd.set_option('display.max_rows', None)
 
 SUBDIVX_MAIN_URL = "https://www.subdivx.com/index.php"
 
-FIND_SUBTITLE = "Halo S01E01"
+FIND_SUBTITLE = sys.argv[1]
 
 payload = {
     "buscar2": FIND_SUBTITLE,
