@@ -63,7 +63,6 @@ patternDate = '(\d+/\d+/\d+)'
 sizeText = 20
 for download in results_downloads:
 	text = download.get_text()
-	print(text)
 
 	date = re.search(patternDate, text)
 	if date != 'null':
