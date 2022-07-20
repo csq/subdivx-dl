@@ -10,7 +10,10 @@ pd.set_option('display.max_rows', None)
 
 SUBDIVX_MAIN_URL = "https://www.subdivx.com/index.php"
 
-FIND_SUBTITLE = sys.argv[1]
+if ((len(sys.argv)-1) == 0):
+	sys.exit('Input any movie or serie name')
+else:
+	FIND_SUBTITLE = sys.argv[1]
 
 payload = {
     "buscar2": FIND_SUBTITLE,
@@ -32,6 +35,7 @@ results_user = page.find_all('a', {'class': 'link1'})
 
 if not results_descriptions:
 	print('No suitable subtitles')
+	sys.exit(0)
 
 tittleList = list()
 descriptionList = list()
@@ -59,6 +63,7 @@ patternDate = '(\d+/\d+/\d+)'
 sizeText = 20
 for download in results_downloads:
 	text = download.get_text()
+	print(text)
 
 	date = re.search(patternDate, text)
 	if date != 'null':
