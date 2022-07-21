@@ -84,3 +84,12 @@ for user in results_user:
 df = pd.DataFrame({'Tittle':tittleList, 'Description':descriptionList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
 
 print(df)
+
+try:
+	selection = int(input('\n[Selection] : '))
+	print('\nURL: ' + urlList[selection])
+except ValueError:
+	print('Input only numbers')
+except IndexError:
+	print('Input only numbers valid')
+	
