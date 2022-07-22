@@ -104,8 +104,16 @@ urlFileToDownload = SUBDIVX_URL + urlFile.get('href')
 
 downloadFile(urlFileToDownload)
 
+# Clear screen
+os.system('clr' if os.name == 'nt' else 'clear')
+
 fpath = os.path.join(os.getcwd(), '.temp', '')
 listDirectory = os.listdir(fpath)
 
 for file in listDirectory:
-   unzip(os.path.join(fpath, file))
+	pathFile = os.path.join(fpath, file)
+
+	if (file.endswith('.zip')):
+		unzip(pathFile)
+	elif (file.endswith('.rar')):
+		unrar(pathFile)
