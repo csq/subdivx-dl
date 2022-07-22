@@ -104,6 +104,8 @@ urlFileToDownload = SUBDIVX_URL + urlFile.get('href')
 
 downloadFile(urlFileToDownload)
 
-fpath = os.getcwd()+'/.temp/'
-for file in os.listdir(fpath):
-   unzip(fpath+file)
+fpath = os.path.join(os.getcwd(), '.temp', '')
+listDirectory = os.listdir(fpath)
+
+for file in listDirectory:
+   unzip(os.path.join(fpath, file))
