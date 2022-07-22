@@ -3,6 +3,7 @@ import pandas as pd
 import re
 import sys
 import os
+import shutil
 from src.download import *
 from bs4 import BeautifulSoup
 
@@ -117,3 +118,10 @@ for file in listDirectory:
 		unzip(pathFile)
 	elif (file.endswith('.rar')):
 		unrar(pathFile)
+
+# Remove temp folder
+try:
+	shutil.rmtree(fpath)
+	print('Clear temp files\n')
+except OSError as error:
+	print(error)
