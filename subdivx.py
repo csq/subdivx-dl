@@ -2,6 +2,8 @@ import urllib3
 import pandas as pd
 import re
 import sys
+import os
+from src.download import *
 from bs4 import BeautifulSoup
 
 # Options pandas
@@ -9,6 +11,7 @@ pd.set_option('colheader_justify', 'center')
 pd.set_option('display.max_rows', None)
 
 SUBDIVX_MAIN_URL = "https://www.subdivx.com/index.php"
+SUBDIVX_URL = "https://www.subdivx.com/"
 
 if ((len(sys.argv)-1) == 0):
 	sys.exit('Input any movie or serie name')
@@ -87,9 +90,20 @@ print(df)
 
 try:
 	selection = int(input('\n[Selection] : '))
-	print('\nURL: ' + urlList[selection])
 except ValueError:
 	print('Input only numbers')
 except IndexError:
 	print('Input only numbers valid')
-	
+
+# Scrap page download srt
+request = http.request('GET', urlList[selection])
+page = BeautifulSoup(request.data, 'html.parser')
+urlFile = page.find('a', {'class': 'link1'})
+
+urlFileToDownload = SUBDIVX_URL + urlFile.get('href')
+
+downloadFile(urlFileToDownload)
+
+fpath = os.getcwd()+'/.temp/'
+for file in os.listdir(fpath):
+   unzip(fpath+file)
