@@ -1,8 +1,9 @@
 from subprocess import Popen
 import zipfile
 
+location = '.temp/'
+
 def downloadFile(url):
-  location = '.temp/'
   args = ['wget', '--content-disposition', '-q', '-c', '-P', location, url]
   output = Popen(args)
   output.wait()
@@ -14,12 +15,16 @@ def unzip(fileZip):
             for file in z.namelist():
                  if file.endswith(extension):
                       z.extract(file)
-            print('Successfully extrated ', file)
+            print('Extraction sucessfull subtittle enjoy!\n', file)
    except:
        print('Invalid file')
 
-def unrar(file):
-   pass
+def unrar(fileRar):
+    devnull = open('/dev/null', 'w')
+
+    args = ['unrar', 'x', fileRar]
+    sp = Popen(args, stdout=devnull)
+    sp.wait()
 
 def renameFile(newName):
    pass
