@@ -125,3 +125,7 @@ try:
 	print('Clear temp files\n')
 except OSError as error:
 	print(error)
+
+# Rename bulk srt
+currentPath = os.getcwd()
+renameFile(currentPath, FIND_SUBTITLE)

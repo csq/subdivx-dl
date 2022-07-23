@@ -1,5 +1,6 @@
 from subprocess import Popen
 import zipfile
+import os
 
 location = '.temp/'
 
@@ -26,5 +27,20 @@ def unrar(fileRar):
     sp = Popen(args, stdout=devnull)
     sp.wait()
 
-def renameFile(newName):
-   pass
+def renameFile(pathFile, newName):
+    files = os.listdir(pathFile)
+
+    index = 0
+    count = 0
+
+    while (index < len(files)):
+        if (files[index].endswith('.srt')):
+            old_name = os.path.join(pathFile, files[index])
+            if (count == 0):
+                new_name = os.path.join(pathFile, f'{newName}.srt')
+                os.rename(old_name, new_name)
+                count = count + 1
+            else:
+                new_name = os.path.join(pathFile, f'{newName}-V{count}.srt')
+                os.rename(old_name, new_name)
+        index = index + 1
