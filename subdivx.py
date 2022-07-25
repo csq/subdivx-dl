@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import urllib3
 import pandas as pd
 import re
