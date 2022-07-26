@@ -93,13 +93,13 @@ print(df)
 
 try:
 	selection = int(input('\n[Selection] : '))
+	request = http.request('GET', urlList[selection])
 except ValueError:
-	print('Input only numbers')
+	sys.exit('Input only numbers')
 except IndexError:
-	print('Input only numbers valid')
+    sys.exit('input valid numbers')
 
 # Scrap page download srt
-request = http.request('GET', urlList[selection])
 page = BeautifulSoup(request.data, 'html.parser')
 urlFile = page.find('a', {'class': 'link1'})
 
