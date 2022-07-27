@@ -8,6 +8,7 @@ import os
 import shutil
 from src.download import *
 from bs4 import BeautifulSoup
+from tabulate import tabulate
 
 # Options pandas
 pd.set_option('colheader_justify', 'center')
@@ -89,7 +90,8 @@ for user in results_user:
 # Table (id, tittle, description, downloads, date, user)
 df = pd.DataFrame({'Tittle':tittleList, 'Description':descriptionList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
 
-print(df)
+# Displaying the DataFrame
+print(tabulate(df, headers = 'keys', tablefmt = 'pretty'))
 
 try:
 	selection = int(input('\n[Selection] : '))
