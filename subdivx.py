@@ -47,7 +47,7 @@ def getDataPage(poolManager, url, search):
 		print('No suitable subtitles')
 		sys.exit(0)
 
-	tittleList = list()
+	titleList = list()
 	descriptionList = list()
 	urlList = list()
 	downloadList = list()
@@ -55,9 +55,9 @@ def getDataPage(poolManager, url, search):
 	dateList = list()
 
 	separator = "Subtitulos de "
-	for tittle in results_url:
-		string = tittle.get_text()
-		tittleList.append(string[len(separator):])
+	for title in results_url:
+		string = title.get_text()
+		titleList.append(string[len(separator):])
 
 	for description in results_descriptions:
 		text = description.get_text()
@@ -88,7 +88,7 @@ def getDataPage(poolManager, url, search):
 		if userName not in banWord:
 			userList.append(userName)
 
-	return tittleList, descriptionList, urlList, downloadList, userList, dateList
+	return titleList, descriptionList, urlList, downloadList, userList, dateList
 
 def printSelectDescription(selection, descriptionList):
 	description_select = []
@@ -149,10 +149,10 @@ def getSubtitle(request, url):
 def clear():
 	os.system('clr' if os.name == 'nt' else 'clear')
 
-tittleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
+titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
-# Table (id, tittle, downloads, date, user)
-df = pd.DataFrame({'Tittle':tittleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
+# Table (id, title, downloads, date, user)
+df = pd.DataFrame({'title':titleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
 
 while (1):
 	# Clear screen
