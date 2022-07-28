@@ -152,7 +152,7 @@ def clear():
 titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
 # Table (id, title, downloads, date, user)
-df = pd.DataFrame({'title':titleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
+df = pd.DataFrame({'Title':titleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
 
 while (1):
 	# Clear screen
