@@ -109,7 +109,11 @@ def printSelectDescription(selection, descriptionList):
 			line = ""
 			count = 0
 	description_select.append(line)
+
 	df_description = pd.DataFrame({'Description':description_select})
+	df_description.index.name = 'N°'
+	df_description.index += 1
+	
 	print(tabulate(df_description, headers = 'keys', tablefmt = 'pretty', stralign='left'))
 
 def getSubtitle(request, url):
@@ -153,6 +157,8 @@ titleList, descriptionList, urlList, downloadList, userList, dateList = getDataP
 
 # Table (id, title, downloads, date, user)
 df = pd.DataFrame({'Title':titleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
+df.index.name = 'N°'
+df.index += 1
 
 while (1):
 	# Clear screen
@@ -162,7 +168,7 @@ while (1):
 	print(tabulate(df, headers = 'keys', tablefmt = 'pretty'))
 
 	try:
-		selection = int(input('\n[Selection] : '))
+		selection = (int(input('\n[Selection] : '))) - 1
 		request = http.request('GET', urlList[selection])
 	except ValueError:
 		sys.exit('Input only numbers')
