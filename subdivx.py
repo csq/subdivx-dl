@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import shutil
+
 from src.download import *
 from bs4 import BeautifulSoup
 from tabulate import tabulate
