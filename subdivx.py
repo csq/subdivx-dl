@@ -74,14 +74,18 @@ def getDataPage(poolManager, url, search):
 		text = download.get_text()
 
 		date = re.search(patternDate, text)
-		if date != 'null':
+		if date != None:
 			dateList.append(date.group())
+		else:
+			dateList.append('-')
 
 		subText = text[:sizeText]
 		downloadCount = re.search(patternNumber, subText)
 
-		if downloadCount != 'null':
+		if downloadCount != None:
 			downloadList.append(downloadCount.group())
+		else:
+			downloadCount.append('-')
 
 	banWord = ["tÃ­tulo", "fecha", "downloads", "subtitulos en espaÃ±ol"]
 	for user in results_user:
