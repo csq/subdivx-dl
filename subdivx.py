@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import shutil
+import time
 
 from src.download import *
 from bs4 import BeautifulSoup
@@ -168,26 +169,45 @@ while (1):
 	print(tabulate(df, headers = 'keys', tablefmt = 'pretty'))
 
 	try:
-		selection = (int(input('\n[Selection] : '))) - 1
-		request = http.request('GET', urlList[selection])
+		print('\n[1~9] Select')
+		print('[ 0 ] Exit')
+		selection = (int(input('\nSelection: '))) - 1
+
+		if selection < -1:
+			print('\nPositive numbers only please!')
+			time.sleep(1)
+			continue
+		elif selection == -1:
+			clear()
+			exit(0)
+		else:
+			request = http.request('GET', urlList[selection])
+
 	except ValueError:
-		sys.exit('Input only numbers')
+		print('\nInput only numbers')
+		time.sleep(1)
+		continue
 	except IndexError:
-	    sys.exit('input valid numbers')
+	    print('\ninput valid numbers')
+	    time.sleep(1)
+	    continue
 
 	clear()
 	printSelectDescription(selection, descriptionList)
 
-	print('\n[1] Download subtitle')
-	print('[2] Back\n')
+	print('\n[ 1 ] Download subtitle')
+	print('[ 0 ] Exit\n')
 
 	try:
-		select_action = int(input('[Selection] : '))
+		select_action = int(input('Selection: '))
 	except ValueError:
-		sys.exit('Input only numbers')
+		print('\nInput only numbers')
+		time.sleep(1)
+		continue
 
 	if select_action == 1:
 		getSubtitle(request, SUBDIVX_URL)
 		exit(0)
-	elif select_action == 2:
+	elif select_action == 0:
 		clear()
+		exit(0)
