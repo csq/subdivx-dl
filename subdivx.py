@@ -62,7 +62,10 @@ def getDataPage(poolManager, url, search):
 
 	for description in results_descriptions:
 		text = description.get_text()
-		descriptionList.append(text)
+		if text != '':
+			descriptionList.append(text)
+		else:
+			descriptionList.append('Whitout Description')
 
 	for link in results_url:
 		urlList.append(link.get('href'))
