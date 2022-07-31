@@ -9,6 +9,7 @@ import shutil
 import time
 
 from src.download import *
+from src.help import *
 from bs4 import BeautifulSoup
 from tabulate import tabulate
 
