@@ -1,8 +1,11 @@
 import argparse
 
 parser = argparse.ArgumentParser(
-	description='Subdvix-dl is a subtitle downloader of page subdvix.com',
-	epilog='subdvix.com not involve in this development, any comment on software do it <www.github.com/csq/subdivx-dl>.'
+	description='Subdvix-dl is a subtitle downloader of website subdvix.com',
+	epilog='Disclaimer: subdvix.com not involve in this development.\
+	        Any comments about this software make it in: \
+	        <www.github.com/csq/subdivx-dl> or \
+	        <www.gitlab.com/csq1/subdivx-dl>'
 )
 
 parser.add_argument('SEARCH', help='Name at serie or movie to search subtitle')
