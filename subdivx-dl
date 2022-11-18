@@ -148,6 +148,9 @@ def getSubtitle(request, url):
 		elif (file.endswith('.rar')):
 			unrar(pathFile)
 
+	# Rename bulk srt
+	renameFile(fpath, FIND_SUBTITLE)
+
 	# Remove temp folder
 	try:
 		shutil.rmtree(fpath)
@@ -155,9 +158,6 @@ def getSubtitle(request, url):
 	except OSError as error:
 		print(error)
 
-	# Rename bulk srt
-	currentPath = os.getcwd()
-	renameFile(currentPath, FIND_SUBTITLE)
 
 def clear():
 	os.system('clr' if os.name == 'nt' else 'clear')
