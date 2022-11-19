@@ -20,10 +20,9 @@ pd.set_option('display.max_rows', None)
 SUBDIVX_MAIN_URL = "https://www.subdivx.com/index.php"
 SUBDIVX_URL = "https://www.subdivx.com/"
 
-if ((len(sys.argv)-1) == 0):
-	sys.exit('Input any movie or serie name')
-else:
-	FIND_SUBTITLE = sys.argv[1]
+args = parser.parse_args()
+
+FIND_SUBTITLE = args.SEARCH
 
 http = urllib3.PoolManager()
 
@@ -148,8 +147,13 @@ def getSubtitle(request, url):
 		elif (file.endswith('.rar')):
 			unrar(pathFile)
 
-	# Rename bulk srt
-	renameFile(fpath, FIND_SUBTITLE)
+	# Check flag season
+	if (args.season == False):
+		# Rename single srt
+		renameFile(fpath, FIND_SUBTITLE)
+	else:
+		# Move and rename bulk srt
+		moveFiles(fpath)
 
 	# Remove temp folder
 	try:
