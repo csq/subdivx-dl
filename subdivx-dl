@@ -131,29 +131,38 @@ def getSubtitle(request, url):
 
 	urlFileToDownload = url + urlFile.get('href')
 
-	downloadFile(urlFileToDownload)
-
 	# Clear screen
 	clear()
 
-	fpath = os.path.join(os.getcwd(), '.temp', '')
+	# Check flag --location
+	LOCATION_DESTINATION = args.location
+	
+	if (LOCATION_DESTINATION == None):
+		fpath = os.path.join(os.getcwd(), '.tmp', '')
+		downloadFile(urlFileToDownload, fpath)
+		parent_folder = os.getcwd()
+	else:
+		fpath = os.path.join(LOCATION_DESTINATION, '.tmp', '')
+		downloadFile(urlFileToDownload, fpath)
+		parent_folder = LOCATION_DESTINATION
+
 	listDirectory = os.listdir(fpath)
 
 	for file in listDirectory:
 		pathFile = os.path.join(fpath, file)
 
 		if (file.endswith('.zip')):
-			unzip(pathFile)
+			unzip(pathFile, fpath)
 		elif (file.endswith('.rar')):
-			unrar(pathFile)
+			unrar(pathFile, fpath)
 
-	# Check flag season
+	# Check flag --season
 	if (args.season == False):
 		# Rename single srt
-		renameFile(fpath, FIND_SUBTITLE)
+		renameFile(fpath, parent_folder, FIND_SUBTITLE)
 	else:
 		# Move and rename bulk srt
-		moveFiles(fpath)
+		moveFiles(fpath, parent_folder)
 
 	# Remove temp folder
 	try:

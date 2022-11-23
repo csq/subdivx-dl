@@ -3,33 +3,30 @@ import zipfile
 import os
 import re
 
-location = '.temp/'
-temp_dir = os.path.join(os.getcwd(), location, '')
+def downloadFile(url, location):
+    args = ['wget', '--content-disposition', '-q', '-c', '-P', location, url]
+    output = Popen(args)
+    output.wait()
 
-def downloadFile(url):
-  args = ['wget', '--content-disposition', '-q', '-c', '-P', location, url]
-  output = Popen(args)
-  output.wait()
-
-def unzip(fileZip):
+def unzip(fileZip, destination):
    extension = '.srt'
    try:
        with zipfile.ZipFile(fileZip, 'r') as z:
             for file in z.namelist():
                  if file.endswith(extension):
-                      z.extract(file, temp_dir)
+                      z.extract(file, destination)
             print('Extraction sucessfull subtittle enjoy!\n', file)
    except:
        print('Invalid file')
 
-def unrar(fileRar):
+def unrar(fileRar, destination):
     devnull = open('/dev/null', 'w')
 
-    args = ['unrar', 'x', fileRar, temp_dir]
+    args = ['unrar', 'x', fileRar, destination]
     sp = Popen(args, stdout=devnull)
     sp.wait()
 
-def renameFile(pathFile, newName):
+def renameFile(pathFile, destination, newName):
     files = os.listdir(pathFile)
 
     index = 0
@@ -39,17 +36,17 @@ def renameFile(pathFile, newName):
         if (files[index].endswith('.srt')):
             old_name = os.path.join(pathFile, files[index])
             if (count == 0):
-                new_name = os.path.join(os.getcwd(), f'{newName}.srt')
+                new_name = os.path.join(destination, f'{newName}.srt')
                 os.rename(old_name, new_name)
                 count = count + 1
             else:
-                new_name = os.path.join(os.getcwd(), f'{newName}-V{count}.srt')
+                new_name = os.path.join(destination, f'{newName}-V{count}.srt')
                 os.rename(old_name, new_name)
                 count = count + 1
         index = index + 1
 
 
-def moveFiles(pathFile):
+def moveFiles(pathFile, destination):
     files = os.listdir(pathFile)
 
     # TV series season and episode names
@@ -78,6 +75,6 @@ def moveFiles(pathFile):
                 pass
 
             file_src = os.path.join(pathFile, files[index])
-            file_dst = os.path.join(os.getcwd(), new_name)
+            file_dst = os.path.join(destination, new_name)
             os.rename(file_src, file_dst)
         index = index + 1
