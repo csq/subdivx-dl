@@ -17,7 +17,6 @@ from tabulate import tabulate
 pd.set_option('colheader_justify', 'center')
 pd.set_option('display.max_rows', None)
 
-SUBDIVX_MAIN_URL = "https://www.subdivx.com/index.php"
 SUBDIVX_URL = "https://www.subdivx.com/"
 
 args = parser.parse_args()
@@ -45,7 +44,7 @@ def getDataPage(poolManager, url, search):
 	results_user = page.find_all('a', {'class': 'link1'})
 
 	if not results_descriptions:
-		print('No suitable subtitles')
+		print('Subtitles not found')
 		sys.exit(0)
 
 	titleList = list()
@@ -65,7 +64,7 @@ def getDataPage(poolManager, url, search):
 		if text != '':
 			descriptionList.append(text)
 		else:
-			descriptionList.append('Whitout Description')
+			descriptionList.append('Whitout description')
 
 	for link in results_url:
 		urlList.append(link.get('href'))
@@ -167,7 +166,7 @@ def getSubtitle(request, url):
 	# Remove temp folder
 	try:
 		shutil.rmtree(fpath)
-		print('Clear temp files\n')
+		print('Deleted temporal files\n')
 	except OSError as error:
 		print(error)
 
@@ -195,7 +194,7 @@ while (1):
 		selection = (int(input('\nSelection: '))) - 1
 
 		if selection < -1:
-			print('\nPositive numbers only please!')
+			print('\nInput only positive numbers!')
 			time.sleep(1)
 			continue
 		elif selection == -1:
@@ -209,14 +208,14 @@ while (1):
 		time.sleep(1)
 		continue
 	except IndexError:
-	    print('\ninput valid numbers')
+	    print('\nInput valid numbers')
 	    time.sleep(1)
 	    continue
 
 	clear()
 	printSelectDescription(selection, descriptionList)
 
-	print('\n[ 1 ] Download subtitle')
+	print('\n[ 1 ] Download')
 	print('[ 0 ] Exit\n')
 
 	try:
