@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import urllib3
-import pandas as pd
 import re
 import sys
 import os
@@ -12,10 +11,6 @@ from src.download import *
 from src.help import *
 from bs4 import BeautifulSoup
 from tabulate import tabulate
-
-# Options pandas
-pd.set_option('colheader_justify', 'center')
-pd.set_option('display.max_rows', None)
 
 SUBDIVX_URL = "https://www.subdivx.com/"
 
@@ -98,7 +93,7 @@ def getDataPage(poolManager, url, search):
 	return titleList, descriptionList, urlList, downloadList, userList, dateList
 
 def printSelectDescription(selection, descriptionList):
-	description_select = []
+	description_select = [['Description']]
 	aux = descriptionList[selection].splitlines()
 	words = aux[0].split()
 
@@ -112,16 +107,32 @@ def printSelectDescription(selection, descriptionList):
 			count = count + 1
 		else:
 			a = line+" "+word
-			description_select.append(a)
+			description_select.append([a])
 			line = ""
 			count = 0
-	description_select.append(line)
-
-	df_description = pd.DataFrame({'Description':description_select})
-	df_description.index.name = 'N°'
-	df_description.index += 1
+	description_select.append([line])
 	
-	print(tabulate(df_description, headers = 'keys', tablefmt = 'pretty', stralign='left'))
+	print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='center'))
+
+def printSearchResult(titleList, downloadList, dateList, userList):
+	# Mix data
+	data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
+
+	index = 1
+	row = []
+
+	while index <= len(titleList):
+		row.append(index)
+		row.append(titleList[index - 1])
+		row.append(downloadList[index - 1])
+		row.append(dateList[index - 1])
+		row.append(userList[index - 1])
+		data.append(row[:])
+		row.clear()
+		index = index + 1
+
+	print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
+
 
 def getSubtitle(request, url):
 	# Scrap page download srt
@@ -170,23 +181,18 @@ def getSubtitle(request, url):
 	except OSError as error:
 		print(error)
 
-
 def clear():
 	os.system('clr' if os.name == 'nt' else 'clear')
 
 titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
-# Table (id, title, downloads, date, user)
-df = pd.DataFrame({'Title':titleList, 'Downloads':downloadList, 'Date':dateList, 'User':userList})
-df.index.name = 'N°'
-df.index += 1
 
 while (1):
 	# Clear screen
 	clear()
 	
 	# Display Search Results
-	print(tabulate(df, headers = 'keys', tablefmt = 'pretty'))
+	printSearchResult(titleList, downloadList, dateList, userList)
 
 	try:
 		print('\n[1~9] Select')
