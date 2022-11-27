@@ -25,10 +25,14 @@ def getDataPage(poolManager, url, search):
 	payload = {
 	    "buscar2": search,
 	    "accion": "5",
-	    "masdesc": "",
-	    "subtitulos": "1",
-	    "realiza_b": "1",
+	    "masdesc": ""
 	}
+
+	# Check flag --order-by
+	if args.order_by_downloads == True:
+		payload["oxdown"] = "1"
+	elif args.order_by_dates == True:
+		payload["oxfecha"] = "2"
 
 	request = http.request('POST', url, fields=payload)
 	page = BeautifulSoup(request.data, 'html.parser')

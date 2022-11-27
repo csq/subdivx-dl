@@ -12,3 +12,5 @@ parser.add_argument('SEARCH', help='name of the tv serie or movie to search for 
 parser.add_argument('-v', '--version', action='version', version='2022.07.31')
 parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
 parser.add_argument('-l', '--location', help='destination directory')
+parser.add_argument('--order-by-downloads', help='order results by downloads', action='store_true')
+parser.add_argument('--order-by-dates', help='order results by dates', action='store_true')
