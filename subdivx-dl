@@ -18,7 +18,8 @@ args = parser.parse_args()
 
 FIND_SUBTITLE = args.SEARCH
 
-http = urllib3.PoolManager()
+user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0'}
+http = urllib3.PoolManager(headers=user_agent)
 
 def getDataPage(poolManager, url, search):
 
@@ -34,7 +35,7 @@ def getDataPage(poolManager, url, search):
 	elif args.order_by_dates == True:
 		payload["oxfecha"] = "2"
 
-	request = http.request('POST', url, fields=payload)
+	request = poolManager.request('POST', url, fields=payload)
 	page = BeautifulSoup(request.data, 'html.parser')
 
 	results_descriptions = page.find_all('div', id='buscador_detalle_sub')
