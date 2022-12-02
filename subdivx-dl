@@ -138,16 +138,12 @@ def printSearchResult(titleList, downloadList, dateList, userList):
 
 	print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
 
-
 def getSubtitle(request, url):
 	# Scrap page download srt
 	page = BeautifulSoup(request.data, 'html.parser')
 	urlFile = page.find('a', {'class': 'link1'})
 
 	urlFileToDownload = url + urlFile.get('href')
-
-	# Clear screen
-	clear()
 
 	# Check flag --location
 	LOCATION_DESTINATION = args.location
@@ -182,15 +178,14 @@ def getSubtitle(request, url):
 	# Remove temp folder
 	try:
 		shutil.rmtree(fpath)
-		print('Deleted temporal files\n')
 	except OSError as error:
 		print(error)
 
 def clear():
 	os.system('clr' if os.name == 'nt' else 'clear')
 
-titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
+titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
 while (1):
 	# Clear screen
@@ -237,7 +232,10 @@ while (1):
 		continue
 
 	if select_action == 1:
+		clear()
+		print('Working ...')
 		getSubtitle(request, SUBDIVX_URL)
+		print('Done')
 		exit(0)
 	elif select_action == 0:
 		clear()

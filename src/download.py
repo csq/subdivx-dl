@@ -9,15 +9,14 @@ def downloadFile(url, location):
     output.wait()
 
 def unzip(fileZip, destination):
-   extension = '.srt'
-   try:
-       with zipfile.ZipFile(fileZip, 'r') as z:
+    extension = '.srt'
+    try:
+        with zipfile.ZipFile(fileZip, 'r') as z:
             for file in z.namelist():
-                 if file.endswith(extension):
-                      z.extract(file, destination)
-            print('Extraction sucessfull subtittle enjoy!\n', file)
-   except:
-       print('Invalid file')
+                if file.endswith(extension):
+                    z.extract(file, destination)
+    except:
+        print('Invalid file')
 
 def unrar(fileRar, destination):
     devnull = open('/dev/null', 'w')
@@ -44,7 +43,6 @@ def renameFile(pathFile, destination, newName):
                 os.rename(old_name, new_name)
                 count = count + 1
         index = index + 1
-
 
 def moveFiles(pathFile, destination):
     files = os.listdir(pathFile)
