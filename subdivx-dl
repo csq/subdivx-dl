@@ -1,191 +1,20 @@
 #!/usr/bin/env python3
 
 import urllib3
-import re
-import sys
-import os
-import shutil
 import time
 
-from src.download import *
 from src.help import *
-from bs4 import BeautifulSoup
-from tabulate import tabulate
+from src.download import *
 
 SUBDIVX_URL = "https://www.subdivx.com/"
 
 args = parser.parse_args()
-
 FIND_SUBTITLE = args.SEARCH
 
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0'}
 http = urllib3.PoolManager(headers=user_agent)
 
-def getDataPage(poolManager, url, search):
-
-	payload = {
-	    "buscar2": search,
-	    "accion": "5",
-	    "masdesc": ""
-	}
-
-	# Check flag --order-by
-	if args.order_by_downloads == True:
-		payload["oxdown"] = "1"
-	elif args.order_by_dates == True:
-		payload["oxfecha"] = "2"
-
-	request = poolManager.request('POST', url, fields=payload)
-	page = BeautifulSoup(request.data, 'html.parser')
-
-	results_descriptions = page.find_all('div', id='buscador_detalle_sub')
-	results_url = page.find_all('a', {'class': 'titulo_menu_izq'})
-	results_downloads = page.find_all('div', id='buscador_detalle_sub_datos')
-	results_user = page.find_all('a', {'class': 'link1'})
-
-	if not results_descriptions:
-		print('Subtitles not found')
-		sys.exit(0)
-
-	titleList = list()
-	descriptionList = list()
-	urlList = list()
-	downloadList = list()
-	userList = list()
-	dateList = list()
-
-	separator = "Subtitulos de "
-	for title in results_url:
-		string = title.get_text()
-		titleList.append(string[len(separator):])
-
-	for description in results_descriptions:
-		text = description.get_text()
-		if text != '':
-			descriptionList.append(text)
-		else:
-			descriptionList.append('Whitout description')
-
-	for link in results_url:
-		urlList.append(link.get('href'))
-
-	patternNumber = '\d+(?:\,\d+)?'
-	patternDate = '(\d+/\d+/\d+)'
-	sizeText = 20
-	for download in results_downloads:
-		text = download.get_text()
-
-		date = re.search(patternDate, text)
-		if date != None:
-			dateList.append(date.group())
-		else:
-			dateList.append('-')
-
-		subText = text[:sizeText]
-		downloadCount = re.search(patternNumber, subText)
-
-		if downloadCount != None:
-			downloadList.append(downloadCount.group())
-		else:
-			downloadCount.append('-')
-
-	banWord = ["tÃ­tulo", "fecha", "downloads", "subtitulos en espaÃ±ol"]
-	for user in results_user:
-		userName = user.get_text()
-		if userName not in banWord:
-			userList.append(userName)
-
-	return titleList, descriptionList, urlList, downloadList, userList, dateList
-
-def printSelectDescription(selection, descriptionList):
-	description_select = [['Description']]
-	aux = descriptionList[selection].splitlines()
-	words = aux[0].split()
-
-	maxLengh =  10
-	line = ""
-	count = 0
-
-	for word in words:
-		if (count <= maxLengh):
-			line = line+" "+word
-			count = count + 1
-		else:
-			a = line+" "+word
-			description_select.append([a])
-			line = ""
-			count = 0
-	description_select.append([line])
-	
-	print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='center'))
-
-def printSearchResult(titleList, downloadList, dateList, userList):
-	# Mix data
-	data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
-
-	index = 1
-	row = []
-
-	while index <= len(titleList):
-		row.append(index)
-		row.append(titleList[index - 1])
-		row.append(downloadList[index - 1])
-		row.append(dateList[index - 1])
-		row.append(userList[index - 1])
-		data.append(row[:])
-		row.clear()
-		index = index + 1
-
-	print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
-
-def getSubtitle(request, url):
-	# Scrap page download srt
-	page = BeautifulSoup(request.data, 'html.parser')
-	urlFile = page.find('a', {'class': 'link1'})
-
-	urlFileToDownload = url + urlFile.get('href')
-
-	# Check flag --location
-	LOCATION_DESTINATION = args.location
-	
-	if (LOCATION_DESTINATION == None):
-		fpath = os.path.join(os.getcwd(), '.tmp', '')
-		downloadFile(urlFileToDownload, fpath)
-		parent_folder = os.getcwd()
-	else:
-		fpath = os.path.join(LOCATION_DESTINATION, '.tmp', '')
-		downloadFile(urlFileToDownload, fpath)
-		parent_folder = LOCATION_DESTINATION
-
-	listDirectory = os.listdir(fpath)
-
-	for file in listDirectory:
-		pathFile = os.path.join(fpath, file)
-
-		if (file.endswith('.zip')):
-			unzip(pathFile, fpath)
-		elif (file.endswith('.rar')):
-			unrar(pathFile, fpath)
-
-	# Check flag --season
-	if (args.season == False):
-		# Rename single srt
-		renameFile(fpath, parent_folder, FIND_SUBTITLE)
-	else:
-		# Move and rename bulk srt
-		moveFiles(fpath, parent_folder)
-
-	# Remove temp folder
-	try:
-		shutil.rmtree(fpath)
-	except OSError as error:
-		print(error)
-
-def clear():
-	os.system('clr' if os.name == 'nt' else 'clear')
-
-
-titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
+titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
 
 while (1):
 	# Clear screen
@@ -233,9 +62,7 @@ while (1):
 
 	if select_action == 1:
 		clear()
-		print('Working ...')
-		getSubtitle(request, SUBDIVX_URL)
-		print('Done')
+		getSubtitle(args, request, SUBDIVX_URL)
 		exit(0)
 	elif select_action == 0:
 		clear()
