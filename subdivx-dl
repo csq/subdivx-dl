@@ -26,7 +26,7 @@ while (1):
 	print('[ 0 ] Exit\n')
 
 	try:
-		selection = (int(input('Selection: ')))
+		selection = int(input('Selection: '))-1
 		url = urlList[selection]
 	except ValueError:
 		print('\nInput only numbers')
@@ -37,11 +37,11 @@ while (1):
 		time.sleep(1)
 		continue
 
-	if selection < 0:
+	if selection < -1:
 		print('\nInput only positive numbers')
 		time.sleep(1)
 		continue
-	elif selection == 0:
+	elif selection == -1:
 		clear()
 		exit(0)
 
