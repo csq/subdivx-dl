@@ -56,10 +56,8 @@ def unzip(fileZip, destination):
 
 def unrar(fileRar, destination):
     logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
-    devnull = open('/dev/null', 'w')
-
-    args = ['unrar', 'x', fileRar, destination]
-    sp = Popen(args, stdout=devnull)
+    args = ['unrar', 'x', '-inul', '-o+', fileRar, destination]
+    sp = Popen(args)
     sp.wait()
 
 def renameFile(pathFile, destination, newName):
