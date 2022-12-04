@@ -109,14 +109,15 @@ def moveFiles(pathFile, destination):
                 new_name = serie + ' - ' + season + episode + '.srt'
             except Exception as e:
                 logging.error(e)
-                print('Error: ', e)
-            finally:
-                pass
-
-            file_src = os.path.join(pathFile, files[index])
-            file_dst = os.path.join(destination, new_name)
-            logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
-            os.rename(file_src, file_dst)
+                file_src = os.path.join(pathFile, files[index])
+                file_dst = os.path.join(destination, files[index])
+                logging.info('No match Regex: Just move subtitle [' + files[index] + ']')
+                os.rename(file_src, file_dst)
+            else:
+                file_src = os.path.join(pathFile, files[index])
+                file_dst = os.path.join(destination, new_name)
+                logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
+                os.rename(file_src, file_dst)
         index = index + 1
 
 def getDataPage(args, poolManager, url, search):
