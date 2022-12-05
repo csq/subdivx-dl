@@ -23,6 +23,7 @@ parser.add_argument('SEARCH', help='name of the tv serie or movie to search for 
 parser.add_argument('-v', '--version', action='version', version='2022.07.31')
 parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
 parser.add_argument('-l', '--location', help='destination directory')
+parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('--order-by-downloads', help='order results by downloads', action='store_true')
 parser.add_argument('--order-by-dates', help='order results by dates', action='store_true')
 
@@ -60,7 +61,7 @@ def unrar(fileRar, destination):
     sp = Popen(args)
     sp.wait()
 
-def renameFile(pathFile, destination, newName):
+def renameFile(args, pathFile, destination, newName):
     logging.debug('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
     
@@ -68,9 +69,8 @@ def renameFile(pathFile, destination, newName):
     count = 0
 
     while (index < len(files)):
-        if (files[index].endswith('.srt')):
-            old_name = os.path.join(pathFile, files[index])
-
+        old_name = os.path.join(pathFile, files[index])
+        if (files[index].endswith('.srt') and (args.no_rename != True)):
             if (count == 0):
                 new_name = os.path.join(destination, f'{newName}.srt')
                 logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(old_name), os.path.basename(new_name))
@@ -81,9 +81,15 @@ def renameFile(pathFile, destination, newName):
                 logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(old_name), os.path.basename(new_name))
                 os.rename(old_name, new_name)
                 count = count + 1
+
+        # Move (rename same name for override) files without rename if flag --no-rename is True
+        elif files[index].endswith('.srt'):
+            new_name = os.path.join(destination, files[index])
+            logging.info('Just move subtitle [' + files[index] + '] to [' + destination + ']')
+            os.rename(old_name, new_name)
         index = index + 1
 
-def moveFiles(pathFile, destination):
+def moveFiles(args, pathFile, destination):
     logging.debug('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
 
@@ -93,7 +99,9 @@ def moveFiles(pathFile, destination):
     index = 0
 
     while (index < len(files)):
-        if (files[index].endswith('.srt')):
+        file_src = os.path.join(pathFile, files[index])
+
+        if (files[index].endswith('.srt') and (args.no_rename != True)):
             result = re.search(pattern_series_tv, files[index])
 
             try:
@@ -109,15 +117,19 @@ def moveFiles(pathFile, destination):
                 new_name = serie + ' - ' + season + episode + '.srt'
             except Exception as e:
                 logging.error(e)
-                file_src = os.path.join(pathFile, files[index])
                 file_dst = os.path.join(destination, files[index])
                 logging.info('No match Regex: Just move subtitle [' + files[index] + ']')
                 os.rename(file_src, file_dst)
             else:
-                file_src = os.path.join(pathFile, files[index])
                 file_dst = os.path.join(destination, new_name)
                 logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
                 os.rename(file_src, file_dst)
+
+        # Move (rename same name for override) files without rename if flag --no-rename is True
+        elif files[index].endswith('.srt'):
+            file_dst = os.path.join(destination, files[index])
+            logging.info('Move subtitle [' + files[index] + '] to [' + destination + ']')
+            os.rename(file_src, file_dst)
         index = index + 1
 
 def getDataPage(args, poolManager, url, search):
@@ -272,10 +284,10 @@ def getSubtitle(args, request, url):
     # Check flag --season
     if (args.season == False):
         # Rename single srt
-        renameFile(fpath, parent_folder, args.SEARCH)
+        renameFile(args, fpath, parent_folder, args.SEARCH)
     else:
         # Move and rename bulk srt
-        moveFiles(fpath, parent_folder)
+        moveFiles(args, fpath, parent_folder)
 
     # Remove temp folder
     try:
