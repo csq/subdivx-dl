@@ -61,13 +61,14 @@ def unrar(fileRar, destination):
     sp = Popen(args)
     sp.wait()
 
-def renameFile(args, pathFile, destination, newName):
+def movieSubtitle(args, pathFile, destination):
     logging.debug('Moves subtitles to %s', destination)
+
     files = os.listdir(pathFile)
+    newName = args.SEARCH
     
     index = 0
     count = 0
-
     while (index < len(files)):
         old_name = os.path.join(pathFile, files[index])
         if (files[index].endswith('.srt') and (args.no_rename != True)):
@@ -89,7 +90,7 @@ def renameFile(args, pathFile, destination, newName):
             os.rename(old_name, new_name)
         index = index + 1
 
-def moveFiles(args, pathFile, destination):
+def tvShowSubtitles(args, pathFile, destination):
     logging.debug('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
 
@@ -131,6 +132,15 @@ def moveFiles(args, pathFile, destination):
             logging.info('Move subtitle [' + files[index] + '] to [' + destination + ']')
             os.rename(file_src, file_dst)
         index = index + 1
+
+def renameAndMoveSubtitle(args, pathFile, destination):
+    # Check flag --season
+    if (args.season == False):
+        # Rename single srt
+        movieSubtitle(args, pathFile, destination)
+    else:
+        # Move and rename bulk srt
+        tvShowSubtitles(args, pathFile, destination)
 
 def getDataPage(args, poolManager, url, search):
 
@@ -281,13 +291,8 @@ def getSubtitle(args, request, url):
         elif (file.endswith('.rar')):
             unrar(pathFile, fpath)
 
-    # Check flag --season
-    if (args.season == False):
-        # Rename single srt
-        renameFile(args, fpath, parent_folder, args.SEARCH)
-    else:
-        # Move and rename bulk srt
-        moveFiles(args, fpath, parent_folder)
+    # Rename and/or move subtitles
+    renameAndMoveSubtitle(args, fpath, parent_folder)
 
     # Remove temp folder
     try:
