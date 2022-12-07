@@ -2,6 +2,7 @@ import argparse
 import logging
 import zipfile
 import shutil
+import time
 import sys
 import os
 import re
@@ -44,12 +45,11 @@ def downloadFile(url, location):
     output.wait()
 
 def unzip(fileZip, destination):
-    extension = '.srt'
     try:
         with zipfile.ZipFile(fileZip, 'r') as z:
+            logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if file.endswith(extension):
-                    logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
+                if file.endswith('.srt'):
                     z.extract(file, destination)
     except:
         logging.error('File corrupt')
@@ -61,34 +61,76 @@ def unrar(fileRar, destination):
     sp = Popen(args)
     sp.wait()
 
+def printMenuContentDir(pathDir):
+    header = [['N°', 'File name']]
+    files = os.listdir(pathDir)
+
+    data = []
+
+    index = 1
+    x = 0
+    while (x < len(files)):
+        if files[x].endswith('.srt'):
+            data.append(index)
+            data.append(os.path.basename(files[x]))
+            header.append(data[:])
+            data.clear()
+            index = index + 1
+        x = x + 1
+
+    if index > 2:
+        while(True):
+            # Clear screen
+            clear()
+            
+            # Print table with of the subtitles avaliable
+            print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
+            
+            print('\n[1~9] Select')
+            print('[ 0 ] Exit\n')
+
+            try:
+                selection = int(input('Selection: '))-1
+            except ValueError:
+                print('\nInput only numbers')
+                time.sleep(1)
+                continue
+            except IndexError:
+                print('\nInput valid numbers')
+                time.sleep(1)
+                continue
+
+            if selection < -1:
+                print('\nInput only positive numbers')
+                time.sleep(1)
+                continue
+            elif selection == -1:
+                clear()
+                exit(0)
+
+            # Return name file with extension .srt selected
+            return os.path.basename(header[selection+1][1])
+    else:
+        # Return name file with extension .srt exclude .zip or .rar
+        for x in range(2):
+            if files[x].endswith('.srt'):
+                return os.path.basename(files[x])
+
 def movieSubtitle(args, pathFile, destination):
     logging.debug('Moves subtitles to %s', destination)
-
-    files = os.listdir(pathFile)
     newName = args.SEARCH
-    
-    index = 0
-    count = 0
-    while (index < len(files)):
-        old_name = os.path.join(pathFile, files[index])
-        if (files[index].endswith('.srt') and (args.no_rename != True)):
-            if (count == 0):
-                new_name = os.path.join(destination, f'{newName}.srt')
-                logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(old_name), os.path.basename(new_name))
-                os.rename(old_name, new_name)
-                count = count + 1
-            else:
-                new_name = os.path.join(destination, f'{newName}-V{count}.srt')
-                logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(old_name), os.path.basename(new_name))
-                os.rename(old_name, new_name)
-                count = count + 1
 
-        # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif files[index].endswith('.srt'):
-            new_name = os.path.join(destination, files[index])
-            logging.info('Just move subtitle [' + files[index] + '] to [' + destination + ']')
-            os.rename(old_name, new_name)
-        index = index + 1
+    fileNameSelect = printMenuContentDir(pathFile)
+    pathFileSelect = os.path.join(pathFile, fileNameSelect)
+    
+    if args.no_rename == False:
+        new_name = os.path.join(destination, f'{newName}.srt')
+        logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
+        os.rename(pathFileSelect, new_name)
+    else:
+        new_name = os.path.join(destination, os.path.basename(pathFileSelect))
+        logging.info('Just move subtitle [' + os.path.basename(pathFileSelect) + '] to [' + destination + ']')
+        os.rename(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
     logging.debug('Moves subtitles to %s', destination)
@@ -301,6 +343,7 @@ def getSubtitle(args, request, url):
     except OSError as error:
         logging.error(error)
 
+    clear()
     print('Done')
 
 def clear():
