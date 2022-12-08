@@ -105,6 +105,12 @@ def printMenuContentDir(pathDir):
                 time.sleep(1)
                 continue
             elif selection == -1:
+                # Remove temp folder
+                try:
+                    shutil.rmtree(pathDir)
+                    logging.info('Delete temporal directory %s', pathDir)
+                except OSError as error:
+                    logging.error(error)
                 clear()
                 exit(0)
 
@@ -117,12 +123,12 @@ def printMenuContentDir(pathDir):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
-    logging.debug('Moves subtitles to %s', destination)
-    newName = args.SEARCH
-
     fileNameSelect = printMenuContentDir(pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
     
+    logging.debug('Moves subtitles to %s', destination)
+    newName = args.SEARCH
+
     if args.no_rename == False:
         new_name = os.path.join(destination, f'{newName}.srt')
         logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
