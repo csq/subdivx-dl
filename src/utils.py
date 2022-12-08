@@ -85,12 +85,12 @@ def printMenuContentDir(pathDir):
             
             # Print table with of the subtitles avaliable
             print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
-            
             print('\n[1~9] Select')
             print('[ 0 ] Exit\n')
 
             try:
                 selection = int(input('Selection: '))-1
+                fileName = header[selection+1][1]
             except ValueError:
                 print('\nInput only numbers')
                 time.sleep(1)
@@ -109,7 +109,7 @@ def printMenuContentDir(pathDir):
                 exit(0)
 
             # Return name file with extension .srt selected
-            return os.path.basename(header[selection+1][1])
+            return fileName
     else:
         # Return name file with extension .srt exclude .zip or .rar
         for x in range(2):
