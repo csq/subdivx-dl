@@ -2,7 +2,7 @@
 
 import urllib3
 
-from src.utils import *
+from utils import *
 
 SUBDIVX_URL = "https://www.subdivx.com/"
 
