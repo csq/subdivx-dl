@@ -4,15 +4,15 @@ CLI tool for download subtitle for the site www.subdivx.com
 
 ## INSTALLATION
 
-You can install subdivx-dl using for the moment this a workaround:  
+You can install subdivx-dl using pip command:  
 
-  Change permission
+  Download repository
 
-    sudo chmod +x /{directory}/subdivx-dl/subdivx-dl
+    git clone www.github.com/csq/subdivx-dl
 
-Add path to .bashrc or .zshrc
+Enter into the folder and execute
 
-    export PATH=$PATH:/{directory}/subdivx-dl/subdivx-dl
+    pip install .
 
 
 ### DEPENDENCIES
