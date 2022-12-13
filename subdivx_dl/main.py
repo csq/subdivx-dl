@@ -4,7 +4,7 @@
 
 import urllib3
 
-from utils import *
+from .utils import *
 
 SUBDIVX_URL = "https://www.subdivx.com/"
 
@@ -20,7 +20,7 @@ def main():
 	while (1):
 		# Clear screen
 		clear()
-		
+
 		# Show Search Results
 		printSearchResult(titleList, downloadList, dateList, userList)
 
