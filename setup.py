@@ -13,12 +13,12 @@ setup(
     description='A subtitle downloader for the website subdvix.com',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    package_dir={'': 'subdivx-dl'},
-    packages=setuptools.find_packages(where='subdivx-dl'),
+    packages=['subdivx_dl'],
+    py_modules=['subdivx_dl.utils'],
     install_requires=requirements,
     entry_points={
         'console_scripts':[
-            'subdivx-dl=main:main'
+            'subdivx-dl=subdivx_dl.main:main'
         ]
     },
 )
