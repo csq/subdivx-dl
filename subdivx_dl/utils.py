@@ -27,6 +27,7 @@ parser.add_argument('SEARCH', help='name of the tv serie or movie to search for 
 parser.add_argument('-v', '--version', action='version', version='2023.07.13')
 parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
 parser.add_argument('-l', '--location', help='destination directory')
+parser.add_argument('-g', '--grid', help='show results in a grid', action='store_true')
 parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('--order-by-downloads', help='order results by downloads', action='store_true')
 parser.add_argument('--order-by-dates', help='order results by dates', action='store_true')
@@ -64,7 +65,7 @@ def unrar(fileRar, destination):
     sp = Popen(args)
     sp.wait()
 
-def printMenuContentDir(pathDir):
+def printMenuContentDir(args, pathDir):
     header = [['N°', 'File name']]
     files = os.listdir(pathDir)
 
@@ -87,7 +88,11 @@ def printMenuContentDir(pathDir):
             clear()
             
             # Print table with of the subtitles avaliable
-            print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
+            if (args.grid == False):
+                print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
+            else:
+                print(tabulate(header, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
+
             print('\n[1~9] Select')
             print('[ 0 ] Exit\n')
 
@@ -126,7 +131,7 @@ def printMenuContentDir(pathDir):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
-    fileNameSelect = printMenuContentDir(pathFile)
+    fileNameSelect = printMenuContentDir(args, pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
     
     logging.debug('Moves subtitles to %s', destination)
@@ -272,7 +277,7 @@ def getDataPage(args, poolManager, url, search, pageNum):
 
     return titleList, descriptionList, urlList, downloadList, userList, dateList
 
-def printSearchResult(titleList, downloadList, dateList, userList):
+def printSearchResult(args, titleList, downloadList, dateList, userList):
     # Mix data
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
 
@@ -289,9 +294,13 @@ def printSearchResult(titleList, downloadList, dateList, userList):
         row.clear()
         index = index + 1
 
-    print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
+    # Check flag --grid
+    if (args.grid == False):
+        print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
+    else:
+        print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', colalign=('center', 'center','decimal', 'center', 'center')))
 
-def printSelectDescription(selection, descriptionList):
+def printSelectDescription(args, selection, descriptionList):
     description_select = [['Description']]
     aux = descriptionList[selection].splitlines()
     words = aux[0].split()
@@ -310,8 +319,12 @@ def printSelectDescription(selection, descriptionList):
             line = ""
             count = 0
     description_select.append([line])
-    
-    print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='center'))
+
+    # Check flag --grid
+    if (args.grid == False):
+        print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='center'))
+    else:
+        print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='center'))
 
 def getSubtitle(args, request, url):
     print('Working ...')

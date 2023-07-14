@@ -23,7 +23,7 @@ def main():
 		clear()
 
 		# Show Search Results
-		printSearchResult(titleList, downloadList, dateList, userList)
+		printSearchResult(args, titleList, downloadList, dateList, userList)
 
 		if len(titleList) == 100 and PAGE_NUM == 1:
 			print('\n[ n ] Next page')
@@ -80,7 +80,7 @@ def main():
 			exit(0)
 
 		clear()
-		printSelectDescription(selection, descriptionList)
+		printSelectDescription(args, selection, descriptionList)
 
 		print('\n[ 1 ] Download')
 		print('[ 0 ] Exit\n')
