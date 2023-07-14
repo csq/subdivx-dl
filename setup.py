@@ -7,7 +7,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='subdivx-dl',
-    version='2022.12.12',
+    version='2023.07.13',
     url='https://github.com/csq/subdivx-dl',
     license='GPLv3+',
     description='A subtitle downloader for the website subdvix.com',
