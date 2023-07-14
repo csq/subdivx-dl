@@ -19,8 +19,8 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description='Subdvix-dl is a subtitle downloader for the website subdvix.com',
     epilog='''Disclaimer: subdvix.com not involve in this development.\n
-            \rAny comments about this software make it in:\n \
-            \r<www.github.com/csq/subdivx-dl> or <www.gitlab.com/csq1/subdivx-dl>'''
+            \rAny bug report, questions about this software do it at\n \
+            \r<www.github.com/csq/subdivx-dl/issues>'''
 )
 
 parser.add_argument('SEARCH', help='name of the tv serie or movie to search for subtitle')
