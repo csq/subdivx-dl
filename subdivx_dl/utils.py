@@ -53,7 +53,7 @@ def unzip(fileZip, destination):
         with zipfile.ZipFile(fileZip, 'r') as z:
             logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if file.endswith('.srt'):
+                if file.endswith(('.srt', '.SRT')):
                     z.extract(file, destination)
     except:
         logging.error('File corrupt')
@@ -74,7 +74,7 @@ def printMenuContentDir(args, pathDir):
     index = 1
     x = 0
     while (x < len(files)):
-        if files[x].endswith('.srt'):
+        if files[x].endswith(('.srt', '.SRT')):
             data.append(index)
             data.append(os.path.basename(files[x]))
             header.append(data[:])
@@ -127,7 +127,7 @@ def printMenuContentDir(args, pathDir):
     else:
         # Return name file with extension .srt exclude .zip or .rar
         for x in range(2):
-            if files[x].endswith('.srt'):
+            if files[x].endswith(('.srt', '.SRT')):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
