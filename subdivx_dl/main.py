@@ -7,7 +7,7 @@ from .utils import *
 
 SUBDIVX_URL = "https://www.subdivx.com/"
 
-args = parser.parse_args()
+args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0'}

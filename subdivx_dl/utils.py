@@ -1,8 +1,6 @@
 # Copyright: (c) 2022, subdivx-dl
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-import argparse
-import logging
 import zipfile
 import shutil
 import time
@@ -10,40 +8,13 @@ import sys
 import os
 import re
 
-from subprocess import Popen
 from bs4 import BeautifulSoup
 from tabulate import tabulate
-
-# Parser for command-line
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    description='Subdvix-dl is a subtitle downloader for the website subdvix.com',
-    epilog='''Disclaimer: subdvix.com not involve in this development.\n
-            \rAny bug report, questions about this software do it at\n \
-            \r<www.github.com/csq/subdivx-dl/issues>'''
-)
-
-parser.add_argument('SEARCH', help='name of the tv serie or movie to search for subtitle')
-parser.add_argument('-v', '--version', action='version', version='2023.07.13')
-parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
-parser.add_argument('-l', '--location', help='destination directory')
-parser.add_argument('-g', '--grid', help='show results in a grid', action='store_true')
-parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
-parser.add_argument('--order-by-downloads', help='order results by downloads', action='store_true')
-parser.add_argument('--order-by-dates', help='order results by dates', action='store_true')
-
-# Create and configure logger
-logging.basicConfig(
-    filename='/tmp/subdivx-dl.log',
-    filemode='w',
-    encoding='utf-8',
-    level=logging.DEBUG,
-    format='[%(asctime)s] |%(levelname)s| %(message)s',
-    datefmt='%d/%m/%y %H:%M:%S'
-)
+from subdivx_dl import helper
+from subprocess import Popen
 
 def downloadFile(url, location):
-    logging.info('Downloading archive from: %s in %s', url, location)
+    helper.logging.info('Downloading archive from: %s in %s', url, location)
     args = ['wget', '--content-disposition', '-q', '-c', '-P', location, url]
     output = Popen(args)
     output.wait()
@@ -51,16 +22,16 @@ def downloadFile(url, location):
 def unzip(fileZip, destination):
     try:
         with zipfile.ZipFile(fileZip, 'r') as z:
-            logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
+            helper.logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
                 if file.endswith(('.srt', '.SRT')):
                     z.extract(file, destination)
     except:
-        logging.error('File corrupt')
+        helper.logging.error('File corrupt')
         print('Invalid file')
 
 def unrar(fileRar, destination):
-    logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
+    helper.logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
     args = ['unrar', 'x', '-inul', '-o+', fileRar, destination]
     sp = Popen(args)
     sp.wait()
@@ -116,9 +87,9 @@ def printMenuContentDir(args, pathDir):
                 # Remove temp folder
                 try:
                     shutil.rmtree(pathDir)
-                    logging.info('Delete temporal directory %s', pathDir)
+                    helper.logging.info('Delete temporal directory %s', pathDir)
                 except OSError as error:
-                    logging.error(error)
+                    helper.logging.error(error)
                 clear()
                 exit(0)
 
@@ -134,20 +105,20 @@ def movieSubtitle(args, pathFile, destination):
     fileNameSelect = printMenuContentDir(args, pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
     
-    logging.debug('Moves subtitles to %s', destination)
+    helper.logging.debug('Moves subtitles to %s', destination)
     newName = args.SEARCH
 
     if args.no_rename == False:
         new_name = os.path.join(destination, f'{newName}.srt')
-        logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
+        helper.logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
         os.rename(pathFileSelect, new_name)
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
-        logging.info('Just move subtitle [' + os.path.basename(pathFileSelect) + '] to [' + destination + ']')
+        helper.logging.info('Just move subtitle [' + os.path.basename(pathFileSelect) + '] to [' + destination + ']')
         os.rename(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
-    logging.debug('Moves subtitles to %s', destination)
+    helper.logging.debug('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
 
     # TV series season and episode names
@@ -173,19 +144,19 @@ def tvShowSubtitles(args, pathFile, destination):
                 # New name format example: Silicon Valley - S05E01.srt
                 new_name = serie + ' - ' + season + episode + '.srt'
             except Exception as e:
-                logging.error(e)
+                helper.logging.error(e)
                 file_dst = os.path.join(destination, files[index])
-                logging.info('No match Regex: Just move subtitle [' + files[index] + ']')
+                helper.logging.info('No match Regex: Just move subtitle [' + files[index] + ']')
                 os.rename(file_src, file_dst)
             else:
                 file_dst = os.path.join(destination, new_name)
-                logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
+                helper.logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
                 os.rename(file_src, file_dst)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif files[index].endswith('.srt'):
             file_dst = os.path.join(destination, files[index])
-            logging.info('Move subtitle [' + files[index] + '] to [' + destination + ']')
+            helper.logging.info('Move subtitle [' + files[index] + '] to [' + destination + ']')
             os.rename(file_src, file_dst)
         index = index + 1
 
@@ -213,7 +184,7 @@ def getDataPage(args, poolManager, url, search, pageNum):
     elif args.order_by_dates == True:
         payload["oxfecha"] = "2"
 
-    logging.debug('Starting request to subdivx.com with search query: %s', search)
+    helper.logging.debug('Starting request to subdivx.com with search query: %s', search)
     request = poolManager.request('POST', url, fields=payload)
     page = BeautifulSoup(request.data, 'html.parser')
 
@@ -224,7 +195,7 @@ def getDataPage(args, poolManager, url, search, pageNum):
 
     if not results_descriptions:
         print('Subtitles not found')
-        logging.info('Subtitles not found for %s', search)
+        helper.logging.info('Subtitles not found for %s', search)
         sys.exit(0)
 
     titleList = list()
@@ -362,9 +333,9 @@ def getSubtitle(args, request, url):
     # Remove temp folder
     try:
         shutil.rmtree(fpath)
-        logging.info('Delete temporal directory %s', fpath)
+        helper.logging.info('Delete temporal directory %s', fpath)
     except OSError as error:
-        logging.error(error)
+        helper.logging.error(error)
 
     clear()
     print('Done')
