@@ -5,7 +5,7 @@
 import urllib3
 from .utils import *
 
-SUBDIVX_URL = "https://www.subdivx.com/"
+SUBDIVX_URL = 'https://www.subdivx.com/'
 
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH

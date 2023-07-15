@@ -172,17 +172,17 @@ def renameAndMoveSubtitle(args, pathFile, destination):
 def getDataPage(args, poolManager, url, search, pageNum):
 
     payload = {
-        "buscar2": search,
-        "accion": "5",
-        "masdesc": "",
-        "pg": pageNum
+        'buscar2': search,
+        'accion': '5',
+        'masdesc': '',
+        'pg': pageNum
     }
 
     # Check flag --order-by
     if args.order_by_downloads == True:
-        payload["oxdown"] = "1"
+        payload['oxdown'] = '1'
     elif args.order_by_dates == True:
-        payload["oxfecha"] = "2"
+        payload['oxfecha'] = '2'
 
     helper.logging.debug('Starting request to subdivx.com with search query: %s', search)
     request = poolManager.request('POST', url, fields=payload)
@@ -205,7 +205,7 @@ def getDataPage(args, poolManager, url, search, pageNum):
     userList = list()
     dateList = list()
 
-    separator = "Subtitulos de "
+    separator = 'Subtitulos de '
     for title in results_url:
         string = title.get_text()
         titleList.append(string[len(separator):])
@@ -240,7 +240,7 @@ def getDataPage(args, poolManager, url, search, pageNum):
         else:
             downloadCount.append('-')
 
-    banWord = ["tÃ­tulo", "fecha", "downloads", "subtitulos en espaÃ±ol"]
+    banWord = ['tÃ­tulo', 'fecha', 'downloads', 'subtitulos en espaÃ±ol']
     for user in results_user:
         userName = user.get_text()
         if userName not in banWord:
@@ -277,17 +277,17 @@ def printSelectDescription(args, selection, descriptionList):
     words = aux[0].split()
 
     maxLengh =  10
-    line = ""
+    line = ''
     count = 0
 
     for word in words:
         if (count <= maxLengh):
-            line = line+" "+word
+            line = line+' '+word
             count = count + 1
         else:
-            a = line+" "+word
+            a = line+' '+word
             description_select.append([a])
-            line = ""
+            line = ''
             count = 0
     description_select.append([line])
 
