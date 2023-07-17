@@ -122,7 +122,7 @@ def tvShowSubtitles(args, pathFile, destination):
     files = os.listdir(pathFile)
 
     # TV series season and episode names
-    pattern_series_tv = '(.*?)[.\s][sS](\d{1,2})[eE](\d{1,3}).*'
+    pattern_series_tv = '(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
 
     index = 0
 
@@ -133,13 +133,20 @@ def tvShowSubtitles(args, pathFile, destination):
             result = re.search(pattern_series_tv, files[index])
 
             try:
-                get_name_serie = result.group(1)
+                get_tv_show = result.group(1)
                 get_season = result.group(2)
                 get_episode = result.group(3)
 
-                serie = get_name_serie.replace('.',' ')
+                serie = get_tv_show
                 season = 'S' + get_season
                 episode = 'E' + get_episode
+
+                exclude = ['.', '-']
+                for i in exclude:
+                    serie = serie.replace(i, ' ')
+
+                # Remove double spaces and end space in name tv show
+                serie = serie.replace('  ', '').rstrip()
 
                 # New name format example: Silicon Valley - S05E01.srt
                 new_name = serie + ' - ' + season + episode + '.srt'
