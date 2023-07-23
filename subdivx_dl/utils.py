@@ -160,8 +160,13 @@ def tvShowSubtitles(args, pathFile, destination):
                 # Remove double spaces and end space in name tv show
                 serie = serie.replace('  ', '').rstrip()
 
-                # New name format example: Silicon Valley - S05E01.srt
-                new_name = serie + ' - ' + season + episode + '.srt'
+                # Format name example:
+                # Serie - S05E01.srt | S05E01.srt
+                if serie != '':
+                    new_name = serie + ' - ' + season + episode + '.srt'
+                else:
+                    new_name = season + episode + '.srt'
+
             except Exception as e:
                 helper.logging.error(e)
                 file_dst = os.path.join(destination, files[index])
