@@ -29,10 +29,22 @@ def unzip(fileZip, destination):
     except:
         helper.logging.error('File corrupt')
         print('Invalid file')
+    else:
+        moveAllToParentFolder(destination)
+
+
+def moveAllToParentFolder(pathDir):
+    for (root, dirs, files) in os.walk(pathDir, topdown=True):
+        for d in dirs:
+            if d != '__MACOSX':
+                subfolder = os.path.join(pathDir, dirs[0])
+                for (root, dirs, files) in os.walk(subfolder, topdown=True):
+                    for name in files:
+                        os.rename(os.path.join(root, name), os.path.join(pathDir, name))
 
 def unrar(fileRar, destination):
     helper.logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
-    args = ['unrar', 'x', '-inul', '-o+', fileRar, destination]
+    args = ['unrar', 'e', '-r', '-inul', '-o+', fileRar, destination]
     sp = Popen(args)
     sp.wait()
 
