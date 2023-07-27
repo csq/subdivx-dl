@@ -366,3 +366,14 @@ def getSubtitle(args, request, url):
 
 def clear():
     os.system('clr' if os.name == 'nt' else 'clear')
+
+# Menu section
+def mainMenu(titleList, pageNum):
+    if len(titleList) == 100 and pageNum == 1:
+        print('\n[ n ] Next page')
+    elif len(titleList) == 100 and pageNum > 1:
+        print('\n[n/p] Next/Previous page')
+    elif len(titleList) < 100 and pageNum > 1:
+        print('\n[ p ] Previous page')
+    print('\n[1~9] Select')
+    print('[ 0 ] Exit\n')

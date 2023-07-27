@@ -24,15 +24,7 @@ def main():
 		# Show Search Results
 		printSearchResult(args, titleList, downloadList, dateList, userList)
 
-		if len(titleList) == 100 and PAGE_NUM == 1:
-			print('\n[ n ] Next page')
-		elif len(titleList) == 100 and PAGE_NUM > 1:
-			print('\n[n/p] Next/Previous page')
-		elif len(titleList) < 100 and PAGE_NUM > 1:
-			print('\n[ p ] Previous page')
-		print('\n[1~9] Select')
-		print('[ 0 ] Exit\n')
-
+		mainMenu(titleList, PAGE_NUM)
 		inputUser = input('Selection: ')
 
 		try:
