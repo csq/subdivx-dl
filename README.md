@@ -35,6 +35,7 @@ Libraries:
     -v, --version                   Print program version and exit
     -s, --season                    Download full season subtitles
     -l, --location LOCATION         Download subtitle in destination directory
+    -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
 
     --order-by-downloads            Print order results by downloads
@@ -72,6 +73,9 @@ Description view
 
 Selection view: in case of having multiple subtitles
 ![example](img/img-03.png)
+
+Search results view in a grid format
+![example](img/img-04.png)
 
 ### Author
 subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
