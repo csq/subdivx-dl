@@ -3,21 +3,24 @@
 
 import zipfile
 import shutil
+import json
 import time
 import sys
 import os
 import re
 
-from bs4 import BeautifulSoup
 from tabulate import tabulate
 from subdivx_dl import helper
 from subprocess import Popen
 
-def downloadFile(url, location):
+def downloadFile(userAgent, url, location):
     helper.logging.info('Downloading archive from: %s in %s', url, location)
-    args = ['wget', '--content-disposition', '-q', '-c', '-P', location, url]
-    output = Popen(args)
-    output.wait()
+    sv = ['sub9/', 'sub8/', 'sub7/', 'sub4/']
+    for i in sv:
+        url_2 = url[:20] + i + url[20:]
+        args = ['wget', '--user-agent=' + userAgent['user-agent'], '-q', '-c', '-P', location, url_2 + '.zip', url_2 + '.rar']
+        output = Popen(args)
+        output.wait()
 
 def unzip(fileZip, destination):
     try:
@@ -31,7 +34,6 @@ def unzip(fileZip, destination):
         print('Invalid file')
     else:
         moveAllToParentFolder(destination)
-
 
 def moveAllToParentFolder(pathDir):
     for (root, dirs, files) in os.walk(pathDir, topdown=True):
@@ -193,84 +195,51 @@ def renameAndMoveSubtitle(args, pathFile, destination):
         # Move and rename bulk srt
         tvShowSubtitles(args, pathFile, destination)
 
-def getDataPage(args, poolManager, url, search, pageNum):
+def getDataPage(args, poolManager, url, search):
 
     payload = {
-        'buscar2': search,
-        'accion': '5',
-        'masdesc': '',
-        'pg': pageNum
+        'buscar': search,
+        'filtros': '',
+        'tabla': 'resultados'
     }
-
-    # Check flag --order-by
-    if args.order_by_downloads == True:
-        payload['oxdown'] = '1'
-    elif args.order_by_dates == True:
-        payload['oxfecha'] = '2'
 
     helper.logging.debug('Starting request to subdivx.com with search query: %s', search)
     request = poolManager.request('POST', url, fields=payload)
-    page = BeautifulSoup(request.data, 'html.parser')
 
-    results_descriptions = page.find_all('div', id='buscador_detalle_sub')
-    results_url = page.find_all('a', {'class': 'titulo_menu_izq'})
-    results_downloads = page.find_all('div', id='buscador_detalle_sub_datos')
-    results_user = page.find_all('a', {'class': 'link1'})
-
-    if not results_descriptions:
+    try:
+        data = json.loads(json.dumps(request.json().get('aaData')))
+    except JSONDecodeError:
         print('Subtitles not found')
-        helper.logging.info('Subtitles not found for %s', search)
+        helper.logging.error('Response could not be serialized')
         sys.exit(0)
 
+    idList = list()
     titleList = list()
     descriptionList = list()
-    urlList = list()
     downloadList = list()
     userList = list()
     dateList = list()
 
-    separator = 'Subtitulos de '
-    for title in results_url:
-        string = title.get_text()
-        titleList.append(string[len(separator):])
+    for key in data:
+        idList.append(key['id'])
+        titleList.append(key['titulo'])
+        descriptionList.append(key['descripcion'])
+        downloadList.append(key['descargas'])
+        userList.append(key['nick'])
 
-    for description in results_descriptions:
-        text = description.get_text()
-        if text != '':
-            descriptionList.append(text)
-        else:
-            descriptionList.append('Whitout description')
-
-    for link in results_url:
-        urlList.append(link.get('href'))
-
-    patternNumber = '\d+(?:\,\d+)?'
-    patternDate = '(\d+/\d+/\d+)'
-    sizeText = 20
-    for download in results_downloads:
-        text = download.get_text()
-
-        date = re.search(patternDate, text)
-        if date != None:
-            dateList.append(date.group())
-        else:
+        # Format date (year-month-day)
+        match = re.search(r'(\d+-\d+-\d+)', str(key['fecha_subida']))
+        if match is None:
             dateList.append('-')
-
-        subText = text[:sizeText]
-        downloadCount = re.search(patternNumber, subText)
-
-        if downloadCount != None:
-            downloadList.append(downloadCount.group())
         else:
-            downloadCount.append('-')
+            dateList.append(match.group(1))
 
-    banWord = ['tÃ­tulo', 'fecha', 'downloads', 'subtitulos en espaÃ±ol']
-    for user in results_user:
-        userName = user.get_text()
-        if userName not in banWord:
-            userList.append(userName)
+    if not idList:
+        print('Subtitles not found')
+        helper.logging.info('Subtitles not found for %s', search)
+        sys.exit(0)
 
-    return titleList, descriptionList, urlList, downloadList, userList, dateList
+    return titleList, descriptionList, idList, downloadList, userList, dateList
 
 def printSearchResult(args, titleList, downloadList, dateList, userList):
     # Mix data
@@ -321,27 +290,28 @@ def printSelectDescription(args, selection, descriptionList):
     else:
         print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='center'))
 
-def getSubtitle(args, request, url):
+def getSubtitle(userAgent, args, url):
     print('Working ...')
-    # Scrap page download srt
-    page = BeautifulSoup(request.data, 'html.parser')
-    urlFile = page.find('a', {'class': 'link1'})
-
-    urlFileToDownload = url + urlFile.get('href')
 
     # Check flag --location
     LOCATION_DESTINATION = args.location
     
     if (LOCATION_DESTINATION == None):
         fpath = os.path.join(os.getcwd(), '.tmp', '')
-        downloadFile(urlFileToDownload, fpath)
+        downloadFile(userAgent, url, fpath)
         parent_folder = os.getcwd()
     else:
         fpath = os.path.join(LOCATION_DESTINATION, '.tmp', '')
-        downloadFile(urlFileToDownload, fpath)
+        downloadFile(userAgent, url, fpath)
         parent_folder = LOCATION_DESTINATION
 
-    listDirectory = os.listdir(fpath)
+    try:
+        listDirectory = os.listdir(fpath)
+    except FileNotFoundError:
+        print('Subtitle not found because server missing file')
+        helper.logging.info('Remote server not found file')
+        exit(0)
+
 
     for file in listDirectory:
         pathFile = os.path.join(fpath, file)
@@ -368,12 +338,6 @@ def clear():
     os.system('clr' if os.name == 'nt' else 'clear')
 
 # Menu section
-def mainMenu(titleList, pageNum):
-    if len(titleList) == 100 and pageNum == 1:
-        print('\n[ n ] Next page')
-    elif len(titleList) == 100 and pageNum > 1:
-        print('\n[n/p] Next/Previous page')
-    elif len(titleList) < 100 and pageNum > 1:
-        print('\n[ p ] Previous page')
+def mainMenu():
     print('\n[1~9] Select')
     print('[ 0 ] Exit\n')

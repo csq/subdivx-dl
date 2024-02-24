@@ -4,18 +4,18 @@
 import urllib3
 from .utils import *
 
-SUBDIVX_URL = 'https://www.subdivx.com/'
+SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
 
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
-user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0'}
+user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'}
 http = urllib3.PoolManager(headers=user_agent)
 
 def main():
 
 	PAGE_NUM = 1
-	titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE, PAGE_NUM)
+	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
 	
 	while (1):
 		# Clear screen
@@ -24,32 +24,16 @@ def main():
 		# Show Search Results
 		printSearchResult(args, titleList, downloadList, dateList, userList)
 
-		mainMenu(titleList, PAGE_NUM)
+		mainMenu()
 		inputUser = input('Selection: ')
 
 		try:
 			selection = int(inputUser)-1
-			url = urlList[selection]
+			url = 'https://subdivx.com/'+str(idList[selection])
 		except ValueError:
-			if len(titleList) == 100 and PAGE_NUM > 1:
-				if inputUser == 'n':
-					PAGE_NUM = PAGE_NUM + 1
-					titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE, PAGE_NUM)
-					continue
-				elif inputUser == 'p':
-					PAGE_NUM = PAGE_NUM - 1
-					titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE, PAGE_NUM)
-					continue
-			elif len(titleList) < 100 and PAGE_NUM > 1:
-				if inputUser == 'p':
-					PAGE_NUM = PAGE_NUM - 1
-					titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE, PAGE_NUM)
-					continue
-			elif len(titleList) == 100 and PAGE_NUM == 1:
-				if inputUser == 'n':
-					PAGE_NUM = PAGE_NUM + 1
-					titleList, descriptionList, urlList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE, PAGE_NUM)
-					continue
+			if len(titleList) == 100:
+				titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
+				continue
 			else:
 				print('\nInput valid options')
 				time.sleep(1)
@@ -85,8 +69,7 @@ def main():
 
 		if select_action == 1:
 			clear()
-			request = http.request('GET', url)
-			getSubtitle(args, request, SUBDIVX_URL)
+			getSubtitle(user_agent, args, url)
 			exit(0)
 		elif select_action == 0:
 			clear()

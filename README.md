@@ -16,7 +16,6 @@ Enter into the folder and execute
 Python versions 3.0+ are supported. Other versions and implementations may or may not work correctly.
 
 Libraries:
-* BeautifulSoup
 * Tabulate
 * Urllib3
 
@@ -38,9 +37,6 @@ Libraries:
     -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
 
-    --order-by-downloads            Print order results by downloads
-    --order-by-dates                Print order results by dates
-
 #### Examples
 These examples show habitual operation
 
@@ -51,10 +47,6 @@ Download single subtitle in actual directory
 Download multiples subtitles in same directory
 
     subdivx-dl 'Silicon Valley S01' -s
-
-Search and order by most downloaded
-
-    subdivx-dl 'Silicon Valley S01E01' --order-by-downloads
 
 Download subtitle in specific directory (directory is create if it does not exist)
 
