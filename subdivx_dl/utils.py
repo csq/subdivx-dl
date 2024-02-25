@@ -241,6 +241,30 @@ def getDataPage(args, poolManager, url, search):
 
     return titleList, descriptionList, idList, downloadList, userList, dateList
 
+def getComments(poolManager, url, id_sub):
+
+    payload = {
+        'getComentarios': id_sub
+    }
+
+    request = poolManager.request('POST', url, fields=payload)
+
+    try:
+        data = json.loads(json.dumps(request.json().get('aaData')))
+    except JSONDecodeError:
+        print('Comments not found')
+        helper.logging.error('Response could not be serialized')
+        sys.exit(0)
+
+    commentList = []
+
+    index = 1
+    for key in data:
+        commentList.append([index, key['comentario']])
+        index = index + 1 
+
+    return commentList
+
 def printSearchResult(args, titleList, downloadList, dateList, userList):
     # Mix data
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
@@ -333,6 +357,15 @@ def getSubtitle(userAgent, args, url):
 
     clear()
     print('Done')
+
+def printSelectComments(args, commentList):
+    header = ['N°', 'Comments']
+
+    # Check flag --grid
+    if (args.grid == False):
+        print(tabulate(commentList, header, tablefmt='pretty', stralign='left'))
+    else:
+        print(tabulate(commentList, header, tablefmt='fancy_outline', stralign='left'))
 
 def clear():
     os.system('clr' if os.name == 'nt' else 'clear')

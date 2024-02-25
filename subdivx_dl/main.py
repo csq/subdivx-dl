@@ -29,7 +29,8 @@ def main():
 
 		try:
 			selection = int(inputUser)-1
-			url = 'https://subdivx.com/'+str(idList[selection])
+			id_subtitle = str(idList[selection])
+			url = 'https://subdivx.com/'+id_subtitle
 		except ValueError:
 			if len(titleList) == 100:
 				titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
@@ -56,6 +57,14 @@ def main():
 
 		clear()
 		printSelectDescription(args, selection, descriptionList)
+
+		# Checking flag for add comments view
+		if (args.comments == True):
+			commentList = getComments(http, SUBDIVX_URL, id_subtitle)
+			if not commentList:
+				pass
+			else:
+				printSelectComments(args, commentList)
 
 		print('\n[ 1 ] Download')
 		print('[ 0 ] Exit\n')

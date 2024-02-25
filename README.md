@@ -36,6 +36,7 @@ Libraries:
     -l, --location LOCATION         Download subtitle in destination directory
     -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
+    -c, --comments                  Show comments
 
 #### Examples
 These examples show habitual operation
@@ -56,6 +57,10 @@ Download subtitle but not renaming file (keep name of origin)
 
     subdivx-dl 'Matrix' -nr
 
+Search subtitle including comments
+
+    subdivx-dl 'Halo S01E01' -c
+
 ### Screenshots
 Search results view
 ![example](img/img-01.png)
@@ -68,6 +73,9 @@ Selection view: in case of having multiple subtitles
 
 Search results view in a grid format
 ![example](img/img-04.png)
+
+Description view with comments in a grid format
+![example](img/img-05.png)
 
 ### Author
 subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
