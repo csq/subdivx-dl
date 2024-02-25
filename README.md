@@ -1,5 +1,5 @@
 # Subdivx-dl
-CLI tool for download subtitle for the site www.subdivx.com
+CLI tool for search and download subtitles for the site www.subdivx.com
 
 ## INSTALLATION
 You can install subdivx-dl using pip command:
@@ -36,24 +36,24 @@ Libraries:
     -l, --location LOCATION         Download subtitle in destination directory
     -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
-    -c, --comments                  Show comments
+    -c, --comments                  Show subtitles comments in search
 
 #### Examples
 These examples show habitual operation
 
-Download single subtitle in actual directory
+Search single subtitle in actual directory
 
     subdivx-dl 'Silicon Valley S01E01'
 
-Download multiples subtitles in same directory
+Search multiples subtitles in same directory
 
     subdivx-dl 'Silicon Valley S01' -s
 
-Download subtitle in specific directory (directory is create if it does not exist)
+Search subtitle in specific directory (directory is create if it does not exist)
 
     subdivx-dl 'Silicon Valley S01E01' -l ~/Downloads/MyDirectory/
 
-Download subtitle but not renaming file (keep name of origin)
+Search subtitle but not renaming file (keep name of origin)
 
     subdivx-dl 'Matrix' -nr
 
