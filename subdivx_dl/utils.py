@@ -15,9 +15,9 @@ from subprocess import Popen
 
 def downloadFile(userAgent, url, location):
     helper.logging.info('Downloading archive from: %s in %s', url, location)
-    sv = ['sub9/', 'sub8/', 'sub7/', 'sub4/']
-    for i in sv:
-        url_2 = url[:20] + i + url[20:]
+    sv = range(1, 10)
+    for i in reversed(sv):
+        url_2 = url[:20] + 'sub'+ str(i) +'/' + url[20:]
         args = ['wget', '--user-agent=' + userAgent['user-agent'], '-q', '-c', '-P', location, url_2 + '.zip', url_2 + '.rar']
         output = Popen(args)
         output.wait()
