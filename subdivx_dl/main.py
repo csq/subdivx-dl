@@ -39,9 +39,6 @@ def main():
 				print('\nInput valid options')
 				time.sleep(1)
 				continue
-			print('\nInput valid options')
-			time.sleep(1)
-			continue
 		except IndexError:
 			print('\nInput valid numbers')
 			time.sleep(1)
