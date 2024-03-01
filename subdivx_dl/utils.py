@@ -11,16 +11,34 @@ import re
 
 from tabulate import tabulate
 from subdivx_dl import helper
-from subprocess import Popen
+from subprocess import PIPE, Popen
+
+SUCCESSFULL = '0'
 
 def downloadFile(userAgent, url, location):
     helper.logging.info('Downloading archive from: %s in %s', url, location)
-    sv = range(1, 10)
-    for i in reversed(sv):
-        url_2 = url[:20] + 'sub'+ str(i) +'/' + url[20:]
-        args = ['wget', '--user-agent=' + userAgent['user-agent'], '-q', '-c', '-P', location, url_2 + '.zip', url_2 + '.rar']
-        output = Popen(args)
-        output.wait()
+    
+    sv = 9
+    stop = False
+
+    while(stop is False):
+        address = url[:20] + 'sub'+ str(sv) + '/' + url[20:]
+
+        cmd1 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.zip ; echo $?'
+        cmd2 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.rar ; echo $?'
+        
+        process = Popen("{}; {}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
+        process.wait()
+        response = process.communicate()[0]
+
+        helper.logging.info('Attempt on sv N°%d with url %s', sv, address)
+
+        if (SUCCESSFULL in response):
+            stop = True
+        elif(sv == 1):
+            stop = True
+        
+        sv = sv - 1
 
 def unzip(fileZip, destination):
     try:
