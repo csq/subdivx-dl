@@ -14,6 +14,7 @@ http = urllib3.PoolManager(headers=user_agent)
 
 def main():
 
+	# Get all data from search
 	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
@@ -29,21 +30,17 @@ def main():
 		# Show Search Results
 		printSearchResult(args, titleList, downloadList, dateList, userList)
 
-		mainMenu()
-		inputUser = input('Selection: ')
+		# Get the user selection
+		userInput = mainMenu()
 
 		try:
-			selection = int(inputUser)-1
+			selection = int(userInput) - 1
 			id_subtitle = str(idList[selection])
 			url = 'https://subdivx.com/'+id_subtitle
 		except ValueError:
-			if len(titleList) == 100:
-				titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
-				continue
-			else:
-				print('\nInput valid options')
-				time.sleep(1)
-				continue
+			print('\nInput valid options')
+			time.sleep(1)
+			continue
 		except IndexError:
 			print('\nInput valid numbers')
 			time.sleep(1)
@@ -68,17 +65,21 @@ def main():
 			else:
 				printSelectComments(args, commentList)
 
-		print('\n[ 1 ] Download')
-		print('[ 0 ] Exit\n')
+		# Show selection menu
+		userInput = selectMenu()
 
 		try:
-			select_action = int(input('Selection: '))
+			select_action = int(userInput)
 		except ValueError:
 			print('\nInput only numbers')
 			time.sleep(1)
 			continue
 
-		if select_action == 1:
+		if select_action > 1 or select_action <= -1:
+			print('\nInput valid numbers')
+			time.sleep(1)
+			continue
+		elif select_action == 1:
 			clear()
 			getSubtitle(user_agent, args, url)
 			exit(0)

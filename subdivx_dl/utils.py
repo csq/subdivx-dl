@@ -388,7 +388,16 @@ def printSelectComments(args, commentList):
 def clear():
     os.system('clr' if os.name == 'nt' else 'clear')
 
-# Menu section
 def mainMenu():
     print('\n[1~9] Select')
     print('[ 0 ] Exit\n')
+    
+    userInput = input('Selection: ')
+    return userInput
+
+def selectMenu():
+    print('\n[ 1 ] Download')
+    print('[ 0 ] Exit\n')
+
+    userInput = input('Selection: ')
+    return userInput
