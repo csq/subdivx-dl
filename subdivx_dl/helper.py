@@ -20,6 +20,7 @@ parser.add_argument('-l', '--location', help='destination directory')
 parser.add_argument('-g', '--grid', help='show results in a grid', action='store_true')
 parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('-c', '--comments', help='show comments', action='store_true')
+parser.add_argument('-f', '--first', help='download the first matching', action='store_true')
 
 # Create and configure logger
 logging.basicConfig(

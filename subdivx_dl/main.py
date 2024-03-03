@@ -14,8 +14,13 @@ http = urllib3.PoolManager(headers=user_agent)
 
 def main():
 
-	PAGE_NUM = 1
 	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
+
+	# Checking flag for switch to fast download mode
+	if(args.first == True):
+		url = 'https://subdivx.com/'+str(idList[0])
+		getSubtitle(user_agent, args, url)
+		exit(0)
 	
 	while (1):
 		# Clear screen
