@@ -24,10 +24,10 @@ def downloadFile(userAgent, url, location):
     while(stop is False):
         address = url[:20] + 'sub'+ str(sv) + '/' + url[20:]
 
-        cmd1 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.zip ; echo $?'
-        cmd2 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.rar ; echo $?'
+        cmd1 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip ; echo $?'
+        cmd2 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar ; echo $?'
         
-        process = Popen("{}; {}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
+        process = Popen("{};{}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
         process.wait()
         response = process.communicate()[0]
 
