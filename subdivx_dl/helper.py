@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('SEARCH', help='name of the tv serie or movie to search for subtitle')
-parser.add_argument('-v', '--version', action='version', version='2024.02.24')
+parser.add_argument('-v', '--version', action='version', version='2024.03.06')
 parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
 parser.add_argument('-l', '--location', help='destination directory')
 parser.add_argument('-g', '--grid', help='show results in a grid', action='store_true')
