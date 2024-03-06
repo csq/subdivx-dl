@@ -15,7 +15,7 @@ http = urllib3.PoolManager(headers=user_agent)
 def main():
 
 	# Get all data from search
-	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, http, SUBDIVX_URL, FIND_SUBTITLE)
+	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
 	if(args.first == True):
@@ -81,7 +81,7 @@ def main():
 			continue
 		elif select_action == 1:
 			clear()
-			getSubtitle(user_agent, args, url)
+			getSubtitle(args, user_agent, url)
 			exit(0)
 		elif select_action == 0:
 			clear()
