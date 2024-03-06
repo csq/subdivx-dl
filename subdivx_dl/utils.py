@@ -24,10 +24,10 @@ def downloadFile(userAgent, url, location):
     while(stop is False):
         address = url[:20] + 'sub'+ str(sv) + '/' + url[20:]
 
-        cmd1 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.zip ; echo $?'
-        cmd2 = 'wget --user-agent=' + '"{}"'.format(userAgent['user-agent']) + ' -qcP ' + location +' '+ address + '.rar ; echo $?'
+        cmd1 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip ; echo $?'
+        cmd2 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar ; echo $?'
         
-        process = Popen("{}; {}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
+        process = Popen("{};{}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
         process.wait()
         response = process.communicate()[0]
 
@@ -213,7 +213,7 @@ def renameAndMoveSubtitle(args, pathFile, destination):
         # Move and rename bulk srt
         tvShowSubtitles(args, pathFile, destination)
 
-def getDataPage(args, poolManager, url, search):
+def getDataPage(poolManager, url, search):
 
     payload = {
         'buscar': search,
@@ -276,10 +276,8 @@ def getComments(poolManager, url, id_sub):
 
     commentList = []
 
-    index = 1
     for key in data:
-        commentList.append([index, key['comentario']])
-        index = index + 1 
+        commentList.append(key['comentario'])
 
     return commentList
 
@@ -308,31 +306,40 @@ def printSearchResult(args, titleList, downloadList, dateList, userList):
 
 def printSelectDescription(args, selection, descriptionList):
     description_select = [['Description']]
-    aux = descriptionList[selection].splitlines()
-    words = aux[0].split()
+    words = descriptionList[selection].split()
 
-    maxLengh =  10
-    line = ''
+    maxLengh = 77
     count = 0
-
+    
+    line = ''
     for word in words:
-        if (count <= maxLengh):
-            line = line+' '+word
-            count = count + 1
-        else:
-            a = line+' '+word
-            description_select.append([a])
-            line = ''
-            count = 0
+        size_word = len(word)
+
+        if (count + size_word <= maxLengh):
+            line = '{} {}'.format(line, word)
+            count = count + size_word
+        elif (count + size_word > maxLengh):
+                # Slice word
+                missing = maxLengh - count
+                slice_1 = word[:missing]
+                slice_2 = word[missing:]
+
+                line = '{} {}'.format(line, slice_1)
+                count = count + len(slice_1)
+
+                if (count == maxLengh):
+                    description_select.append([line])
+                    line = '{}'.format(slice_2)
+                    count = len(slice_2)
     description_select.append([line])
 
     # Check flag --grid
     if (args.grid == False):
-        print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='center'))
+        print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='left'))
     else:
-        print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='center'))
+        print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
 
-def getSubtitle(userAgent, args, url):
+def getSubtitle(args, userAgent, url):
     print('Working ...')
 
     # Check flag --location
@@ -378,17 +385,52 @@ def getSubtitle(userAgent, args, url):
 
 def printSelectComments(args, commentList):
     header = ['N°', 'Comments']
+    comment = []
+
+    maxLengh = 77
+
+    for i in range(len(commentList)):
+        words = commentList[i].split()
+        
+        count = 0
+        line = ''
+
+        for word in words:
+            len_word = len(word)
+           
+            if (count + len_word < maxLengh):
+                line = '{} {}'.format(line, word)
+                count = count + len_word
+            elif (count + len_word >= maxLengh):
+                # Slice word
+                slice = []
+
+                missing = maxLengh - count
+                slice = word[:missing]
+
+                line = '{} {}'.format(line, slice)
+                count = count + len(slice)
+        comment.append([i + 1, line])
 
     # Check flag --grid
     if (args.grid == False):
-        print(tabulate(commentList, header, tablefmt='pretty', stralign='left'))
+        print(tabulate(comment, headers=header, tablefmt='pretty', colalign=('center', 'left')))
     else:
-        print(tabulate(commentList, header, tablefmt='fancy_outline', stralign='left'))
+        print(tabulate(comment, headers=header, tablefmt='fancy_outline', colalign=('center', 'left')))
 
 def clear():
     os.system('clr' if os.name == 'nt' else 'clear')
 
-# Menu section
 def mainMenu():
     print('\n[1~9] Select')
     print('[ 0 ] Exit\n')
+    
+    userInput = input('Selection: ')
+    return userInput
+
+def selectMenu():
+    print('\n[ 1 ] Download')
+    print('[ 0 ] Exit\n')
+
+    userInput = input('Selection: ')
+    return userInput

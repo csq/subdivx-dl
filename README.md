@@ -37,6 +37,7 @@ Libraries:
     -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
     -c, --comments                  Show subtitles comments in search
+    -f, --first                     Download the first matching
 
 #### Examples
 These examples show habitual operation
@@ -45,7 +46,7 @@ Search single subtitle in actual directory
 
     subdivx-dl 'Silicon Valley S01E01'
 
-Search multiples subtitles in same directory
+Search and download multiples subtitles in same directory
 
     subdivx-dl 'Silicon Valley S01' -s
 
@@ -60,6 +61,10 @@ Search subtitle but not renaming file (keep name of origin)
 Search subtitle including comments
 
     subdivx-dl 'Halo S01E01' -c
+
+Download subtitle directly
+
+    subdivx-dl 'It Crowd S02E01' -f
 
 ### Screenshots
 Search results view
