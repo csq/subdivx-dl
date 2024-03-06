@@ -18,7 +18,7 @@ def main():
 	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
-	if(args.first == True):
+	if (args.first == True):
 		url = 'https://subdivx.com/'+str(idList[0])
 		getSubtitle(args, user_agent, url)
 		exit(0)
@@ -46,11 +46,11 @@ def main():
 			time.sleep(1)
 			continue
 
-		if selection < -1:
+		if (selection < -1):
 			print('\nInput only positive numbers')
 			time.sleep(1)
 			continue
-		elif selection == -1:
+		elif (selection == -1):
 			clear()
 			exit(0)
 
@@ -60,7 +60,7 @@ def main():
 		# Checking flag for add comments view
 		if (args.comments == True):
 			commentList = getComments(http, SUBDIVX_URL, id_subtitle)
-			if not commentList:
+			if (not commentList):
 				pass
 			else:
 				printSelectComments(args, commentList)
@@ -75,15 +75,15 @@ def main():
 			time.sleep(1)
 			continue
 
-		if select_action > 1 or select_action <= -1:
+		if (select_action > 1) or (select_action <= -1):
 			print('\nInput valid numbers')
 			time.sleep(1)
 			continue
-		elif select_action == 1:
+		elif (select_action == 1):
 			clear()
 			getSubtitle(args, user_agent, url)
 			exit(0)
-		elif select_action == 0:
+		elif (select_action == 0):
 			clear()
 			exit(0)
 

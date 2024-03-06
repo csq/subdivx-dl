@@ -21,7 +21,7 @@ def downloadFile(userAgent, url, location):
     sv = 9
     stop = False
 
-    while(stop is False):
+    while (stop is False):
         address = url[:20] + 'sub'+ str(sv) + '/' + url[20:]
 
         cmd1 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip ; echo $?'
@@ -35,7 +35,7 @@ def downloadFile(userAgent, url, location):
 
         if (SUCCESSFULL in response):
             stop = True
-        elif(sv == 1):
+        elif (sv == 1):
             stop = True
         
         sv = sv - 1
@@ -45,7 +45,7 @@ def unzip(fileZip, destination):
         with zipfile.ZipFile(fileZip, 'r') as z:
             helper.logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if file.endswith(('.srt', '.SRT')):
+                if (file.endswith(('.srt', '.SRT'))):
                     z.extract(file, destination)
     except:
         helper.logging.error('File corrupt')
@@ -56,7 +56,7 @@ def unzip(fileZip, destination):
 def moveAllToParentFolder(pathDir):
     for (root, dirs, files) in os.walk(pathDir, topdown=True):
         for d in dirs:
-            if d != '__MACOSX':
+            if (d != '__MACOSX'):
                 subfolder = os.path.join(pathDir, dirs[0])
                 for (root, dirs, files) in os.walk(subfolder, topdown=True):
                     for name in files:
@@ -77,7 +77,7 @@ def printMenuContentDir(args, pathDir):
     index = 1
     x = 0
     while (x < len(files)):
-        if files[x].endswith(('.srt', '.SRT')):
+        if (files[x].endswith(('.srt', '.SRT'))):
             data.append(index)
             data.append(os.path.basename(files[x]))
             header.append(data[:])
@@ -85,8 +85,8 @@ def printMenuContentDir(args, pathDir):
             index = index + 1
         x = x + 1
 
-    if index > 2:
-        while(True):
+    if (index > 2):
+        while (True):
             # Clear screen
             clear()
             
@@ -96,11 +96,10 @@ def printMenuContentDir(args, pathDir):
             else:
                 print(tabulate(header, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
 
-            print('\n[1~9] Select')
-            print('[ 0 ] Exit\n')
+            userInput = selectMenu()
 
             try:
-                selection = int(input('Selection: '))-1
+                selection = int(userInput) - 1
                 fileName = header[selection+1][1]
             except ValueError:
                 print('\nInput only numbers')
@@ -111,11 +110,11 @@ def printMenuContentDir(args, pathDir):
                 time.sleep(1)
                 continue
 
-            if selection < -1:
+            if (selection < -1):
                 print('\nInput only positive numbers')
                 time.sleep(1)
                 continue
-            elif selection == -1:
+            elif (selection == -1):
                 # Remove temp folder
                 try:
                     shutil.rmtree(pathDir)
@@ -130,7 +129,7 @@ def printMenuContentDir(args, pathDir):
     else:
         # Return name file with extension .srt exclude .zip or .rar
         for x in range(2):
-            if files[x].endswith(('.srt', '.SRT')):
+            if (files[x].endswith(('.srt', '.SRT'))):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
@@ -140,13 +139,13 @@ def movieSubtitle(args, pathFile, destination):
     helper.logging.debug('Moves subtitles to %s', destination)
     newName = args.SEARCH
 
-    if args.no_rename == False:
+    if (args.no_rename == False):
         new_name = os.path.join(destination, f'{newName}.srt')
         helper.logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
         os.rename(pathFileSelect, new_name)
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
-        helper.logging.info('Just move subtitle [' + os.path.basename(pathFileSelect) + '] to [' + destination + ']')
+        helper.logging.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
         os.rename(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
@@ -182,7 +181,7 @@ def tvShowSubtitles(args, pathFile, destination):
 
                 # Format name example:
                 # Serie - S05E01.srt | S05E01.srt
-                if serie != '':
+                if (serie != ''):
                     new_name = serie + ' - ' + season + episode + '.srt'
                 else:
                     new_name = season + episode + '.srt'
@@ -190,17 +189,17 @@ def tvShowSubtitles(args, pathFile, destination):
             except Exception as e:
                 helper.logging.error(e)
                 file_dst = os.path.join(destination, files[index])
-                helper.logging.info('No match Regex: Just move subtitle [' + files[index] + ']')
+                helper.logging.info('No match Regex: Just move subtitle [%s]', files[index])
                 os.rename(file_src, file_dst)
             else:
                 file_dst = os.path.join(destination, new_name)
-                helper.logging.info('Move subtitle [' + files[index] + '] as [' + new_name + ']')
+                helper.logging.info('Move subtitle [%s] as [%s]', files[index], new_name)
                 os.rename(file_src, file_dst)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif files[index].endswith('.srt'):
+        elif (files[index].endswith('.srt')):
             file_dst = os.path.join(destination, files[index])
-            helper.logging.info('Move subtitle [' + files[index] + '] to [' + destination + ']')
+            helper.logging.info('Move subtitle [%s] to [%s]',  files[index], destination)
             os.rename(file_src, file_dst)
         index = index + 1
 
@@ -247,12 +246,12 @@ def getDataPage(poolManager, url, search):
 
         # Format date (year-month-day)
         match = re.search(r'(\d+-\d+-\d+)', str(key['fecha_subida']))
-        if match is None:
+        if (match is None):
             dateList.append('-')
         else:
             dateList.append(match.group(1))
 
-    if not idList:
+    if (not idList):
         print('Subtitles not found')
         helper.logging.info('Subtitles not found for %s', search)
         sys.exit(0)
