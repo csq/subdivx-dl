@@ -224,7 +224,7 @@ def getDataPage(poolManager, url, search):
     request = poolManager.request('POST', url, fields=payload)
 
     try:
-        data = json.loads(json.dumps(request.json().get('aaData')))
+        data = json.loads(request.data).get('aaData')
     except JSONDecodeError:
         print('Subtitles not found')
         helper.logging.error('Response could not be serialized')
@@ -267,7 +267,7 @@ def getComments(poolManager, url, id_sub):
     request = poolManager.request('POST', url, fields=payload)
 
     try:
-        data = json.loads(json.dumps(request.json().get('aaData')))
+        data = json.loads(request.data).get('aaData')
     except JSONDecodeError:
         print('Comments not found')
         helper.logging.error('Response could not be serialized')
