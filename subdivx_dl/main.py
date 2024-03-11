@@ -10,20 +10,20 @@ args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'}
-http = urllib3.PoolManager(headers=user_agent)
+https = urllib3.PoolManager(headers=user_agent)
 
 def main():
 
 	# Get all data from search
-	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(http, SUBDIVX_URL, FIND_SUBTITLE)
+	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(https, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
 		url = 'https://subdivx.com/'+str(idList[0])
 		getSubtitle(args, user_agent, url)
 		exit(0)
-	
-	while (1):
+
+	while (True):
 		# Clear screen
 		clear()
 
@@ -59,7 +59,7 @@ def main():
 
 		# Checking flag for add comments view
 		if (args.comments == True):
-			commentList = getComments(http, SUBDIVX_URL, id_subtitle)
+			commentList = getComments(https, SUBDIVX_URL, id_subtitle)
 			if (not commentList):
 				pass
 			else:

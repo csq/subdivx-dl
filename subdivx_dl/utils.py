@@ -11,34 +11,35 @@ import re
 
 from tabulate import tabulate
 from subdivx_dl import helper
+from json import JSONDecodeError
 from subprocess import PIPE, Popen
-
-SUCCESSFULL = '0'
 
 def downloadFile(userAgent, url, location):
     helper.logging.info('Downloading archive from: %s in %s', url, location)
 
-    sv = 9
+    SUCCESSFULL = '0'
+    NUMBER_OF_SERVER = 9
+
     stop = False
 
     while (stop is False):
-        address = url[:20] + 'sub'+ str(sv) + '/' + url[20:]
+        address = url[:20] + 'sub'+ str(NUMBER_OF_SERVER) + '/' + url[20:]
 
         cmd1 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip ; echo $?'
         cmd2 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar ; echo $?'
-        
+
         process = Popen("{};{}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
         process.wait()
         response = process.communicate()[0]
 
-        helper.logging.info('Attempt on sv N°%d with url %s', sv, address)
+        helper.logging.info('Attempt on server N°%d with url %s', NUMBER_OF_SERVER, address)
 
         if (SUCCESSFULL in response):
             stop = True
-        elif (sv == 1):
+        elif (NUMBER_OF_SERVER == 1):
             stop = True
-        
-        sv = sv - 1
+
+        NUMBER_OF_SERVER -= 1
 
 def unzip(fileZip, destination):
     try:
@@ -82,14 +83,14 @@ def printMenuContentDir(args, pathDir):
             data.append(os.path.basename(files[x]))
             header.append(data[:])
             data.clear()
-            index = index + 1
-        x = x + 1
+            index += 1
+        x += 1
 
     if (index > 2):
         while (True):
             # Clear screen
             clear()
-            
+
             # Print table with of the subtitles avaliable
             if (args.grid == False):
                 print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
@@ -135,7 +136,7 @@ def printMenuContentDir(args, pathDir):
 def movieSubtitle(args, pathFile, destination):
     fileNameSelect = printMenuContentDir(args, pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
-    
+
     helper.logging.debug('Moves subtitles to %s', destination)
     newName = args.SEARCH
 
@@ -201,7 +202,7 @@ def tvShowSubtitles(args, pathFile, destination):
             file_dst = os.path.join(destination, files[index])
             helper.logging.info('Move subtitle [%s] to [%s]',  files[index], destination)
             os.rename(file_src, file_dst)
-        index = index + 1
+        index += 1
 
 def renameAndMoveSubtitle(args, pathFile, destination):
     # Check flag --season
@@ -228,7 +229,7 @@ def getDataPage(poolManager, url, search):
     except JSONDecodeError:
         print('Subtitles not found')
         helper.logging.error('Response could not be serialized')
-        sys.exit(0)
+        exit(0)
 
     idList = list()
     titleList = list()
@@ -254,7 +255,7 @@ def getDataPage(poolManager, url, search):
     if (not idList):
         print('Subtitles not found')
         helper.logging.info('Subtitles not found for %s', search)
-        sys.exit(0)
+        exit(0)
 
     return titleList, descriptionList, idList, downloadList, userList, dateList
 
@@ -271,7 +272,7 @@ def getComments(poolManager, url, id_sub):
     except JSONDecodeError:
         print('Comments not found')
         helper.logging.error('Response could not be serialized')
-        sys.exit(0)
+        exit(0)
 
     commentList = []
 
@@ -295,7 +296,7 @@ def printSearchResult(args, titleList, downloadList, dateList, userList):
         row.append(userList[index - 1])
         data.append(row[:])
         row.clear()
-        index = index + 1
+        index += 1
 
     # Check flag --grid
     if (args.grid == False):
@@ -309,7 +310,7 @@ def printSelectDescription(args, selection, descriptionList):
 
     maxLengh = 77
     count = 0
-    
+
     line = ''
     for word in words:
         size_word = len(word)
@@ -343,7 +344,7 @@ def getSubtitle(args, userAgent, url):
 
     # Check flag --location
     LOCATION_DESTINATION = args.location
-    
+
     if (LOCATION_DESTINATION == None):
         fpath = os.path.join(os.getcwd(), '.tmp', '')
         downloadFile(userAgent, url, fpath)
@@ -390,13 +391,13 @@ def printSelectComments(args, commentList):
 
     for i in range(len(commentList)):
         words = commentList[i].split()
-        
+
         count = 0
         line = ''
 
         for word in words:
             len_word = len(word)
-           
+
             if (count + len_word < maxLengh):
                 line = '{} {}'.format(line, word)
                 count = count + len_word
@@ -423,7 +424,7 @@ def clear():
 def mainMenu():
     print('\n[1~9] Select')
     print('[ 0 ] Exit\n')
-    
+
     userInput = input('Selection: ')
     return userInput
 
