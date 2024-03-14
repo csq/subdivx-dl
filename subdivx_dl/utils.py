@@ -26,8 +26,8 @@ def downloadFile(userAgent, url, location):
     while (stop is False):
         address = url[:20] + 'sub'+ str(NUMBER_OF_SERVER) + '/' + url[20:]
 
-        cmd1 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip ; echo $?'
-        cmd2 = 'wget --user-agent="{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar ; echo $?'
+        cmd1 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip >/dev/null 2>&1 ; echo $?'
+        cmd2 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar >/dev/null 2>&1 ; echo $?'
 
         process = Popen("{};{}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
         process.wait()
