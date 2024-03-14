@@ -1,6 +1,7 @@
 # Copyright: (c) 2022, subdivx-dl
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+import tempfile
 import zipfile
 import shutil
 import json
@@ -61,7 +62,7 @@ def moveAllToParentFolder(pathDir):
                 subfolder = os.path.join(pathDir, dirs[0])
                 for (root, dirs, files) in os.walk(subfolder, topdown=True):
                     for name in files:
-                        os.rename(os.path.join(root, name), os.path.join(pathDir, name))
+                        shutil.copy(os.path.join(root, name), os.path.join(pathDir, name))
 
 def unrar(fileRar, destination):
     helper.logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
@@ -143,11 +144,11 @@ def movieSubtitle(args, pathFile, destination):
     if (args.no_rename == False):
         new_name = os.path.join(destination, f'{newName}.srt')
         helper.logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
-        os.rename(pathFileSelect, new_name)
+        shutil.copy(pathFileSelect, new_name)
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
         helper.logging.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
-        os.rename(pathFileSelect, new_name)
+        shutil.copy(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
     helper.logging.debug('Moves subtitles to %s', destination)
@@ -191,17 +192,17 @@ def tvShowSubtitles(args, pathFile, destination):
                 helper.logging.error(e)
                 file_dst = os.path.join(destination, files[index])
                 helper.logging.info('No match Regex: Just move subtitle [%s]', files[index])
-                os.rename(file_src, file_dst)
+                shutil.copy(file_src, file_dst)
             else:
                 file_dst = os.path.join(destination, new_name)
                 helper.logging.info('Move subtitle [%s] as [%s]', files[index], new_name)
-                os.rename(file_src, file_dst)
+                shutil.copy(file_src, file_dst)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif (files[index].endswith('.srt')):
             file_dst = os.path.join(destination, files[index])
             helper.logging.info('Move subtitle [%s] to [%s]',  files[index], destination)
-            os.rename(file_src, file_dst)
+            shutil.copy(file_src, file_dst)
         index += 1
 
 def renameAndMoveSubtitle(args, pathFile, destination):
@@ -345,23 +346,28 @@ def getSubtitle(args, userAgent, url):
     # Check flag --location
     LOCATION_DESTINATION = args.location
 
+    # Create temporal directory
+    tempdir = tempfile.TemporaryDirectory()
+    fpath = tempdir.name
+
+    # Download zip/rar in temporal directory
+    downloadFile(userAgent, url, fpath)
+
+    # Determinate final path for subtitle
     if (LOCATION_DESTINATION == None):
-        fpath = os.path.join(os.getcwd(), '.tmp', '')
-        downloadFile(userAgent, url, fpath)
         parent_folder = os.getcwd()
     else:
-        fpath = os.path.join(LOCATION_DESTINATION, '.tmp', '')
-        downloadFile(userAgent, url, fpath)
         parent_folder = LOCATION_DESTINATION
 
-    try:
-        listDirectory = os.listdir(fpath)
-    except FileNotFoundError:
+    # In case the server does not return a file, exit
+    listDirectory = os.listdir(fpath)
+
+    if not listDirectory:
         print('Subtitle not found because server missing file')
         helper.logging.info('Remote server not found file')
         exit(0)
 
-
+    # Extract zip/rar file
     for file in listDirectory:
         pathFile = os.path.join(fpath, file)
 
@@ -375,7 +381,7 @@ def getSubtitle(args, userAgent, url):
 
     # Remove temp folder
     try:
-        shutil.rmtree(fpath)
+        tempdir.cleanup()
         helper.logging.info('Delete temporal directory %s', fpath)
     except OSError as error:
         helper.logging.error(error)
