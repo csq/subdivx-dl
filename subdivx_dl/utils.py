@@ -143,14 +143,19 @@ def movieSubtitle(args, pathFile, destination):
     if (args.no_rename == False):
         new_name = os.path.join(destination, f'{newName}.srt')
         helper.logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
+
+        os.makedirs(os.path.dirname(new_name), exist_ok=True)
         shutil.copy(pathFileSelect, new_name)
+
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
         helper.logging.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
+
+        os.makedirs(os.path.dirname(new_name), exist_ok=True)
         shutil.copy(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
-    helper.logging.debug('Moves subtitles to %s', destination)
+    helper.logging.info('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
 
     # TV series season and episode names
@@ -191,16 +196,19 @@ def tvShowSubtitles(args, pathFile, destination):
                 helper.logging.error(e)
                 file_dst = os.path.join(destination, files[index])
                 helper.logging.info('No match Regex: Just move subtitle [%s]', files[index])
+                os.makedirs(os.path.dirname(file_dst), exist_ok=True)
                 shutil.copy(file_src, file_dst)
             else:
                 file_dst = os.path.join(destination, new_name)
                 helper.logging.info('Move subtitle [%s] as [%s]', files[index], new_name)
+                os.makedirs(os.path.dirname(file_dst), exist_ok=True)
                 shutil.copy(file_src, file_dst)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif (files[index].endswith('.srt')):
             file_dst = os.path.join(destination, files[index])
             helper.logging.info('Move subtitle [%s] to [%s]',  files[index], destination)
+            os.makedirs(os.path.dirname(file_dst), exist_ok=True)
             shutil.copy(file_src, file_dst)
         index += 1
 
