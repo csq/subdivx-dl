@@ -27,44 +27,45 @@ Libraries:
 
 ## USAGE AND OPTIONS
 
-    subdivx-dl [SEARCH][OPTIONS]
+    subdivx-dl [OPTIONS][SEARCH]
 
 ### General Options:
     -h, --help                      Print this help text and exit
-    -v, --version                   Print program version and exit
+    -V, --version                   Print program version and exit
     -s, --season                    Download full season subtitles
     -l, --location LOCATION         Download subtitle in destination directory
     -g, --grid                      Print results in a grid format
     -nr, --no-rename                Disable rename files
     -c, --comments                  Show subtitles comments in search
     -f, --first                     Download the first matching
+    -v, --verbose                   Be verbose
 
 #### Examples
 These examples show habitual operation
 
-Search single subtitle in actual directory
+Search and download a single subtitle in the current directory
 
     subdivx-dl 'Silicon Valley S01E01'
 
 Search and download multiples subtitles in same directory
 
-    subdivx-dl 'Silicon Valley S01' -s
+    subdivx-dl -s 'Silicon Valley S01'
 
-Search subtitle in specific directory (directory is create if it does not exist)
+Search and download a subtitle in specific directory (directory is create if it does not exist)
 
-    subdivx-dl 'Silicon Valley S01E01' -l ~/Downloads/MyDirectory/
+    subdivx-dl -l ~/Downloads/MyDirectory/ 'Silicon Valley S01E01'
 
-Search subtitle but not renaming file (keep name of origin)
+Search and download a subtitle but not renaming file (keep name of origin)
 
-    subdivx-dl 'Matrix' -nr
+    subdivx-dl -nr 'Matrix'
 
-Search subtitle including comments
+Search subtitle including their comments
 
-    subdivx-dl 'Halo S01E01' -c
+    subdivx-dl -c 'Halo S01E01'
 
 Download subtitle directly
 
-    subdivx-dl 'It Crowd S02E01' -f
+    subdivx-dl -f 'It Crowd S02E01'
 
 ### Screenshots
 Search results view
