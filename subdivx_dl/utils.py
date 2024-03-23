@@ -149,14 +149,30 @@ def movieSubtitle(args, pathFile, destination):
         helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
 
         os.makedirs(os.path.dirname(new_name), exist_ok=True)
-        shutil.copy(pathFileSelect, new_name)
+
+        try:
+            shutil.copy(pathFileSelect, new_name)
+        except PermissionError:
+            if (args.verbose != True):
+                clear()
+                print('You do not have permissions to write here ', os.path.dirname(new_name))
+            helper.logger.warning('Permissions issues on destination directory')
+            exit(0)
 
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
         helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
 
         os.makedirs(os.path.dirname(new_name), exist_ok=True)
-        shutil.copy(pathFileSelect, new_name)
+
+        try:
+            shutil.copy(pathFileSelect, new_name)
+        except PermissionError:
+            if (args.verbose != True):
+                clear()
+                print('You do not have permissions to write here ', os.path.dirname(new_name))
+            helper.logger.warning('Permissions issues on destination directory')
+            exit(0)
 
 def tvShowSubtitles(args, pathFile, destination):
     helper.logger.info('Moves subtitles to %s', destination)
@@ -202,13 +218,29 @@ def tvShowSubtitles(args, pathFile, destination):
                 helper.logger.info('No match Regex: Just move subtitle [%s]', files[index])
 
                 os.makedirs(os.path.dirname(file_dst), exist_ok=True)
-                shutil.copy(file_src, file_dst)
+
+                try:
+                    shutil.copy(file_src, file_dst)
+                except PermissionError:
+                    if (args.verbose != True):
+                        clear()
+                        print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                    helper.logger.warning('Permissions issues on destination directory')
+                    exit(0)
             else:
                 file_dst = os.path.join(destination, new_name)
                 helper.logger.info('Move subtitle [%s] as [%s]', files[index], new_name)
 
                 os.makedirs(os.path.dirname(file_dst), exist_ok=True)
-                shutil.copy(file_src, file_dst)
+
+                try:
+                    shutil.copy(file_src, file_dst)
+                except PermissionError:
+                    if (args.verbose != True):
+                        clear()
+                        print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                    helper.logger.warning('Permissions issues on destination directory')
+                    exit(0)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif (files[index].endswith('.srt')):
@@ -216,7 +248,15 @@ def tvShowSubtitles(args, pathFile, destination):
             helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
 
             os.makedirs(os.path.dirname(file_dst), exist_ok=True)
-            shutil.copy(file_src, file_dst)
+
+            try:
+                shutil.copy(file_src, file_dst)
+            except PermissionError:
+                if (args.verbose != True):
+                    clear()
+                    print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                helper.logger.warning('Permissions issues on destination directory')
+                exit(0)
         index += 1
 
 def renameAndMoveSubtitle(args, pathFile, destination):
