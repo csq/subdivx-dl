@@ -15,7 +15,7 @@ https = urllib3.PoolManager(headers=user_agent)
 def main():
 
 	# Get all data from search
-	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(https, SUBDIVX_URL, FIND_SUBTITLE)
+	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, https, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
 	if (args.first == True):

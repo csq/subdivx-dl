@@ -15,7 +15,7 @@ from json import JSONDecodeError
 from subprocess import PIPE, Popen
 
 def downloadFile(userAgent, url, location):
-    helper.logging.info('Downloading archive from: %s in %s', url, location)
+    helper.logger.info('Downloading archive from: %s in %s', url, location)
 
     SUCCESSFULL = '0'
     NUMBER_OF_SERVER = 9
@@ -32,9 +32,10 @@ def downloadFile(userAgent, url, location):
         process.wait()
         response = process.communicate()[0]
 
-        helper.logging.info('Attempt on server N°%d with url %s', NUMBER_OF_SERVER, address)
+        helper.logger.debug('Attempt on server N°%d with url %s', NUMBER_OF_SERVER, address)
 
         if (SUCCESSFULL in response):
+            helper.logger.info('Download complete')
             stop = True
         elif (NUMBER_OF_SERVER == 1):
             stop = True
@@ -44,12 +45,13 @@ def downloadFile(userAgent, url, location):
 def unzip(fileZip, destination):
     try:
         with zipfile.ZipFile(fileZip, 'r') as z:
-            helper.logging.info('Unpacking zip [%s]', os.path.basename(z.filename))
+            helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
                 if (file.endswith(('.srt', '.SRT'))):
+                    helper.logger.debug('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
     except:
-        helper.logging.error('File corrupt')
+        helper.logger.error('File corrupt')
         print('Invalid file')
     else:
         moveAllToParentFolder(destination)
@@ -64,7 +66,7 @@ def moveAllToParentFolder(pathDir):
                         shutil.copy(os.path.join(root, name), os.path.join(pathDir, name))
 
 def unrar(fileRar, destination):
-    helper.logging.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
+    helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
     args = ['unrar', 'e', '-r', '-inul', '-o+', fileRar, destination]
     sp = Popen(args)
     sp.wait()
@@ -119,13 +121,14 @@ def printMenuContentDir(args, pathDir):
                 # Remove temp folder
                 try:
                     shutil.rmtree(pathDir)
-                    helper.logging.info('Delete temporal directory %s', pathDir)
+                    helper.logger.info('Delete temporal directory %s', pathDir)
                 except OSError as error:
-                    helper.logging.error(error)
+                    helper.logger.error(error)
                 clear()
                 exit(0)
 
             # Return name file with extension .srt selected
+            clear()
             return fileName
     else:
         # Return name file with extension .srt exclude .zip or .rar
@@ -134,28 +137,29 @@ def printMenuContentDir(args, pathDir):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
+    helper.logger.info('Move subtitle to %s', destination)
+
     fileNameSelect = printMenuContentDir(args, pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
 
-    helper.logging.debug('Moves subtitles to %s', destination)
     newName = args.SEARCH
 
     if (args.no_rename == False):
         new_name = os.path.join(destination, f'{newName}.srt')
-        helper.logging.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
+        helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
 
         os.makedirs(os.path.dirname(new_name), exist_ok=True)
         shutil.copy(pathFileSelect, new_name)
 
     else:
         new_name = os.path.join(destination, os.path.basename(pathFileSelect))
-        helper.logging.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
+        helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
 
         os.makedirs(os.path.dirname(new_name), exist_ok=True)
         shutil.copy(pathFileSelect, new_name)
 
 def tvShowSubtitles(args, pathFile, destination):
-    helper.logging.info('Moves subtitles to %s', destination)
+    helper.logger.info('Moves subtitles to %s', destination)
     files = os.listdir(pathFile)
 
     # TV series season and episode names
@@ -193,21 +197,24 @@ def tvShowSubtitles(args, pathFile, destination):
                     new_name = season + episode + '.srt'
 
             except Exception as e:
-                helper.logging.error(e)
+                helper.logger.error(e)
                 file_dst = os.path.join(destination, files[index])
-                helper.logging.info('No match Regex: Just move subtitle [%s]', files[index])
+                helper.logger.info('No match Regex: Just move subtitle [%s]', files[index])
+
                 os.makedirs(os.path.dirname(file_dst), exist_ok=True)
                 shutil.copy(file_src, file_dst)
             else:
                 file_dst = os.path.join(destination, new_name)
-                helper.logging.info('Move subtitle [%s] as [%s]', files[index], new_name)
+                helper.logger.info('Move subtitle [%s] as [%s]', files[index], new_name)
+
                 os.makedirs(os.path.dirname(file_dst), exist_ok=True)
                 shutil.copy(file_src, file_dst)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif (files[index].endswith('.srt')):
             file_dst = os.path.join(destination, files[index])
-            helper.logging.info('Move subtitle [%s] to [%s]',  files[index], destination)
+            helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
+
             os.makedirs(os.path.dirname(file_dst), exist_ok=True)
             shutil.copy(file_src, file_dst)
         index += 1
@@ -221,7 +228,7 @@ def renameAndMoveSubtitle(args, pathFile, destination):
         # Move and rename bulk srt
         tvShowSubtitles(args, pathFile, destination)
 
-def getDataPage(poolManager, url, search):
+def getDataPage(args, poolManager, url, search):
 
     payload = {
         'buscar': search,
@@ -229,14 +236,14 @@ def getDataPage(poolManager, url, search):
         'tabla': 'resultados'
     }
 
-    helper.logging.debug('Starting request to subdivx.com with search query: %s', search)
+    helper.logger.info('Starting request to subdivx.com with search query: %s', search)
     request = poolManager.request('POST', url, fields=payload)
 
     try:
         data = json.loads(request.data).get('aaData')
     except JSONDecodeError:
         print('Subtitles not found')
-        helper.logging.error('Response could not be serialized')
+        helper.logger.error('Response could not be serialized')
         exit(0)
 
     idList = list()
@@ -260,9 +267,10 @@ def getDataPage(poolManager, url, search):
         else:
             dateList.append(match.group(1))
 
-    if (not idList):
-        print('Subtitles not found')
-        helper.logging.info('Subtitles not found for %s', search)
+    if not idList:
+        helper.logger.info('Subtitles not found for %s', search)
+        if (args.verbose != True):
+            print('Subtitles not found')
         exit(0)
 
     return titleList, descriptionList, idList, downloadList, userList, dateList
@@ -279,7 +287,7 @@ def getComments(poolManager, url, id_sub):
         data = json.loads(request.data).get('aaData')
     except JSONDecodeError:
         print('Comments not found')
-        helper.logging.error('Response could not be serialized')
+        helper.logger.error('Response could not be serialized')
         exit(0)
 
     commentList = []
@@ -290,7 +298,6 @@ def getComments(poolManager, url, id_sub):
     return commentList
 
 def printSearchResult(args, titleList, downloadList, dateList, userList):
-    # Mix data
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
 
     index = 1
@@ -348,7 +355,8 @@ def printSelectDescription(args, selection, descriptionList):
         print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
 
 def getSubtitle(args, userAgent, url):
-    print('Working ...')
+    if (args.verbose != True):
+        print('Working...')
 
     # Check flag --location
     LOCATION_DESTINATION = args.location
@@ -356,6 +364,7 @@ def getSubtitle(args, userAgent, url):
     # Create temporal directory
     tempdir = tempfile.TemporaryDirectory()
     fpath = tempdir.name
+    helper.logger.info('Create temporal directory %s', fpath)
 
     # Download zip/rar in temporal directory
     downloadFile(userAgent, url, fpath)
@@ -370,8 +379,14 @@ def getSubtitle(args, userAgent, url):
     listDirectory = os.listdir(fpath)
 
     if not listDirectory:
-        print('Subtitle not found because server missing file')
-        helper.logging.info('Remote server not found file')
+        helper.logger.info('Remote server not found file')
+
+        helper.logger.info('Delete temporal directory %s', fpath)
+        tempdir.cleanup()
+
+        if (args.verbose != True):
+            clear()
+            print('Subtitle not found because server missing file')
         exit(0)
 
     # Extract zip/rar file
@@ -389,12 +404,13 @@ def getSubtitle(args, userAgent, url):
     # Remove temp folder
     try:
         tempdir.cleanup()
-        helper.logging.info('Delete temporal directory %s', fpath)
+        helper.logger.info('Delete temporal directory %s', fpath)
     except OSError as error:
-        helper.logging.error(error)
+        helper.logger.error(error)
 
-    clear()
-    print('Done')
+    if (args.verbose != True):
+        clear()
+        print('Done')
 
 def printSelectComments(args, commentList):
     header = ['N°', 'Comments']
