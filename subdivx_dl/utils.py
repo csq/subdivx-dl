@@ -488,7 +488,7 @@ def printSelectComments(args, commentList):
         print(tabulate(comment, headers=header, tablefmt='fancy_outline', colalign=('center', 'left')))
 
 def clear():
-    os.system('clr' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def mainMenu():
     print('\n[1~9] Select')
