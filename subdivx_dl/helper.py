@@ -3,6 +3,8 @@
 
 import argparse
 import logging
+import tempfile
+import os
 
 # Parser for command-line
 parser = argparse.ArgumentParser(
@@ -30,11 +32,16 @@ fmt_full = '[%(asctime)s] |%(levelname)s| %(message)s'
 fmt_compact = '|%(levelname)s| %(message)s'
 
 datefmt = '%d/%m/%y %H:%M:%S'
-pathfile ='/tmp/subdivx-dl.log'
+
+# Get the temporary directory
+temp_dir = tempfile.gettempdir()
+
+# Choose appropriate file path based on the platform
+log_file = os.path.join(temp_dir, 'subdivx-dl.log')
 
 args = parser.parse_args()
 
 if (args.verbose):
     logging.basicConfig(level=logging.INFO, format=fmt_compact)
 else:
-    logging.basicConfig(filename=pathfile, filemode='w', encoding='utf-8', level=logging.DEBUG, format=fmt_full, datefmt=datefmt)
+    logging.basicConfig(filename=log_file, filemode='w', encoding='utf-8', level=logging.DEBUG, format=fmt_full, datefmt=datefmt)
