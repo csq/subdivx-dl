@@ -2,6 +2,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import urllib3
+import certifi
+
 from .utils import *
 
 SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
@@ -10,7 +12,7 @@ args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0'}
-https = urllib3.PoolManager(headers=user_agent)
+https = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 def main():
 
