@@ -17,6 +17,9 @@ from subprocess import PIPE, Popen
 def downloadFile(userAgent, url, location):
     helper.logger.info('Downloading archive from: %s in %s', url, location)
 
+    arg_file_zip = ('.zip 2>&1 && echo $' if os.name == 'nt' else '.zip >/dev/null ; echo $?')
+    arg_file_rar = ('.rar 2>&1 && echo $' if os.name == 'nt' else '.rar >/dev/null ; echo $?')
+
     SUCCESSFULL = '0'
     NUMBER_OF_SERVER = 9
 
@@ -25,19 +28,25 @@ def downloadFile(userAgent, url, location):
     while (stop is False):
         address = url[:20] + 'sub'+ str(NUMBER_OF_SERVER) + '/' + url[20:]
 
-        cmd1 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.zip >/dev/null 2>&1 ; echo $?'
-        cmd2 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + '.rar >/dev/null 2>&1 ; echo $?'
+        cmd1 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + arg_file_zip
+        cmd2 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + arg_file_rar
 
-        process = Popen("{};{}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
-        process.wait()
-        response = process.communicate()[0]
+        if (os.name == 'nt'):
+            returncode1 = Popen(cmd1, shell=True, stdout=PIPE, text=True).wait()
+            returncode2 = Popen(cmd2, shell=True, stdout=PIPE, text=True).wait()
+            returncodes = (returncode1, returncode2)
+            response = str(returncodes)
+        else:
+            process = Popen("{} & {}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
+            process.wait()
+            response = process.communicate()[0]
 
         helper.logger.debug('Attempt on server N°%d with url %s', NUMBER_OF_SERVER, address)
 
         if (SUCCESSFULL in response):
             helper.logger.info('Download complete')
-            stop = True
-        elif (NUMBER_OF_SERVER == 1):
+
+        if (NUMBER_OF_SERVER == 1 or SUCCESSFULL in response):
             stop = True
 
         NUMBER_OF_SERVER -= 1
