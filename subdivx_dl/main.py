@@ -9,7 +9,7 @@ SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
-user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0'}
+user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0'}
 https = urllib3.PoolManager(headers=user_agent)
 
 def main():
