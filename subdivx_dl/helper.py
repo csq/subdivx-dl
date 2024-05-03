@@ -6,6 +6,8 @@ import logging
 import tempfile
 import os
 
+from subdivx_dl.version import __version__
+
 # Parser for command-line
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -16,7 +18,7 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('SEARCH', help='name of the tv serie or movie to search for subtitle')
-parser.add_argument('-V', '--version', action='version', version='2024.05.03')
+parser.add_argument('-V', '--version', action='version', version=__version__)
 parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
 parser.add_argument('-l', '--location', help='destination directory')
 parser.add_argument('-g', '--grid', help='show results in a grid', action='store_true')

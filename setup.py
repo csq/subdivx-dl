@@ -1,4 +1,5 @@
 from setuptools import setup
+from subdivx_dl.version import __version__
 
 long_description = open('README.md').read()
 
@@ -7,7 +8,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='subdivx-dl',
-    version='2024.05.03', # Format: yyyy-mm-dd
+    version=__version__,
     url='https://github.com/csq/subdivx-dl',
     license='GPLv3+',
     description='A subtitle downloader for the website subdvix.com',
