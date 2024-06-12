@@ -22,7 +22,7 @@ def main():
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
 		url = 'https://subdivx.com/'+str(idList[0])
-		getSubtitle(args, user_agent, url)
+		getSubtitle(args, https, url)
 		exit(0)
 
 	while (True):
@@ -83,7 +83,7 @@ def main():
 			continue
 		elif (select_action == 1):
 			clear()
-			getSubtitle(args, user_agent, url)
+			getSubtitle(args, https, url)
 			exit(0)
 		elif (select_action == 0):
 			clear()

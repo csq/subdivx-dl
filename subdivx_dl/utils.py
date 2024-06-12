@@ -11,46 +11,54 @@ import re
 from tabulate import tabulate
 from subdivx_dl import helper
 from json import JSONDecodeError
-from subprocess import PIPE, Popen
+from tempfile import NamedTemporaryFile
 from rarfile import RarFile
 from zipfile import ZipFile
 
-def downloadFile(userAgent, url, location):
+def getFileExtension(filePath):
+    with open(filePath, 'rb') as file:
+        header = file.read(4)
+
+        file_signatures = {
+            b'\x50\x4B\x03\x04': '.zip',
+            b'\x52\x61\x72\x21': '.rar'
+        }
+
+        for signature, extension in file_signatures.items():
+            if header.startswith(signature):
+                return extension
+
+        return '.bin'
+
+def downloadFile(poolManager, url, location):
     helper.logger.info('Downloading archive from: %s in %s', url, location)
 
-    arg_file_zip = ('.zip 2>&1 && echo $' if os.name == 'nt' else '.zip >/dev/null ; echo $?')
-    arg_file_rar = ('.rar 2>&1 && echo $' if os.name == 'nt' else '.rar >/dev/null ; echo $?')
+    success = False
 
-    SUCCESSFULL = '0'
-    NUMBER_OF_SERVER = 9
+    with NamedTemporaryFile(dir=location, delete=False) as tempFile:
+        for i in range(9, 0, -1):
+            helper.logger.debug('Attempt on server N°%d with url %s', i, address)
+            address = url[:20] + 'sub' + str(i) + '/' + url[20:]
 
-    stop = False
+            response = poolManager.request('GET', address, preload_content=False)
+            tempFile.write(response.data)
+            tempFile.seek(0)
 
-    while (stop is False):
-        address = url[:20] + 'sub'+ str(NUMBER_OF_SERVER) + '/' + url[20:]
+            fileExtension = getFileExtension(tempFile.name)
 
-        cmd1 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + arg_file_zip
-        cmd2 = 'wget -U "{}"'.format(userAgent['user-agent']) + ' -qcP "{}" {}'.format(location, address) + arg_file_rar
+            if fileExtension in ('.zip', '.rar'):
+                helper.logger.info('Download complete')
 
-        if (os.name == 'nt'):
-            returncode1 = Popen(cmd1, shell=True, stdout=PIPE, text=True).wait()
-            returncode2 = Popen(cmd2, shell=True, stdout=PIPE, text=True).wait()
-            returncodes = (returncode1, returncode2)
-            response = str(returncodes)
-        else:
-            process = Popen("{} & {}".format(cmd1, cmd2), shell=True, stdout=PIPE, text=True)
-            process.wait()
-            response = process.communicate()[0]
+                newFilePath = tempFile.name + fileExtension
+                os.rename(tempFile.name, newFilePath)
 
-        helper.logger.debug('Attempt on server N°%d with url %s', NUMBER_OF_SERVER, address)
+                success = True
+                break
+            else:
+                success = False
 
-        if (SUCCESSFULL in response):
-            helper.logger.info('Download complete')
-
-        if (NUMBER_OF_SERVER == 1 or SUCCESSFULL in response):
-            stop = True
-
-        NUMBER_OF_SERVER -= 1
+        if not success:
+            print(f'No suitable subtitles download for: {url}')
 
 def unzip(fileZip, destination):
     try:
@@ -408,7 +416,7 @@ def printSelectDescription(args, selection, descriptionList):
     else:
         print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
 
-def getSubtitle(args, userAgent, url):
+def getSubtitle(args, poolManager, url):
     if (args.verbose != True):
         print('Working...')
 
@@ -421,7 +429,7 @@ def getSubtitle(args, userAgent, url):
     helper.logger.info('Create temporal directory %s', fpath)
 
     # Download zip/rar in temporal directory
-    downloadFile(userAgent, url, fpath)
+    downloadFile(poolManager, url, fpath)
 
     # Determinate final path for subtitle
     if (LOCATION_DESTINATION == None):
