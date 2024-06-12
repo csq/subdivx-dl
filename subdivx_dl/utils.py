@@ -2,7 +2,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import tempfile
-import zipfile
 import shutil
 import json
 import time
@@ -13,6 +12,8 @@ from tabulate import tabulate
 from subdivx_dl import helper
 from json import JSONDecodeError
 from subprocess import PIPE, Popen
+from rarfile import RarFile
+from zipfile import ZipFile
 
 def downloadFile(userAgent, url, location):
     helper.logger.info('Downloading archive from: %s in %s', url, location)
@@ -53,12 +54,13 @@ def downloadFile(userAgent, url, location):
 
 def unzip(fileZip, destination):
     try:
-        with zipfile.ZipFile(fileZip, 'r') as z:
+        with ZipFile(fileZip, 'r') as z:
             helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
                 if (file.endswith(('.srt', '.SRT'))):
                     helper.logger.debug('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
+            z.close()
     except:
         helper.logger.error('File corrupt')
         print('Invalid file')
@@ -76,9 +78,12 @@ def moveAllToParentFolder(pathDir):
 
 def unrar(fileRar, destination):
     helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
-    args = ['unrar', 'e', '-r', '-inul', '-o+', fileRar, destination]
-    sp = Popen(args)
-    sp.wait()
+    rf = RarFile(fileRar)
+
+    for file in rf.namelist():
+        if (file.endswith(('.srt', '.SRT'))):
+            rf.extract(file, destination)
+    rf.close()
 
 def printMenuContentDir(args, pathDir):
     header = [['N°', 'File name']]
