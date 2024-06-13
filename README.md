@@ -77,6 +77,14 @@ Search results view in a grid format
 Description view with comments in a grid format
 ![example](img/img-05.png)
 
+
+## Troubleshooting
+**Note**: If a cookie is not found during the initial search, you will receive the message 'Subtitles not found'. Retry the search to normalize the process.
+
+If the message 'Subtitles not found' is ever returned, follow these steps:
+* Delete the cookie file named **sdx-dl** in the temporary folder
+* Perform the search again
+
 ### Author
 subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
 
