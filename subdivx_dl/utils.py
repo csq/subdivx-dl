@@ -525,3 +525,52 @@ def selectMenu():
 
     userInput = input('Selection: ')
     return userInput
+
+##############################################################################
+# Cookie functions
+##############################################################################
+
+cookie_name = 'sdx-dl'
+
+def getCookie(poolManager, url):
+    helper.logger.info('Get cookie from %s', url)
+
+    # Request petition GET
+    response = poolManager.request('GET', url)
+
+    # Get cookie from response
+    cookie = response.headers.get('Set-Cookie')
+
+    # Split cookie
+    cookie_parts = cookie.split(';')
+
+    # Return sdx_cookie
+    return cookie_parts[0]
+
+def saveCookie(sdx_cookie):
+    # Save cookie in temporary folder
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
+
+    with open(cookie_path, 'w') as file:
+        file.write(sdx_cookie)
+        file.close()
+
+    helper.logger.info('Save cookie')
+
+def existCookie():
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
+
+    return os.path.exists(cookie_path)
+
+def readCookie():
+    helper.logger.info('Read cookie')
+
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
+
+    with open(cookie_path, 'r') as file:
+        cookie = file.read()
+
+    return cookie

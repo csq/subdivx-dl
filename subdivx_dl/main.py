@@ -11,8 +11,20 @@ SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
-user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0'}
-https = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+headers = {
+	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0'
+}
+
+https = urllib3.PoolManager(headers=headers, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+
+cookie = None
+if not existCookie():
+    cookie = getCookie(https, SUBDIVX_URL)
+    saveCookie(cookie)
+else:
+    cookie = readCookie()
+
+headers['cookie'] = cookie
 
 def main():
 
