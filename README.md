@@ -79,11 +79,21 @@ Description view with comments in a grid format
 
 
 ## Troubleshooting
+**Subtitles not found**  
+
 **Note**: If a cookie is not found during the initial search, you will receive the message 'Subtitles not found'. Retry the search to normalize the process.
 
 If the message 'Subtitles not found' is ever returned, follow these steps:
 * Delete the cookie file named **sdx-dl** in the temporary folder
 * Perform the search again
+
+
+**Uncompress rar files**  
+
+The module ``rarfile`` specifies:
+>Compressed files are extracted by executing external tool: unrar (preferred), unar, 7zip or bsdtar.
+
+Therefore, you must have one of these tools installed.
 
 ### Author
 subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
