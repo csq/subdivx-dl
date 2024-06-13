@@ -13,20 +13,14 @@ Enter into the folder and execute
     pip install .
 
 ### DEPENDENCIES
-Python versions 3.0+ are supported. Other versions and implementations may or may not work correctly.
+Python versions 3.6+ are supported. Other versions and implementations may or may not work correctly.
 
 Libraries:
 * Tabulate
 * Urllib3
-
-### External dependencies
-* [**wget**](https://www.gnu.org/software/wget/) - Required for download archives from the web.
-* [**unrar**](https://packages.debian.org/bullseye/unrar) - Required for extract files from rar archives.
-
-**Note**: This external dependency must be present since they are executed by subprocess.
+* Rarfile
 
 ## USAGE AND OPTIONS
-
     subdivx-dl [OPTIONS][SEARCH]
 
 ### General Options:
