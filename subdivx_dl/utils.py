@@ -37,8 +37,8 @@ def downloadFile(poolManager, url, location):
 
     with NamedTemporaryFile(dir=location, delete=False) as tempFile:
         for i in range(9, 0, -1):
-            helper.logger.debug('Attempt on server N°%d with url %s', i, address)
             address = url[:20] + 'sub' + str(i) + '/' + url[20:]
+            helper.logger.debug('Attempt on server N°%d with url %s', i, address)
 
             response = poolManager.request('GET', address, preload_content=False)
             tempFile.write(response.data)
