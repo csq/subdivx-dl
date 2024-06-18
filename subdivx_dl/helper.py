@@ -46,4 +46,4 @@ args = parser.parse_args()
 if (args.verbose):
     logging.basicConfig(level=logging.INFO, format=fmt_compact)
 else:
-    logging.basicConfig(filename=log_file, filemode='w', encoding='utf-8', level=logging.DEBUG, format=fmt_full, datefmt=datefmt)
+    logging.basicConfig(filename=log_file, filemode='w', encoding='utf-8', level=logging.INFO, format=fmt_full, datefmt=datefmt)
