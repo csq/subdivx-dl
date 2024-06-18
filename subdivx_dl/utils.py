@@ -14,6 +14,7 @@ from json import JSONDecodeError
 from tempfile import NamedTemporaryFile
 from rarfile import RarFile
 from zipfile import ZipFile
+from guessit import guessit
 
 def getFileExtension(filePath):
     with open(filePath, 'rb') as file:
@@ -292,13 +293,15 @@ def renameAndMoveSubtitle(args, pathFile, destination):
 
 def getDataPage(args, poolManager, url, search):
 
+    query = parseSearchQuery(search)
+
     payload = {
-        'buscar': search,
+        'buscar': query,
         'filtros': '',
         'tabla': 'resultados'
     }
 
-    helper.logger.info('Starting request to subdivx.com with search query: %s', search)
+    helper.logger.info('Starting request to subdivx.com with search: %s parsed as: %s', search, query)
     request = poolManager.request('POST', url, fields=payload)
 
     try:
@@ -330,12 +333,30 @@ def getDataPage(args, poolManager, url, search):
             dateList.append(match.group(1))
 
     if not idList:
-        helper.logger.info('Subtitles not found for %s', search)
+        helper.logger.info('Subtitles not found for %s', query)
         if (args.verbose != True):
             print('Subtitles not found')
         exit(0)
 
     return titleList, descriptionList, idList, downloadList, userList, dateList
+
+def parseSearchQuery(search):
+    try:
+        result = guessit(search)
+        fileType = result['type']
+        title = result['title']
+        year = result.get('year', '')
+        season = result.get('season', '')
+        episode = result.get('episode', '')
+    except KeyError:
+        return search
+
+    if (fileType == 'episode'):
+        query = f'{title} S{season:02d}E{episode:02d}'
+    else:
+        query = f'{title} {year}'
+
+    return query
 
 def getComments(poolManager, url, id_sub):
 
