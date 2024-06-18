@@ -165,7 +165,9 @@ def movieSubtitle(args, pathFile, destination):
     fileNameSelect = printMenuContentDir(args, pathFile)
     pathFileSelect = os.path.join(pathFile, fileNameSelect)
 
-    newName = args.SEARCH
+    # Rename file
+    searchName, fileExtension = os.path.splitext(args.SEARCH)
+    newName = searchName.strip()
 
     if (args.no_rename == False):
         new_name = os.path.join(destination, f'{newName}.srt')
