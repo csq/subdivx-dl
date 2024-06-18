@@ -19,6 +19,7 @@ Libraries:
 * Tabulate
 * Urllib3
 * Rarfile
+* Guessit
 
 ## USAGE AND OPTIONS
     subdivx-dl [OPTIONS][SEARCH]
@@ -39,7 +40,11 @@ These examples show habitual operation
 
 Search and download a single subtitle in the current directory
 
-    subdivx-dl 'Silicon Valley S01E01'
+    subdivx-dl 'Silicon Valley S01E01'  
+
+    or  
+    
+    subdivx-dl 'The.Matrix.Revolutions.2003.REMASTERED.1080p.10bit.BluRay.8CH.x265.HEVC-PSA.mkv'  
 
 Search and download multiples subtitles in same directory
 
