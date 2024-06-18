@@ -1,2 +1,2 @@
  # Format: yyyy-mm-dd
-__version__ = '2024.06.13'
+__version__ = '2024.06.18'
