@@ -1,14 +1,17 @@
 # Subdivx-dl
 CLI tool for search and download subtitles for the site www.subdivx.com
 
+## Other language
+- [Español](README-es.md)  
+
 ## INSTALLATION
-You can install subdivx-dl using pip command:
+You can install subdivx-dl by following these steps:
 
 Download the repository
 
     git clone www.github.com/csq/subdivx-dl
 
-Enter into the folder and execute
+Enter into the folder ``subdivx-dl`` and execute
 
     pip install .
 
@@ -90,6 +93,8 @@ Description view with comments in a grid format
 
 If the message 'Subtitles not found' is ever returned, follow these steps:
 * Delete the cookie file named **sdx-dl** in the temporary folder
+    * Windows: ``C:\Users\user_name\AppData\Local\Temp``  
+    * Linux: ``/tmp``  
 * Perform the search again
 
 
