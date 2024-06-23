@@ -84,21 +84,21 @@ def main():
 		userInput = selectMenu()
 
 		try:
-			select_action = int(userInput)
+			selectAction = int(userInput)
 		except ValueError:
 			print('\nInput only numbers')
 			time.sleep(1)
 			continue
 
-		if (select_action > 1) or (select_action <= -1):
+		if (selectAction > 1) or (selectAction <= -1):
 			print('\nInput valid numbers')
 			time.sleep(1)
 			continue
-		elif (select_action == 1):
+		elif (selectAction == 1):
 			clear()
 			getSubtitle(args, https, url)
 			exit(0)
-		elif (select_action == 0):
+		elif (selectAction == 0):
 			clear()
 			exit(0)
 

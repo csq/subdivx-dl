@@ -20,12 +20,12 @@ def getFileExtension(filePath):
     with open(filePath, 'rb') as file:
         header = file.read(4)
 
-        file_signatures = {
+        fileSignatures = {
             b'\x50\x4B\x03\x04': '.zip',
             b'\x52\x61\x72\x21': '.rar'
         }
 
-        for signature, extension in file_signatures.items():
+        for signature, extension in fileSignatures.items():
             if header.startswith(signature):
                 return extension
 
@@ -171,32 +171,32 @@ def movieSubtitle(args, pathFile, destination):
     newName = searchName.strip()
 
     if (args.no_rename == False):
-        new_name = os.path.join(destination, f'{newName}.srt')
-        helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(new_name))
+        newName = os.path.join(destination, f'{newName}.srt')
+        helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(newName))
 
-        os.makedirs(os.path.dirname(new_name), exist_ok=True)
+        os.makedirs(os.path.dirname(newName), exist_ok=True)
 
         try:
-            shutil.copy(pathFileSelect, new_name)
+            shutil.copy(pathFileSelect, newName)
         except PermissionError:
             if (args.verbose != True):
                 clear()
-                print('You do not have permissions to write here ', os.path.dirname(new_name))
+                print('You do not have permissions to write here ', os.path.dirname(newName))
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
     else:
-        new_name = os.path.join(destination, os.path.basename(pathFileSelect))
+        newName = os.path.join(destination, os.path.basename(pathFileSelect))
         helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
 
-        os.makedirs(os.path.dirname(new_name), exist_ok=True)
+        os.makedirs(os.path.dirname(newName), exist_ok=True)
 
         try:
-            shutil.copy(pathFileSelect, new_name)
+            shutil.copy(pathFileSelect, newName)
         except PermissionError:
             if (args.verbose != True):
                 clear()
-                print('You do not have permissions to write here ', os.path.dirname(new_name))
+                print('You do not have permissions to write here ', os.path.dirname(newName))
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
@@ -205,24 +205,24 @@ def tvShowSubtitles(args, pathFile, destination):
     files = os.listdir(pathFile)
 
     # TV series season and episode names
-    pattern_series_tv = '(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
+    patternSeriesTv = '(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
 
     index = 0
 
     while (index < len(files)):
-        file_src = os.path.join(pathFile, files[index])
+        fileSrc = os.path.join(pathFile, files[index])
 
         if (files[index].endswith('.srt') and (args.no_rename != True)):
-            result = re.search(pattern_series_tv, files[index])
+            result = re.search(patternSeriesTv, files[index])
 
             try:
-                get_tv_show = result.group(1)
-                get_season = result.group(2)
-                get_episode = result.group(3)
+                getTvShow = result.group(1)
+                getSeason = result.group(2)
+                getEpisode = result.group(3)
 
-                serie = get_tv_show
-                season = 'S' + get_season
-                episode = 'E' + get_episode
+                serie = getTvShow
+                season = 'S' + getSeason
+                episode = 'E' + getEpisode
 
                 exclude = ['.', '-']
                 for i in exclude:
@@ -234,53 +234,53 @@ def tvShowSubtitles(args, pathFile, destination):
                 # Format name example:
                 # Serie - S05E01.srt | S05E01.srt
                 if (serie != ''):
-                    new_name = serie + ' - ' + season + episode + '.srt'
+                    newName = serie + ' - ' + season + episode + '.srt'
                 else:
-                    new_name = season + episode + '.srt'
+                    newName = season + episode + '.srt'
 
             except Exception as e:
                 helper.logger.error(e)
-                file_dst = os.path.join(destination, files[index])
+                fileDst = os.path.join(destination, files[index])
                 helper.logger.info('No match Regex: Just move subtitle [%s]', files[index])
 
-                os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+                os.makedirs(os.path.dirname(fileDst), exist_ok=True)
 
                 try:
-                    shutil.copy(file_src, file_dst)
+                    shutil.copy(fileSrc, fileDst)
                 except PermissionError:
                     if (args.verbose != True):
                         clear()
-                        print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                        print('You do not have permissions to write here ', os.path.dirname(fileDst))
                     helper.logger.warning('Permissions issues on destination directory')
                     exit(0)
             else:
-                file_dst = os.path.join(destination, new_name)
-                helper.logger.info('Move subtitle [%s] as [%s]', files[index], new_name)
+                fileDst = os.path.join(destination, newName)
+                helper.logger.info('Move subtitle [%s] as [%s]', files[index], newName)
 
-                os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+                os.makedirs(os.path.dirname(fileDst), exist_ok=True)
 
                 try:
-                    shutil.copy(file_src, file_dst)
+                    shutil.copy(fileSrc, fileDst)
                 except PermissionError:
                     if (args.verbose != True):
                         clear()
-                        print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                        print('You do not have permissions to write here ', os.path.dirname(fileDst))
                     helper.logger.warning('Permissions issues on destination directory')
                     exit(0)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif (files[index].endswith('.srt')):
-            file_dst = os.path.join(destination, files[index])
+            fileDst = os.path.join(destination, files[index])
             helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
 
-            os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+            os.makedirs(os.path.dirname(fileDst), exist_ok=True)
 
             try:
-                shutil.copy(file_src, file_dst)
+                shutil.copy(fileSrc, fileDst)
             except PermissionError:
                 if (args.verbose != True):
                     clear()
-                    print('You do not have permissions to write here ', os.path.dirname(file_dst))
+                    print('You do not have permissions to write here ', os.path.dirname(fileDst))
                 helper.logger.warning('Permissions issues on destination directory')
                 exit(0)
         index += 1
@@ -361,10 +361,10 @@ def parseSearchQuery(search):
 
     return query
 
-def getComments(poolManager, url, id_sub):
+def getComments(poolManager, url, idSub):
 
     payload = {
-        'getComentarios': id_sub
+        'getComentarios': idSub
     }
 
     request = poolManager.request('POST', url, fields=payload)
@@ -406,7 +406,7 @@ def printSearchResult(args, titleList, downloadList, dateList, userList):
         print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', colalign=('center', 'center','decimal', 'center', 'center')))
 
 def printSelectDescription(args, selection, descriptionList):
-    description_select = [['Description']]
+    descriptionSelect = [['Description']]
     words = descriptionList[selection].split()
 
     maxLengh = 77
@@ -414,31 +414,31 @@ def printSelectDescription(args, selection, descriptionList):
 
     line = ''
     for word in words:
-        size_word = len(word)
+        sizeWord = len(word)
 
-        if (count + size_word <= maxLengh):
+        if (count + sizeWord <= maxLengh):
             line = '{} {}'.format(line, word)
-            count = count + size_word
-        elif (count + size_word > maxLengh):
+            count = count + sizeWord
+        elif (count + sizeWord > maxLengh):
                 # Slice word
                 missing = maxLengh - count
-                slice_1 = word[:missing]
-                slice_2 = word[missing:]
+                sliceOne = word[:missing]
+                sliceTwo = word[missing:]
 
-                line = '{} {}'.format(line, slice_1)
-                count = count + len(slice_1)
+                line = '{} {}'.format(line, sliceOne)
+                count = count + len(sliceOne)
 
                 if (count == maxLengh):
-                    description_select.append([line])
-                    line = '{}'.format(slice_2)
-                    count = len(slice_2)
-    description_select.append([line])
+                    descriptionSelect.append([line])
+                    line = '{}'.format(sliceTwo)
+                    count = len(sliceTwo)
+    descriptionSelect.append([line])
 
     # Check flag --grid
     if (args.grid == False):
-        print(tabulate(description_select, headers='firstrow', tablefmt='pretty', stralign='left'))
+        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='pretty', stralign='left'))
     else:
-        print(tabulate(description_select, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
+        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
 
 def getSubtitle(args, poolManager, url):
     if (args.verbose != True):
@@ -457,9 +457,9 @@ def getSubtitle(args, poolManager, url):
 
     # Determinate final path for subtitle
     if (LOCATION_DESTINATION == None):
-        parent_folder = os.getcwd()
+        parentFolder = os.getcwd()
     else:
-        parent_folder = LOCATION_DESTINATION
+        parentFolder = LOCATION_DESTINATION
 
     # In case the server does not return a file, exit
     listDirectory = os.listdir(fpath)
@@ -485,7 +485,7 @@ def getSubtitle(args, poolManager, url):
             unrar(pathFile, fpath)
 
     # Rename and/or move subtitles
-    renameAndMoveSubtitle(args, fpath, parent_folder)
+    renameAndMoveSubtitle(args, fpath, parentFolder)
 
     # Remove temp folder
     try:
@@ -511,12 +511,12 @@ def printSelectComments(args, commentList):
         line = ''
 
         for word in words:
-            len_word = len(word)
+            lenWord = len(word)
 
-            if (count + len_word < maxLengh):
+            if (count + lenWord < maxLengh):
                 line = '{} {}'.format(line, word)
-                count = count + len_word
-            elif (count + len_word >= maxLengh):
+                count = count + lenWord
+            elif (count + lenWord >= maxLengh):
                 # Slice word
                 slice = []
 
@@ -554,7 +554,7 @@ def selectMenu():
 # Cookie functions
 ##############################################################################
 
-cookie_name = 'sdx-dl'
+cookieName = 'sdx-dl'
 
 def getCookie(poolManager, url):
     helper.logger.info('Get cookie from %s', url)
@@ -566,35 +566,35 @@ def getCookie(poolManager, url):
     cookie = response.headers.get('Set-Cookie')
 
     # Split cookie
-    cookie_parts = cookie.split(';')
+    cookieParts = cookie.split(';')
 
-    # Return sdx_cookie
-    return cookie_parts[0]
+    # Return sdxCookie
+    return cookieParts[0]
 
-def saveCookie(sdx_cookie):
+def saveCookie(sdxCookie):
     # Save cookie in temporary folder
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
 
-    with open(cookie_path, 'w') as file:
-        file.write(sdx_cookie)
+    with open(cookiePath, 'w') as file:
+        file.write(sdxCookie)
         file.close()
 
     helper.logger.info('Save cookie')
 
 def existCookie():
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
 
-    return os.path.exists(cookie_path)
+    return os.path.exists(cookiePath)
 
 def readCookie():
     helper.logger.info('Read cookie')
 
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
 
-    with open(cookie_path, 'r') as file:
+    with open(cookiePath, 'r') as file:
         cookie = file.read()
 
     return cookie
