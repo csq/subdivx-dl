@@ -17,14 +17,7 @@ headers = {
 
 https = urllib3.PoolManager(headers=headers, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
-cookie = None
-if not existCookie():
-    cookie = getCookie(https, SUBDIVX_URL)
-    saveCookie(cookie)
-else:
-    cookie = readCookie()
-
-headers['cookie'] = cookie
+setCookie(https, headers, SUBDIVX_URL)
 
 def main():
 

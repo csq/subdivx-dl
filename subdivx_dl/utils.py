@@ -598,3 +598,14 @@ def readCookie():
         cookie = file.read()
 
     return cookie
+
+def setCookie(https, header, url):
+    cookie = None
+
+    if not existCookie():
+        cookie = getCookie(https, SUBDIVX_URL)
+        saveCookie(cookie)
+    else:
+        cookie = readCookie()
+
+    header['cookie'] = cookie
