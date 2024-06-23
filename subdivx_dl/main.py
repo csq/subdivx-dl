@@ -33,7 +33,8 @@ def main():
 
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
-		url = 'https://subdivx.com/'+str(idList[0])
+		firstSubtitleId = idList[0]
+		url = f'https://subdivx.com/{firstSubtitleId}'
 		getSubtitle(args, https, url)
 		exit(0)
 
@@ -49,8 +50,8 @@ def main():
 
 		try:
 			selection = int(userInput) - 1
-			id_subtitle = str(idList[selection])
-			url = 'https://subdivx.com/'+id_subtitle
+			idSubtitle = str(idList[selection])
+			url = f'https://subdivx.com/{idSubtitle}'
 		except ValueError:
 			print('\nInput valid options')
 			time.sleep(1)
