@@ -70,19 +70,19 @@ Download subtitle directly
     subdivx-dl -f 'It Crowd S02E01'
 
 ### Screenshots
-Search results view
+Search results view  
 ![example](img/img-01.png)
 
-Description view
+Description view  
 ![example](img/img-02.png)
 
-Selection view: in case of having multiple subtitles
+Selection view: in case of having multiple subtitles  
 ![example](img/img-03.png)
 
-Search results view in a grid format
+Search results view in a grid format  
 ![example](img/img-04.png)
 
-Description view with comments in a grid format
+Description view with comments in a grid format  
 ![example](img/img-05.png)
 
 
