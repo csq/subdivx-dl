@@ -39,7 +39,7 @@ def downloadFile(poolManager, url, location):
     with NamedTemporaryFile(dir=location, delete=False) as tempFile:
         for i in range(9, 0, -1):
             address = url[:20] + 'sub' + str(i) + '/' + url[20:]
-            helper.logger.debug('Attempt on server N°%d with url %s', i, address)
+            helper.logger.info('Attempt on server N°%d with url %s', i, address)
 
             response = poolManager.request('GET', address, preload_content=False)
             tempFile.write(response.data)
@@ -67,7 +67,7 @@ def unzip(fileZip, destination):
             helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
                 if (file.endswith(('.srt', '.SRT'))):
-                    helper.logger.debug('Unzip [%s]', os.path.basename(file))
+                    helper.logger.info('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
             z.close()
     except:
