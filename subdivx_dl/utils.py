@@ -91,6 +91,7 @@ def unrar(fileRar, destination):
 
     for file in rf.namelist():
         if (file.endswith(('.srt', '.SRT'))):
+            helper.logger.info('Unrar [%s]', os.path.basename(file))
             rf.extract(file, destination)
     rf.close()
 
