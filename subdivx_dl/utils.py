@@ -603,7 +603,7 @@ def setCookie(https, header, url):
     cookie = None
 
     if not existCookie():
-        cookie = getCookie(https, SUBDIVX_URL)
+        cookie = getCookie(https, url)
         saveCookie(cookie)
     else:
         cookie = readCookie()
