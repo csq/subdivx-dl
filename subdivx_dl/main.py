@@ -67,7 +67,7 @@ def main():
 
 		# Checking flag for add comments view
 		if (args.comments == True):
-			commentList = getComments(https, SUBDIVX_URL, id_subtitle)
+			commentList = getComments(https, SUBDIVX_URL, idSubtitle)
 			if (not commentList):
 				pass
 			else:
