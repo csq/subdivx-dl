@@ -354,8 +354,9 @@ def parseSearchQuery(search):
     except KeyError:
         return search
 
-    if (fileType == 'episode'):
-        query = f'{title} S{season:02d}E{episode:02d}'
+    if fileType == 'episode':
+        episodeNumber = f'E{episode:02d}' if episode else ''
+        query = f'{title} S{season:02d}{episodeNumber}'
     else:
         query = f'{title} {year}'
 
