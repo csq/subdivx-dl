@@ -3,6 +3,7 @@
 
 import tempfile
 import shutil
+import datetime
 import json
 import time
 import os
@@ -320,34 +321,32 @@ def getDataPage(args, poolManager, url, search):
         helper.logger.error('Response could not be serialized')
         exit(0)
 
-    idList = list()
-    titleList = list()
-    descriptionList = list()
-    downloadList = list()
-    userList = list()
-    dateList = list()
+    searchResults = []
 
-    for key in data:
-        idList.append(key['id'])
-        titleList.append(key['titulo'])
-        descriptionList.append(key['descripcion'])
-        downloadList.append(key['descargas'])
-        userList.append(key['nick'])
+    for result in data:
+        subtitle = {
+            'id_subtitle': result['id'],
+            'title': result['titulo'],
+            'description': result['descripcion'],
+            'downloads': result['descargas'],
+            'uploader': result['nick'],
+            'upload_date': parseDate(result['fecha_subida']) if result['fecha_subida'] else '-'
+        }
+        searchResults.append(subtitle)
 
-        # Format date (year-month-day)
-        match = re.search(r'(\d+-\d+-\d+)', str(key['fecha_subida']))
-        if (match is None):
-            dateList.append('-')
-        else:
-            dateList.append(match.group(1))
-
-    if not idList:
+    if not searchResults:
         helper.logger.info('Subtitles not found for %s', query)
         if (args.verbose != True):
             print('Subtitles not found')
         exit(0)
 
-    return titleList, descriptionList, idList, downloadList, userList, dateList
+    return searchResults
+
+def parseDate(date):
+    try:
+        return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+    except ValueError:
+        return None
 
 def parseSearchQuery(search):
     try:
@@ -390,21 +389,12 @@ def getComments(poolManager, url, idSub):
 
     return commentList
 
-def printSearchResult(args, titleList, downloadList, dateList, userList):
+def printSearchResult(args, searchData):
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
 
-    index = 1
-    row = []
-
-    while index <= len(titleList):
-        row.append(index)
-        row.append(titleList[index - 1])
-        row.append(downloadList[index - 1])
-        row.append(dateList[index - 1])
-        row.append(userList[index - 1])
-        data.append(row[:])
-        row.clear()
-        index += 1
+    for index, item in enumerate(searchData, start=1):
+        row = [index, item['title'], item['downloads'], item['upload_date'], item['uploader']]
+        data.append(row)
 
     # Check flag --grid
     if (args.grid == False):
@@ -412,9 +402,9 @@ def printSearchResult(args, titleList, downloadList, dateList, userList):
     else:
         print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', colalign=('center', 'center','decimal', 'center', 'center')))
 
-def printSelectDescription(args, selection, descriptionList):
+def printSelectDescription(args, selection, searchData):
     descriptionSelect = [['Description']]
-    words = descriptionList[selection].split()
+    words = searchData[selection]['description'].split()
 
     maxLengh = 77
     count = 0

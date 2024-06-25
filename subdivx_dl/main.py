@@ -22,11 +22,11 @@ setCookie(https, headers, SUBDIVX_URL)
 def main():
 
 	# Get all data from search
-	titleList, descriptionList, idList, downloadList, userList, dateList = getDataPage(args, https, SUBDIVX_URL, FIND_SUBTITLE)
+	searchData = getDataPage(args, https, SUBDIVX_URL, FIND_SUBTITLE)
 
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
-		firstSubtitleId = idList[0]
+		firstSubtitleId = searchData[0]['id_subtitle']
 		url = f'https://subdivx.com/{firstSubtitleId}'
 		getSubtitle(args, https, url)
 		exit(0)
@@ -36,14 +36,14 @@ def main():
 		clear()
 
 		# Show Search Results
-		printSearchResult(args, titleList, downloadList, dateList, userList)
+		printSearchResult(args, searchData)
 
 		# Get the user selection
 		userInput = mainMenu()
 
 		try:
 			selection = int(userInput) - 1
-			idSubtitle = str(idList[selection])
+			idSubtitle = str(searchData[selection]['id_subtitle'])
 			url = f'https://subdivx.com/{idSubtitle}'
 		except ValueError:
 			print('\nInput valid options')
@@ -63,7 +63,7 @@ def main():
 			exit(0)
 
 		clear()
-		printSelectDescription(args, selection, descriptionList)
+		printSelectDescription(args, selection, searchData)
 
 		# Checking flag for add comments view
 		if (args.comments == True):
