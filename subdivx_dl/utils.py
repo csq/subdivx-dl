@@ -16,6 +16,8 @@ from rarfile import RarFile
 from zipfile import ZipFile
 from guessit import guessit
 
+subtitleExtensions = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+
 def getFileExtension(filePath):
     with open(filePath, 'rb') as file:
         header = file.read(4)
@@ -66,7 +68,7 @@ def unzip(fileZip, destination):
         with ZipFile(fileZip, 'r') as z:
             helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if (file.endswith(('.srt', '.SRT'))):
+                if (file.endswith(subtitleExtensions)):
                     helper.logger.info('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
             z.close()
@@ -90,7 +92,7 @@ def unrar(fileRar, destination):
     rf = RarFile(fileRar)
 
     for file in rf.namelist():
-        if (file.endswith(('.srt', '.SRT'))):
+        if (file.endswith(subtitleExtensions)):
             helper.logger.info('Unrar [%s]', os.path.basename(file))
             rf.extract(file, destination)
     rf.close()
@@ -104,7 +106,7 @@ def printMenuContentDir(args, pathDir):
     index = 1
     x = 0
     while (x < len(files)):
-        if (files[x].endswith(('.srt', '.SRT'))):
+        if (files[x].endswith(subtitleExtensions)):
             data.append(index)
             data.append(os.path.basename(files[x]))
             header.append(data[:])
@@ -151,13 +153,13 @@ def printMenuContentDir(args, pathDir):
                 clear()
                 exit(0)
 
-            # Return name file with extension .srt selected
+            # Return the filename of the selected subtitle file
             clear()
             return fileName
     else:
-        # Return name file with extension .srt exclude .zip or .rar
+        # Return the filename of the subtitle, excluding .zip or .rar extensions
         for x in range(2):
-            if (files[x].endswith(('.srt', '.SRT'))):
+            if (files[x].endswith(subtitleExtensions)):
                 return os.path.basename(files[x])
 
 def movieSubtitle(args, pathFile, destination):
@@ -170,8 +172,11 @@ def movieSubtitle(args, pathFile, destination):
     searchName, fileExtension = os.path.splitext(args.SEARCH)
     newName = searchName.strip()
 
+    # Get file extension of subtitle downloaded
+    subtitleFileExtension = os.path.splitext(pathFileSelect)[1]
+
     if (args.no_rename == False):
-        newName = os.path.join(destination, f'{newName}.srt')
+        newName = os.path.join(destination, f'{newName}{subtitleFileExtension}')
         helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(newName))
 
         os.makedirs(os.path.dirname(newName), exist_ok=True)
@@ -211,8 +216,9 @@ def tvShowSubtitles(args, pathFile, destination):
 
     while (index < len(files)):
         fileSrc = os.path.join(pathFile, files[index])
+        subtitleFileExtension = os.path.splitext(files[index])[1]
 
-        if (files[index].endswith('.srt') and (args.no_rename != True)):
+        if (files[index].endswith(subtitleExtensions) and (args.no_rename != True)):
             result = re.search(patternSeriesTv, files[index])
 
             try:
@@ -234,9 +240,9 @@ def tvShowSubtitles(args, pathFile, destination):
                 # Format name example:
                 # Serie - S05E01.srt | S05E01.srt
                 if (serie != ''):
-                    newName = serie + ' - ' + season + episode + '.srt'
+                    newName = serie + ' - ' + season + episode + subtitleFileExtension
                 else:
-                    newName = season + episode + '.srt'
+                    newName = season + episode + subtitleFileExtension
 
             except Exception as e:
                 helper.logger.error(e)
@@ -269,7 +275,7 @@ def tvShowSubtitles(args, pathFile, destination):
                     exit(0)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif (files[index].endswith('.srt')):
+        elif (files[index].endswith(subtitleExtensions)):
             fileDst = os.path.join(destination, files[index])
             helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
 
