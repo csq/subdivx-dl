@@ -27,16 +27,18 @@ Libraries:
 ## USAGE AND OPTIONS
     subdivx-dl [OPTIONS][SEARCH]
 
-### General Options:
-    -h, --help                      Print this help text and exit
-    -V, --version                   Print program version and exit
-    -s, --season                    Download full season subtitles
-    -l, --location LOCATION         Download subtitle in destination directory
-    -g, --grid                      Print results in a grid format
-    -nr, --no-rename                Disable rename files
-    -c, --comments                  Show subtitles comments in search
-    -f, --first                     Download the first matching
-    -v, --verbose                   Be verbose
+### Opciones Generales:
+    -h, --help                          Print this help text and exit
+    -V, --version                       Print program version and exit
+    -s, --season                        Download full season subtitles
+    -l, --location LOCATION             Download subtitle in destination directory
+    -g, --grid                          Print results in a grid format
+    -nr, --no-rename                    Disable rename files
+    -c, --comments                      Show subtitles comments in search
+    -f, --first                         Download the first matching
+    -odownloads, --order-by-downloads   Order results by downloads
+    -odates, --order-by-dates           Order results by dates
+    -v, --verbose                       Be verbose
 
 #### Examples
 These examples show habitual operation
