@@ -28,6 +28,9 @@ def main():
 	if (args.order_by_dates == True or args.order_by_downloads == True):
 		searchData = sortData(args, searchData)
 
+	# Limit the number of results displayed based on the user's preference
+	searchData = searchData[:args.lines] if args.lines is not None else searchData
+
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
 		firstSubtitleId = searchData[0]['id_subtitle']
