@@ -24,6 +24,10 @@ def main():
 	# Get all data from search
 	searchData = getDataPage(args, https, SUBDIVX_URL, FIND_SUBTITLE)
 
+	# Sorting data if flag is set
+	if (args.order_by_dates == True or args.order_by_downloads == True):
+		searchData = sortData(args, searchData)
+
 	# Checking flag for switch to fast download mode
 	if (args.first == True):
 		firstSubtitleId = searchData[0]['id_subtitle']

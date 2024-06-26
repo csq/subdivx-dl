@@ -2,8 +2,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import argparse
-import logging
 import tempfile
+import logging
 import os
 
 from subdivx_dl.version import __version__
@@ -25,6 +25,8 @@ parser.add_argument('-g', '--grid', help='show results in a grid', action='store
 parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('-c', '--comments', help='show comments', action='store_true')
 parser.add_argument('-f', '--first', help='download the first matching', action='store_true')
+parser.add_argument('-odownloads', '--order-by-downloads', help='order results by downloads', action='store_true')
+parser.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
 parser.add_argument('-v', '--verbose', help='be verbose', action='store_true')
 
 # Create and configure logger

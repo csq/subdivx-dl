@@ -2,17 +2,17 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import tempfile
-import shutil
 import datetime
+import shutil
 import json
 import time
 import os
 import re
 
+from tempfile import NamedTemporaryFile
+from json import JSONDecodeError
 from tabulate import tabulate
 from subdivx_dl import helper
-from json import JSONDecodeError
-from tempfile import NamedTemporaryFile
 from rarfile import RarFile
 from zipfile import ZipFile
 from guessit import guessit
@@ -342,6 +342,19 @@ def getDataPage(args, poolManager, url, search):
 
     return searchResults
 
+def sortData(args, data):
+    if (args.order_by_downloads == True):
+        return sorted(data, key=lambda item: item['downloads'], reverse=True)
+    elif (args.order_by_dates == True):
+        sortedData = sorted(
+            data,
+            key=lambda item: (
+                datetime.datetime.strptime(item['upload_date'], '%d/%m/%Y'
+                if item['upload_date'] != '-' else '-')
+            ),
+            reverse=True
+        )
+        return sortedData
 def parseDate(date):
     try:
         return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
