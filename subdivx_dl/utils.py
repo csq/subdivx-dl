@@ -54,6 +54,7 @@ def downloadFile(poolManager, url, location):
                 helper.logger.info('Download complete')
 
                 newFilePath = tempFile.name + fileExtension
+                tempFile.close()
                 os.rename(tempFile.name, newFilePath)
 
                 success = True
