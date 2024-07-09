@@ -12,7 +12,7 @@ args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
 headers = {
-	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0'
+	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'
 }
 
 https = urllib3.PoolManager(headers=headers, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
