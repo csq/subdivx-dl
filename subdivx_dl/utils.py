@@ -212,7 +212,7 @@ def tvShowSubtitles(args, pathFile, destination):
     files = os.listdir(pathFile)
 
     # TV series season and episode names
-    patternSeriesTv = '(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
+    patternSeriesTv = r'(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
 
     index = 0
 
@@ -302,14 +302,15 @@ def renameAndMoveSubtitle(args, pathFile, destination):
         # Move and rename bulk srt
         tvShowSubtitles(args, pathFile, destination)
 
-def getDataPage(args, poolManager, url, search):
+def getDataPage(args, poolManager, url, token, search):
 
     query = parseSearchQuery(search)
 
     payload = {
-        'buscar': query,
+        'tabla': 'resultados',
         'filtros': '',
-        'tabla': 'resultados'
+        'buscar395a': query,
+        'token': token
     }
 
     helper.logger.info('Starting request to subdivx.com with search: %s parsed as: %s', search, query)
@@ -567,32 +568,6 @@ def selectMenu():
 
 cookieName = 'sdx-dl'
 
-def getCookie(poolManager, url):
-    helper.logger.info('Get cookie from %s', url)
-
-    # Request petition GET
-    response = poolManager.request('GET', url)
-
-    # Get cookie from response
-    cookie = response.headers.get('Set-Cookie')
-
-    # Split cookie
-    cookieParts = cookie.split(';')
-
-    # Return sdxCookie
-    return cookieParts[0]
-
-def saveCookie(sdxCookie):
-    # Save cookie in temporary folder
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
-
-    with open(cookiePath, 'w') as file:
-        file.write(sdxCookie)
-        file.close()
-
-    helper.logger.info('Save cookie')
-
 def existCookie():
     tempDir = tempfile.gettempdir()
     cookiePath = os.path.join(tempDir, cookieName)
@@ -605,18 +580,58 @@ def readCookie():
     tempDir = tempfile.gettempdir()
     cookiePath = os.path.join(tempDir, cookieName)
 
-    with open(cookiePath, 'r') as file:
-        cookie = file.read()
+    cookie = ''
 
+    with open(cookiePath, 'r') as file:
+        for line in file.read().splitlines():
+            key, value = line.split('=')
+            if key != 'token':
+                cookie += f'{key}={value}; '
     return cookie
 
-def setCookie(https, header, url):
+def setCookie(header):
     cookie = None
 
     if not existCookie():
-        cookie = getCookie(https, url)
-        saveCookie(cookie)
+        globalConfig()
+        cookie = readCookie()
     else:
         cookie = readCookie()
 
     header['cookie'] = cookie
+
+# Read token
+def readToken():
+    helper.logger.info('Read token')
+
+    tempDir = tempfile.gettempdir()
+    tokenPath = os.path.join(tempDir, cookieName)
+    token = ''
+
+    with open(tokenPath, 'r') as token_file:
+        for line in token_file:
+            key, value = line.strip().split('=')
+            if key == 'token':
+                token = value
+
+    return token
+
+def globalConfig():
+    clear()
+
+    print('Global configuration mode')
+    print('Paste your cookies and token here:')
+
+    cf_clearance = input('\ncf_clearance: ')
+    sdx = input('\nsdx: ')
+    token = input('\ntoken: ')
+
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
+
+    with open(cookiePath, 'w') as config_file:
+        config_file.write(f'cf_clearance={cf_clearance}\n'
+                          f'sdx={sdx}\n'
+                          f'token={token}\n')
+
+    print('\nDone')

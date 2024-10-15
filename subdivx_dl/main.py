@@ -17,12 +17,13 @@ headers = {
 
 https = urllib3.PoolManager(headers=headers, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
-setCookie(https, headers, SUBDIVX_URL)
+setCookie(headers)
+token = readToken()
 
 def main():
 
 	# Get all data from search
-	searchData = getDataPage(args, https, SUBDIVX_URL, FIND_SUBTITLE)
+	searchData = getDataPage(args, https, SUBDIVX_URL, token, FIND_SUBTITLE)
 
 	# Sorting data if flag is set
 	if (args.order_by_dates == True or args.order_by_downloads == True):
