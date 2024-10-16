@@ -24,6 +24,28 @@ Librerias:
 * Rarfile
 * Guessit
 
+## CONFIGURACION
+Configure las cookies y el token, tome estos datos desde Herramientas de desarrollador de su navegador.
+
+Ejemplo en Firefox
+Abrir Herramientas de desarrollador (**Ctrl+May+I**)
+
+Copiar el valor de ``cf_clearance`` y de ``sdx``
+
+<img src="img/img-06.png" width="800" height="400"/>
+
+&nbsp;
+
+Copiar el valor del ``token``
+
+<img src="img/img-07.png" width="800" height="400"/>
+
+&nbsp;
+
+Pegar todos valores
+
+![example](img/img-08.png)
+
 ## USO Y OPCIONES
     subdivx-dl [OPTIONS][SEARCH]
 
