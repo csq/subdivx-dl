@@ -319,7 +319,14 @@ def getDataPage(args, poolManager, url, token, search):
     try:
         data = json.loads(request.data).get('aaData')
     except JSONDecodeError:
-        print('Subtitles not found')
+        clear()
+        print('Subtitles not found because cookies expired')
+
+        deleteCookie()
+
+        print('\nCookies deleted')
+        print('\nTry again')
+
         helper.logger.error('Response could not be serialized')
         exit(0)
 
@@ -602,6 +609,13 @@ def setCookie(header):
         cookie = readCookie()
 
     header['cookie'] = cookie
+
+def deleteCookie():
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
+
+    if os.path.exists(cookiePath):
+        os.remove(cookiePath)
 
 # Read token
 def readToken():
