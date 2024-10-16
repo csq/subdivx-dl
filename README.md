@@ -30,19 +30,21 @@ Configure cookies and token, take this data from Developer Tools of your browser
 Example in Firefox
 Open Developer Tools (**Ctrl+Shift+I**)
 
-Copy ``cf_clearance`` and ``sdx`` values
+**Important**: Make a query and search into section **Network** the file ``ajax.php``
+
+* Copy ``cf_clearance`` and ``sdx`` values
 
 <img src="img/img-06.png" width="800" height="400"/>
 
 &nbsp;
 
-Copy ``token`` value
+* Copy ``token`` value
 
 <img src="img/img-07.png" width="800" height="400"/>
 
 &nbsp;
 
-Paste all values
+* Paste all values when requested
 
 ![example](img/img-08.png)
 
