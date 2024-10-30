@@ -306,10 +306,12 @@ def getDataPage(args, poolManager, url, token, search):
 
     query = parseSearchQuery(search)
 
+    version = getWebVersion(poolManager)
+
     payload = {
         'tabla': 'resultados',
         'filtros': '',
-        'buscar396e': query,
+        'buscar' + version: query,
         'token': token
     }
 
@@ -571,6 +573,26 @@ def selectMenu():
 
     userInput = input('Selection: ')
     return userInput
+
+def getWebVersion(poolManager):
+    url = 'https://www.subdivx.com/'
+    request = poolManager.request('GET', url)
+
+    label = 'id="vs">'
+
+    try:
+        response_data = request.data.decode('utf-8')
+
+        version_start_index = response_data.find(label) + len(label)
+        version_end_index = response_data.find('</div>', version_start_index)
+
+        version_text = response_data[version_start_index:version_end_index]
+
+        version = version_text.replace('v', '').replace('.', '')
+
+        return version
+    except Exception as error:
+        helper.logger.error(error)
 
 ##############################################################################
 # Cookie functions
