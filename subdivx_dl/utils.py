@@ -309,7 +309,7 @@ def getDataPage(args, poolManager, url, token, search):
     payload = {
         'tabla': 'resultados',
         'filtros': '',
-        'buscar396d': query,
+        'buscar396e': query,
         'token': token
     }
 
