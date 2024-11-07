@@ -303,53 +303,64 @@ def renameAndMoveSubtitle(args, pathFile, destination):
         tvShowSubtitles(args, pathFile, destination)
 
 def getDataPage(args, poolManager, url, token, search):
+    print('Searching...', end='\r')
 
     query = parseSearchQuery(search)
-
     version = getWebVersion(poolManager)
 
     payload = {
         'tabla': 'resultados',
         'filtros': '',
-        'buscar' + version: query,
+        f'buscar{version}': query,
         'token': token
     }
 
     helper.logger.info('Starting request to subdivx.com with search: %s parsed as: %s', search, query)
-    request = poolManager.request('POST', url, fields=payload)
 
-    try:
-        data = json.loads(request.data).get('aaData')
-    except JSONDecodeError:
-        clear()
-        print('Subtitles not found because cookies expired')
-
-        deleteCookie()
-
-        print('\nCookies deleted')
-        print('\nTry again')
-
-        helper.logger.error('Response could not be serialized')
-        exit(0)
-
+    maxAttempts = 3
     searchResults = []
 
-    for result in data:
-        subtitle = {
-            'id_subtitle': result['id'],
-            'title': result['titulo'],
-            'description': result['descripcion'],
-            'downloads': result['descargas'],
-            'uploader': result['nick'],
-            'upload_date': parseDate(result['fecha_subida']) if result['fecha_subida'] else '-'
-        }
-        searchResults.append(subtitle)
+    for attempt in range(maxAttempts):
+        helper.logger.info('Attempt number %s', attempt + 1)
 
-    if not searchResults:
-        helper.logger.info('Subtitles not found for %s', query)
-        if (args.verbose != True):
-            print('Subtitles not found')
-        exit(0)
+        if attempt > 0:
+            delay()
+
+        request = poolManager.request('POST', url=url, fields=payload)
+
+        try:
+            data = json.loads(request.data).get('aaData')
+        except JSONDecodeError:
+            clear()
+            print('Subtitles not found because cookie expired')
+            deleteCookie()
+            print('\nCookie deleted')
+            print('\nTry again')
+
+            helper.logger.error('Response could not be serialized')
+            exit(0)
+
+        for result in data:
+            subtitle = {
+                'id_subtitle': result['id'],
+                'title': result['titulo'],
+                'description': result['descripcion'],
+                'downloads': result['descargas'],
+                'uploader': result['nick'],
+                'upload_date': parseDate(result['fecha_subida']) if result['fecha_subida'] else '-'
+            }
+            searchResults.append(subtitle)
+
+        if not searchResults and attempt < (maxAttempts - 1):
+            continue
+        elif searchResults:
+            helper.logger.info('Subtitles found for: %s', query)
+            break
+        elif not searchResults and attempt == maxAttempts - 1:
+            helper.logger.info('Subtitles not found for: %s', query)
+            if (args.verbose != True):
+                print('Subtitles not found')
+            exit(0)
 
     return searchResults
 
@@ -594,6 +605,10 @@ def getWebVersion(poolManager):
     except Exception as error:
         helper.logger.error(error)
 
+def delay(factor=2):
+    delay = 2 ** factor # default value delay is 4 seconds
+    time.sleep(delay)
+
 ##############################################################################
 # Cookie functions
 ##############################################################################
@@ -612,21 +627,41 @@ def readCookie():
     tempDir = tempfile.gettempdir()
     cookiePath = os.path.join(tempDir, cookieName)
 
-    cookie = ''
-
     with open(cookiePath, 'r') as file:
-        for line in file.read().splitlines():
-            key, value = line.split('=')
-            if key != 'token':
-                cookie += f'{key}={value}; '
-    return cookie
+        return file.read()
 
-def setCookie(header):
+def getCookie(poolManager, url):
+    helper.logger.info('Get cookie from %s', url)
+
+    # Request petition GET
+    response = poolManager.request('GET', url, timeout=10)
+
+    # Get cookie from response
+    cookie = response.headers.get('Set-Cookie')
+
+    # Split cookie
+    cookieParts = cookie.split(';')
+
+    # Return sdxCookie
+    return cookieParts[0]
+
+def saveCookie(sdxCookie):
+    # Save cookie in temporary folder
+    tempDir = tempfile.gettempdir()
+    cookiePath = os.path.join(tempDir, cookieName)
+
+    with open(cookiePath, 'w') as file:
+        file.write(sdxCookie)
+        file.close()
+
+    helper.logger.info('Save cookie')
+
+def setCookie(poolManager, url, header):
     cookie = None
 
     if not existCookie():
-        globalConfig()
-        cookie = readCookie()
+        cookie = getCookie(poolManager, url)
+        saveCookie(cookie)
     else:
         cookie = readCookie()
 
@@ -639,38 +674,12 @@ def deleteCookie():
     if os.path.exists(cookiePath):
         os.remove(cookiePath)
 
-# Read token
-def readToken():
-    helper.logger.info('Read token')
+def getToken(poolManager, url):
+    helper.logger.info('Get token')
 
-    tempDir = tempfile.gettempdir()
-    tokenPath = os.path.join(tempDir, cookieName)
-    token = ''
+    data = poolManager.request('GET', url+'inc/gt.php?gt=1', preload_content=False).data
 
-    with open(tokenPath, 'r') as token_file:
-        for line in token_file:
-            key, value = line.strip().split('=')
-            if key == 'token':
-                token = value
+    token = json.loads(data)['token']
 
     return token
 
-def globalConfig():
-    clear()
-
-    print('Global configuration mode')
-    print('Paste your cookies and token here:')
-
-    cf_clearance = input('\ncf_clearance: ')
-    sdx = input('\nsdx: ')
-    token = input('\ntoken: ')
-
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
-
-    with open(cookiePath, 'w') as config_file:
-        config_file.write(f'cf_clearance={cf_clearance}\n'
-                          f'sdx={sdx}\n'
-                          f'token={token}\n')
-
-    print('\nDone')

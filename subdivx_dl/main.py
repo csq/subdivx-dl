@@ -6,6 +6,7 @@ import certifi
 
 from .utils import *
 
+SUBDIVX_MAIN_URL = 'https://www.subdivx.com/'
 SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
 
 args = helper.parser.parse_args()
@@ -17,8 +18,8 @@ headers = {
 
 https = urllib3.PoolManager(headers=headers, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
-setCookie(headers)
-token = readToken()
+setCookie(https, SUBDIVX_MAIN_URL, headers)
+token = getToken(https, SUBDIVX_MAIN_URL)
 
 def main():
 
