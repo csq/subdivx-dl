@@ -24,30 +24,6 @@ Librerias:
 * Rarfile
 * Guessit
 
-## CONFIGURACION
-Configure las cookies y el token, tome estos datos desde Herramientas de desarrollador de su navegador.
-
-Ejemplo en Firefox
-Abrir Herramientas de desarrollador (**Ctrl+May+I**)
-
-**Importante**: Realizar una consulta y buscar en la sección **Red** el archivo ``ajax.php``
-
-* Copiar el valor de ``cf_clearance`` y de ``sdx``
-
-<img src="img/img-06.png" width="800" height="400"/>
-
-&nbsp;
-
-* Copiar el valor del ``token``
-
-<img src="img/img-07.png" width="800" height="400"/>
-
-&nbsp;
-
-* Pegar todos valores cuando se lo solicite
-
-![example](img/img-08.png)
-
 ## USO Y OPCIONES
     subdivx-dl [OPTIONS][SEARCH]
 
@@ -116,9 +92,7 @@ Vista de descripción con comentarios en formato cuadrícula
 
 **Subtitles not found**
 
-**Nota**: Si la cookie no se encuentra durante la búsqueda inicial, recibirás el mensaje 'Subtitles not found'. Vuelve a intentar la búsqueda para normalizar el proceso.
-
-Si sigues recibiendo el mensaje 'Subtitles not found', sigue estos pasos:
+Si el mensaje 'Subtitles not found', se muestra constantemente, sigue estos pasos:
 
 * Elimina la cookie llamada **sdx-dl** en la carpeta temporal.  
     * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\Temp``  

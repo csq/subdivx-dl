@@ -24,30 +24,6 @@ Libraries:
 * Rarfile
 * Guessit
 
-## FIRST USE
-Configure cookies and token, take this data from Developer Tools of your browser.
-
-Example in Firefox
-Open Developer Tools (**Ctrl+Shift+I**)
-
-**Important**: Make a query and search into section **Network** the file ``ajax.php``
-
-* Copy ``cf_clearance`` and ``sdx`` values
-
-<img src="img/img-06.png" width="800" height="400"/>
-
-&nbsp;
-
-* Copy ``token`` value
-
-<img src="img/img-07.png" width="800" height="400"/>
-
-&nbsp;
-
-* Paste all values when requested
-
-![example](img/img-08.png)
-
 ## USAGE AND OPTIONS
     subdivx-dl [OPTIONS][SEARCH]
 
@@ -116,9 +92,7 @@ Description view with comments in a grid format
 ## Troubleshooting
 **Subtitles not found**  
 
-**Note**: If a cookie is not found during the initial search, you will receive the message 'Subtitles not found'. Retry the search to normalize the process.
-
-If the message 'Subtitles not found' is ever returned, follow these steps:
+If you always see the 'Subtitles not found' message, follow these steps:
 * Delete the cookie file named **sdx-dl** in the temporary folder
     * Windows: ``C:\Users\user_name\AppData\Local\Temp``  
     * Linux: ``/tmp``  
