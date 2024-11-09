@@ -39,14 +39,21 @@ compactfmt = '|%(levelname)s| %(message)s'
 datefmt = '%d/%m/%y %H:%M:%S'
 
 # Get the temporary directory
-tempDir = tempfile.gettempdir()
+temp_dir = tempfile.gettempdir()
 
 # Choose appropriate file path based on the platform
-logFile = os.path.join(tempDir, 'subdivx-dl.log')
+log_file = os.path.join(temp_dir, 'subdivx-dl.log')
 
 args = parser.parse_args()
 
-if (args.verbose):
+if args.verbose:
     logging.basicConfig(level=logging.INFO, format=compactfmt)
 else:
-    logging.basicConfig(filename=logFile, filemode='w', encoding='utf-8', level=logging.INFO, format=fullfmt, datefmt=datefmt)
+    logging.basicConfig(
+        filename=log_file,
+        filemode='w',
+        encoding='utf-8',
+        level=logging.INFO,
+        format=fullfmt,
+        datefmt=datefmt
+    )

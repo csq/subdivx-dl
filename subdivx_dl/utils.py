@@ -18,52 +18,52 @@ from rarfile import RarFile
 from zipfile import ZipFile
 from guessit import guessit
 
-subtitleExtensions = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+subtitle_extensions = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
 
-def getTerminalWidth():
+def get_terminal_width():
     try:
-        terminalSize = shutil.get_terminal_size()
-        return terminalSize.columns
+        terminal_size = shutil.get_terminal_size()
+        return terminal_size.columns
     except OSError:
         return 80
 
-def getFileExtension(filePath):
-    with open(filePath, 'rb') as file:
+def get_file_extension(file_path):
+    with open(file_path, 'rb') as file:
         header = file.read(4)
 
-        fileSignatures = {
+        file_signatures = {
             b'\x50\x4B\x03\x04': '.zip',
             b'\x52\x61\x72\x21': '.rar'
         }
 
-        for signature, extension in fileSignatures.items():
+        for signature, extension in file_signatures.items():
             if header.startswith(signature):
                 return extension
 
         return '.bin'
 
-def downloadFile(poolManager, url, location):
+def download_file(poolManager, url, location):
     helper.logger.info('Downloading archive from: %s in %s', url, location)
 
     success = False
 
-    with NamedTemporaryFile(dir=location, delete=False) as tempFile:
+    with NamedTemporaryFile(dir=location, delete=False) as temp_file:
         for i in range(9, 0, -1):
             address = url[:20] + 'sub' + str(i) + '/' + url[20:]
             helper.logger.info('Attempt on server N°%d with url %s', i, address)
 
             response = poolManager.request('GET', address, preload_content=False)
-            tempFile.write(response.data)
-            tempFile.seek(0)
+            temp_file.write(response.data)
+            temp_file.seek(0)
 
-            fileExtension = getFileExtension(tempFile.name)
+            file_extension = get_file_extension(temp_file.name)
 
-            if fileExtension in ('.zip', '.rar'):
+            if file_extension in ('.zip', '.rar'):
                 helper.logger.info('Download complete')
 
-                newFilePath = tempFile.name + fileExtension
-                tempFile.close()
-                os.rename(tempFile.name, newFilePath)
+                new_file_path = temp_file.name + file_extension
+                temp_file.close()
+                os.rename(temp_file.name, new_file_path)
 
                 success = True
                 break
@@ -73,50 +73,51 @@ def downloadFile(poolManager, url, location):
         if not success:
             print(f'No suitable subtitles download for: {url}')
 
-def unzip(fileZip, destination):
+def unzip(zip_file_path, destination):
     try:
-        with ZipFile(fileZip, 'r') as z:
+        with ZipFile(zip_file_path, 'r') as z:
             helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if (file.endswith(subtitleExtensions)):
+                if file.endswith(subtitle_extensions):
                     helper.logger.info('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
             z.close()
     except:
         helper.logger.error('File corrupt')
         print('Invalid file')
+        exit(1)
     else:
-        moveAllToParentFolder(destination)
+        move_all_to_parent_folder(destination)
 
-def moveAllToParentFolder(pathDir):
-    for (root, dirs, files) in os.walk(pathDir, topdown=True):
+def move_all_to_parent_folder(directory):
+    for (root, dirs, files) in os.walk(directory, topdown=True):
         for d in dirs:
-            if (d != '__MACOSX'):
-                subfolder = os.path.join(pathDir, dirs[0])
+            if d != '__MACOSX':
+                subfolder = os.path.join(directory, dirs[0])
                 for (root, dirs, files) in os.walk(subfolder, topdown=True):
                     for name in files:
-                        shutil.copy(os.path.join(root, name), os.path.join(pathDir, name))
+                        shutil.copy(os.path.join(root, name), os.path.join(directory, name))
 
-def unrar(fileRar, destination):
-    helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(fileRar), destination)
-    rf = RarFile(fileRar)
+def unrar(rar_file_path, destination):
+    helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(rar_file_path), destination)
+    rf = RarFile(rar_file_path)
 
     for file in rf.namelist():
-        if (file.endswith(subtitleExtensions)):
+        if file.endswith(subtitle_extensions):
             helper.logger.info('Unrar [%s]', os.path.basename(file))
             rf.extract(file, destination)
     rf.close()
 
-def printMenuContentDir(args, pathDir):
+def print_menu_content_dir(args, directory):
     header = [['N°', 'File name']]
-    files = os.listdir(pathDir)
+    files = os.listdir(directory)
 
     data = []
 
     index = 1
     x = 0
-    while (x < len(files)):
-        if (files[x].endswith(subtitleExtensions)):
+    while x < len(files):
+        if files[x].endswith(subtitle_extensions):
             data.append(index)
             data.append(os.path.basename(files[x]))
             header.append(data[:])
@@ -124,121 +125,125 @@ def printMenuContentDir(args, pathDir):
             index += 1
         x += 1
 
-    if (index > 2):
-        while (True):
+    if index > 2:
+        while True:
             # Clear screen
             clear()
 
-            # Print table with of the subtitles avaliable
-            if (args.grid == False):
+            # Print table with of the subtitles available
+            if not args.grid:
                 print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
             else:
                 print(tabulate(header, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
 
-            userInput = selectMenu()
+            user_input = select_menu()
 
             try:
-                selection = int(userInput) - 1
-                fileName = header[selection+1][1]
+                selection = int(user_input) - 1
+                file_name = header[selection + 1][1]
             except ValueError:
                 print('\nInput only numbers')
-                time.sleep(1)
+                delay(0)
                 continue
             except IndexError:
                 print('\nInput valid numbers')
-                time.sleep(1)
+                delay(0)
                 continue
 
-            if (selection < -1):
+            if selection < -1:
                 print('\nInput only positive numbers')
-                time.sleep(1)
+                delay(0)
                 continue
-            elif (selection == -1):
+            elif selection == -1:
                 # Remove temp folder
                 try:
-                    shutil.rmtree(pathDir)
-                    helper.logger.info('Delete temporal directory %s', pathDir)
+                    shutil.rmtree(directory)
+                    helper.logger.info('Delete temporal directory %s', directory)
                 except OSError as error:
                     helper.logger.error(error)
                 clear()
                 exit(0)
 
-            # Return the filename of the selected subtitle file
+            # Return the file_name of the selected subtitle file
             clear()
-            return fileName
+            return file_name
     else:
-        # Return the filename of the subtitle, excluding .zip or .rar extensions
+        # Return the file_name of the subtitle, excluding .zip or .rar extensions
         for x in range(2):
-            if (files[x].endswith(subtitleExtensions)):
+            if files[x].endswith(subtitle_extensions):
                 return os.path.basename(files[x])
 
-def movieSubtitle(args, pathFile, destination):
+def movie_subtitle(args, file_path, destination):
     helper.logger.info('Move subtitle to %s', destination)
 
-    fileNameSelect = printMenuContentDir(args, pathFile)
-    pathFileSelect = os.path.join(pathFile, fileNameSelect)
+    file_name_select = print_menu_content_dir(args, file_path)
+    file_path_select = os.path.join(file_path, file_name_select)
 
     # Rename file
-    searchName, fileExtension = os.path.splitext(args.SEARCH)
-    newName = searchName.strip()
+    search_name, file_extension = os.path.splitext(args.SEARCH)
+    new_name = search_name.strip()
 
     # Get file extension of subtitle downloaded
-    subtitleFileExtension = os.path.splitext(pathFileSelect)[1]
+    subtitle_file_extension = os.path.splitext(file_path_select)[1]
 
-    if (args.no_rename == False):
-        newName = os.path.join(destination, f'{newName}{subtitleFileExtension}')
-        helper.logger.info('Rename and move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), os.path.basename(newName))
+    if not args.no_rename:
+        new_name = os.path.join(destination, f'{new_name}{subtitle_file_extension}')
+        helper.logger.info(
+            'Rename and move subtitle [%s] to [%s]',
+            os.path.basename(file_path_select),
+            os.path.basename(new_name)
+        )
 
-        os.makedirs(os.path.dirname(newName), exist_ok=True)
+        os.makedirs(os.path.dirname(new_name), exist_ok=True)
 
         try:
-            shutil.copy(pathFileSelect, newName)
+            shutil.copy(file_path_select, new_name)
         except PermissionError:
-            if (args.verbose != True):
+            if not args.verbose:
                 clear()
-                print('You do not have permissions to write here ', os.path.dirname(newName))
+                print(f'You do not have permissions to write to {os.path.dirname(new_name)}')
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
     else:
-        newName = os.path.join(destination, os.path.basename(pathFileSelect))
-        helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(pathFileSelect), destination)
+        new_name = os.path.join(destination, os.path.basename(file_path_select))
+        helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(file_path_select), destination)
 
-        os.makedirs(os.path.dirname(newName), exist_ok=True)
+        os.makedirs(os.path.dirname(new_name), exist_ok=True)
 
         try:
-            shutil.copy(pathFileSelect, newName)
+            shutil.copy(file_path_select, new_name)
         except PermissionError:
-            if (args.verbose != True):
+            if not args.verbose:
                 clear()
-                print('You do not have permissions to write here ', os.path.dirname(newName))
+                print(f'You do not have permissions to write to {os.path.dirname(new_name)}')
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
-def tvShowSubtitles(args, pathFile, destination):
+def tv_show_subtitles(args, file_path, destination):
     helper.logger.info('Moves subtitles to %s', destination)
-    files = os.listdir(pathFile)
+    files = os.listdir(file_path)
 
     # TV series season and episode names
     patternSeriesTv = r'(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
 
     index = 0
 
-    while (index < len(files)):
-        fileSrc = os.path.join(pathFile, files[index])
-        subtitleFileExtension = os.path.splitext(files[index])[1]
+    while index < len(files):
+        file_origin = os.path.join(file_path, files[index])
+        subtitle_file_extension = os.path.splitext(files[index])[1]
 
-        if (files[index].endswith(subtitleExtensions) and (args.no_rename != True)):
+        if files[index].endswith(subtitle_extensions) and not args.no_rename:
             result = re.search(patternSeriesTv, files[index])
 
             try:
-                getTvShow = result.group(1)
-                getSeason = result.group(2)
-                getEpisode = result.group(3)
+                get_tv_show = result.group(1)
+                get_season = result.group(2)
+                get_episode = result.group(3)
 
-                serie = getTvShow
-                season = 'S' + getSeason
-                episode = 'E' + getEpisode
+                serie = get_tv_show
+                season = 'S' + get_season
+                episode = 'E' + get_episode
 
                 exclude = ['.', '-']
                 for i in exclude:
@@ -249,72 +254,72 @@ def tvShowSubtitles(args, pathFile, destination):
 
                 # Format name example:
                 # Serie - S05E01.srt | S05E01.srt
-                if (serie != ''):
-                    newName = serie + ' - ' + season + episode + subtitleFileExtension
+                if serie != '':
+                    new_name = serie + ' - ' + season + episode + subtitle_file_extension
                 else:
-                    newName = season + episode + subtitleFileExtension
+                    new_name = season + episode + subtitle_file_extension
 
             except Exception as e:
                 helper.logger.error(e)
-                fileDst = os.path.join(destination, files[index])
+                file_destination = os.path.join(destination, files[index])
                 helper.logger.info('No match Regex: Just move subtitle [%s]', files[index])
 
-                os.makedirs(os.path.dirname(fileDst), exist_ok=True)
+                os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
                 try:
-                    shutil.copy(fileSrc, fileDst)
+                    shutil.copy(file_origin, file_destination)
                 except PermissionError:
-                    if (args.verbose != True):
+                    if not args.verbose:
                         clear()
-                        print('You do not have permissions to write here ', os.path.dirname(fileDst))
+                        print(f'Permission denied for writing to {os.path.dirname(file_destination)}')
                     helper.logger.warning('Permissions issues on destination directory')
                     exit(0)
             else:
-                fileDst = os.path.join(destination, newName)
-                helper.logger.info('Move subtitle [%s] as [%s]', files[index], newName)
+                file_destination = os.path.join(destination, new_name)
+                helper.logger.info('Move subtitle [%s] as [%s]', files[index], new_name)
 
-                os.makedirs(os.path.dirname(fileDst), exist_ok=True)
+                os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
                 try:
-                    shutil.copy(fileSrc, fileDst)
+                    shutil.copy(file_origin, file_destination)
                 except PermissionError:
-                    if (args.verbose != True):
+                    if not args.verbose:
                         clear()
-                        print('You do not have permissions to write here ', os.path.dirname(fileDst))
+                        print(f'You do not have permissions to write here {os.path.dirname(file_destination)}')
                     helper.logger.warning('Permissions issues on destination directory')
                     exit(0)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif (files[index].endswith(subtitleExtensions)):
-            fileDst = os.path.join(destination, files[index])
+        elif files[index].endswith(subtitle_extensions):
+            file_destination = os.path.join(destination, files[index])
             helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
 
-            os.makedirs(os.path.dirname(fileDst), exist_ok=True)
+            os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
             try:
-                shutil.copy(fileSrc, fileDst)
+                shutil.copy(file_origin, file_destination)
             except PermissionError:
-                if (args.verbose != True):
+                if not args.verbose:
                     clear()
-                    print('You do not have permissions to write here ', os.path.dirname(fileDst))
+                    print(f'You do not have permissions to write here {os.path.dirname(file_destination)}')
                 helper.logger.warning('Permissions issues on destination directory')
                 exit(0)
         index += 1
 
-def renameAndMoveSubtitle(args, pathFile, destination):
+def rename_and_move_subtitle(args, file_path, destination):
     # Check flag --season
-    if (args.season == False):
+    if not args.season:
         # Rename single srt
-        movieSubtitle(args, pathFile, destination)
+        movie_subtitle(args, file_path, destination)
     else:
         # Move and rename bulk srt
-        tvShowSubtitles(args, pathFile, destination)
+        tv_show_subtitles(args, file_path, destination)
 
-def getDataPage(args, poolManager, url, token, search):
+def get_data_page(args, poolManager, url, token, search):
     print('Searching...', end='\r')
 
-    query = parseSearchQuery(search)
-    version = getWebVersion(poolManager)
+    query = parse_search_query(search)
+    version = get_web_version(poolManager)
 
     payload = {
         'tabla': 'resultados',
@@ -325,10 +330,10 @@ def getDataPage(args, poolManager, url, token, search):
 
     helper.logger.info('Starting request to subdivx.com with search: %s parsed as: %s', search, query)
 
-    maxAttempts = 3
-    searchResults = []
+    max_attempts = 3
+    search_results = []
 
-    for attempt in range(maxAttempts):
+    for attempt in range(max_attempts):
         helper.logger.info('Attempt number %s', attempt + 1)
 
         if attempt > 0:
@@ -341,7 +346,7 @@ def getDataPage(args, poolManager, url, token, search):
         except JSONDecodeError:
             clear()
             print('Subtitles not found because cookie expired')
-            deleteCookie()
+            delete_cookie()
             print('\nCookie deleted')
             print('\nTry again')
 
@@ -355,47 +360,47 @@ def getDataPage(args, poolManager, url, token, search):
                 'description': result['descripcion'],
                 'downloads': result['descargas'],
                 'uploader': result['nick'],
-                'upload_date': parseDate(result['fecha_subida']) if result['fecha_subida'] else '-'
+                'upload_date': parse_date(result['fecha_subida']) if result['fecha_subida'] else '-'
             }
-            searchResults.append(subtitle)
+            search_results.append(subtitle)
 
-        if not searchResults and attempt < (maxAttempts - 1):
+        if not search_results and attempt < (max_attempts - 1):
             continue
-        elif searchResults:
+        elif search_results:
             helper.logger.info('Subtitles found for: %s', query)
             break
-        elif not searchResults and attempt == maxAttempts - 1:
+        elif not search_results and attempt == max_attempts - 1:
             helper.logger.info('Subtitles not found for: %s', query)
-            if (args.verbose != True):
+            if not args.verbose:
                 print('Subtitles not found')
             exit(0)
 
-    return searchResults
+    return search_results
 
-def sortData(args, data):
-    if (args.order_by_downloads == True):
+def sort_data(args, data):
+    if args.order_by_downloads:
         return sorted(data, key=lambda item: item['downloads'], reverse=True)
-    elif (args.order_by_dates == True):
-        sortedData = sorted(
+    elif args.order_by_dates:
+        sorted_data = sorted(
             data,
             key=lambda item: (
                 datetime.datetime.strptime(item['upload_date'], '%d/%m/%Y'
                 if item['upload_date'] != '-' else '-')
             ),
-            reverse=True
+            reverse = True
         )
-        return sortedData
+        return sorted_data
 
-def parseDate(date):
+def parse_date(date):
     try:
         return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
     except ValueError:
         return None
 
-def parseSearchQuery(search):
+def parse_search_query(search):
     try:
         result = guessit(search)
-        fileType = result['type']
+        file_type = result['type']
         title = result['title']
         year = result.get('year', '')
         season = result.get('season', '')
@@ -403,10 +408,10 @@ def parseSearchQuery(search):
     except KeyError:
         return search
 
-    if fileType == 'episode':
+    if file_type == 'episode':
         try:
-            episodeNumber = f'E{episode:02d}' if episode else ''
-            query = f'{title} S{season:02d}{episodeNumber}'
+            episode_number = f'E{episode:02d}' if episode else ''
+            query = f'{title} S{season:02d}{episode_number}'
         except ValueError:
             return search
     else:
@@ -414,10 +419,10 @@ def parseSearchQuery(search):
 
     return query
 
-def getComments(poolManager, url, idSub):
+def get_comments(poolManager, url, id_subtitle):
 
     payload = {
-        'getComentarios': idSub
+        'getComentarios': id_subtitle
     }
 
     request = poolManager.request('POST', url, fields=payload)
@@ -429,28 +434,28 @@ def getComments(poolManager, url, idSub):
         helper.logger.error('Response could not be serialized')
         exit(0)
 
-    commentList = []
+    comment_list = []
 
     for key in data:
-        commentList.append(key['comentario'])
+        comment_list.append(key['comentario'])
 
-    return commentList
+    return comment_list
 
-def printSearchResult(args, searchData):
+def print_search_result(args, search_data):
     # Get terminal width
-    terminalwidth = getTerminalWidth()
+    terminal_width = get_terminal_width()
 
     # Initialize header
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
 
     # Iterate over search results
-    for index, item in enumerate(searchData, start=1):
+    for index, item in enumerate(search_data, start=1):
 
         # Shorten title if necessary
         if args.grid:
-            title = textwrap.shorten(item['title'], width=terminalwidth - 40, placeholder="...")
+            title = textwrap.shorten(item['title'], width=terminal_width - 40, placeholder='...')
         else:
-            title = textwrap.shorten(item['title'], width=terminalwidth - 55, placeholder="...")
+            title = textwrap.shorten(item['title'], width=terminal_width - 55, placeholder='...')
 
         # Create row for table
         row = [index, title, item['downloads'], item['upload_date'], item['uploader']]
@@ -460,121 +465,155 @@ def printSearchResult(args, searchData):
 
     # Print table
     if args.grid:
-        print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', colalign=('center', 'center','decimal', 'center', 'center')))
+        print(tabulate(
+            data,
+            headers='firstrow',
+            tablefmt='fancy_grid',
+            colalign=('center', 'center', 'decimal', 'center', 'center')
+        ))
     else:
-        print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
+        print(tabulate(
+            data,
+            headers='firstrow',
+            tablefmt='pretty',
+            colalign=('center', 'center', 'decimal')
+        ))
 
-def printSelectDescription(args, selection, searchData):
+def print_select_description(args, selection, search_data):
     # Get terminal width
-    terminalwidth = getTerminalWidth()
+    terminal_width = get_terminal_width()
 
     # Initialize header
-    descriptionSelect = [['Description']]
+    description_select = [['Description']]
 
     # Get description
-    description = searchData[selection]['description'].strip()
-    descriptionSelect.append([description])
+    description = search_data[selection]['description'].strip()
+    description_select.append([description])
 
     # Print table
     if args.grid:
-        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='fancy_grid', stralign='left', maxcolwidths=[terminalwidth - 5]))
+        print(tabulate(
+            description_select,
+            headers='firstrow',
+            tablefmt='fancy_grid',
+            stralign='left',
+            maxcolwidths=[terminal_width - 5]
+        ))
     else:
-        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='pretty', stralign='left', maxcolwidths=[terminalwidth - 5]))
+        print(tabulate(
+            description_select,
+            headers='firstrow',
+            tablefmt='pretty',
+            stralign='left',
+            maxcolwidths=[terminal_width - 5]
+        ))
 
-def getSubtitle(args, poolManager, url):
-    if (args.verbose != True):
-        print('Working...')
+def get_subtitle(args, poolManager, url):
+    if not args.verbose:
+        print('Working...', end='\r')
 
     # Check flag --location
     LOCATION_DESTINATION = args.location
 
     # Create temporal directory
-    tempdir = tempfile.TemporaryDirectory()
-    fpath = tempdir.name
+    temp_dir = tempfile.TemporaryDirectory()
+    fpath = temp_dir.name
     helper.logger.info('Create temporal directory %s', fpath)
 
     # Download zip/rar in temporal directory
-    downloadFile(poolManager, url, fpath)
+    download_file(poolManager, url, fpath)
 
     # Determinate final path for subtitle
-    if (LOCATION_DESTINATION == None):
-        parentFolder = os.getcwd()
+    if LOCATION_DESTINATION is None:
+        parent_folder = os.getcwd()
     else:
-        parentFolder = LOCATION_DESTINATION
+        parent_folder = LOCATION_DESTINATION
 
     # In case the server does not return a file, exit
-    listDirectory = os.listdir(fpath)
+    list_directory = os.listdir(fpath)
 
-    if not listDirectory:
+    if not list_directory:
         helper.logger.info('Remote server not found file')
 
         helper.logger.info('Delete temporal directory %s', fpath)
-        tempdir.cleanup()
+        temp_dir.cleanup()
 
-        if (args.verbose != True):
+        if not args.verbose:
             clear()
             print('Subtitle not found because server missing file')
         exit(0)
 
     # Extract zip/rar file
-    for file in listDirectory:
-        pathFile = os.path.join(fpath, file)
+    for file in list_directory:
+        file_path = os.path.join(fpath, file)
 
-        if (file.endswith('.zip')):
-            unzip(pathFile, fpath)
-        elif (file.endswith('.rar')):
-            unrar(pathFile, fpath)
+        if file.endswith('.zip'):
+            unzip(file_path, fpath)
+        elif file.endswith('.rar'):
+            unrar(file_path, fpath)
 
     # Rename and/or move subtitles
-    renameAndMoveSubtitle(args, fpath, parentFolder)
+    rename_and_move_subtitle(args, fpath, parent_folder)
 
     # Remove temp folder
     try:
-        tempdir.cleanup()
+        temp_dir.cleanup()
         helper.logger.info('Delete temporal directory %s', fpath)
     except OSError as error:
         helper.logger.error(error)
 
-    if (args.verbose != True):
+    if not args.verbose:
         clear()
         print('Done')
 
-def printSelectComments(args, commentList):
+def print_select_comments(args, comment_list):
     # Get terminal width
-    terminalwidth = getTerminalWidth()
+    terminal_width = get_terminal_width()
 
     # Initialize header
     header = ['N°', 'Comments']
     comment = []
 
     # Iterate over comments
-    for index, text in enumerate(commentList, start=1):
+    for index, text in enumerate(comment_list, start=1):
         comment.append([index, text.strip()])
 
     # Print table
     if args.grid:
-        print(tabulate(comment, headers=header, tablefmt='fancy_grid', colalign=('center', 'left'), maxcolwidths=[None, terminalwidth - 12]))
+        print(tabulate(
+            comment,
+            headers=header,
+            tablefmt='fancy_grid',
+            colalign=('center', 'left'),
+            maxcolwidths=[None, terminal_width - 12]
+        ))
     else:
-        print(tabulate(comment, headers=header, tablefmt='pretty', colalign=('center', 'left'), maxcolwidths=[None, terminalwidth - 10]))
+        print(tabulate(
+            comment,
+            headers=header,
+            tablefmt='pretty',
+            colalign=('center', 'left'),
+            maxcolwidths=[None, terminal_width - 10]
+        ))
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def mainMenu():
+def main_menu():
     print('\n[1~9] Select')
     print('[ 0 ] Exit\n')
 
-    userInput = input('Selection: ')
-    return userInput
+    user_input = input('Selection: ')
+    return user_input
 
-def selectMenu():
+def select_menu():
     print('\n[ 1 ] Download')
     print('[ 0 ] Exit\n')
 
-    userInput = input('Selection: ')
-    return userInput
+    user_input = input('Selection: ')
+    return user_input
 
-def getWebVersion(poolManager):
+def get_web_version(poolManager):
     url = 'https://www.subdivx.com/'
     request = poolManager.request('GET', url)
 
@@ -602,24 +641,24 @@ def delay(factor=2):
 # Cookie functions
 ##############################################################################
 
-cookieName = 'sdx-dl'
+cookie_name = 'sdx-dl'
 
-def existCookie():
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
+def exist_cookie():
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
 
-    return os.path.exists(cookiePath)
+    return os.path.exists(cookie_path)
 
-def readCookie():
+def read_cookie():
     helper.logger.info('Read cookie')
 
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
 
-    with open(cookiePath, 'r') as file:
+    with open(cookie_path, 'r') as file:
         return file.read()
 
-def getCookie(poolManager, url):
+def get_cookie(poolManager, url):
     helper.logger.info('Get cookie from %s', url)
 
     # Request petition GET
@@ -629,44 +668,45 @@ def getCookie(poolManager, url):
     cookie = response.headers.get('Set-Cookie')
 
     # Split cookie
-    cookieParts = cookie.split(';')
+    cookie_parts = cookie.split(';')
 
-    # Return sdxCookie
-    return cookieParts[0]
+    # Return sdx_cookie
+    return cookie_parts[0]
 
-def saveCookie(sdxCookie):
+def save_cookie(sdx_cookie):
     # Save cookie in temporary folder
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
 
-    with open(cookiePath, 'w') as file:
-        file.write(sdxCookie)
+    with open(cookie_path, 'w') as file:
+        file.write(sdx_cookie)
         file.close()
 
     helper.logger.info('Save cookie')
 
-def setCookie(poolManager, url, header):
+def set_cookie(poolManager, url, header):
     cookie = None
 
-    if not existCookie():
-        cookie = getCookie(poolManager, url)
-        saveCookie(cookie)
+    if not exist_cookie():
+        cookie = get_cookie(poolManager, url)
+        save_cookie(cookie)
     else:
-        cookie = readCookie()
+        cookie = read_cookie()
 
     header['cookie'] = cookie
 
-def deleteCookie():
-    tempDir = tempfile.gettempdir()
-    cookiePath = os.path.join(tempDir, cookieName)
+def delete_cookie():
+    temp_dir = tempfile.gettempdir()
+    cookie_path = os.path.join(temp_dir, cookie_name)
 
-    if os.path.exists(cookiePath):
-        os.remove(cookiePath)
+    if os.path.exists(cookie_path):
+        os.remove(cookie_path)
 
-def getToken(poolManager, url):
+def get_token(poolManager, url):
     helper.logger.info('Get token')
 
-    data = poolManager.request('GET', url+'inc/gt.php?gt=1', preload_content=False).data
+    response = poolManager.request('GET', url + 'inc/gt.php?gt=1')
+    data = response.data
 
     token = json.loads(data)['token']
 
