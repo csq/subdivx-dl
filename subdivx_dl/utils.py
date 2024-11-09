@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import tempfile
+import textwrap
 import datetime
 import shutil
 import json
@@ -18,6 +19,13 @@ from zipfile import ZipFile
 from guessit import guessit
 
 subtitleExtensions = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+
+def getTerminalWidth():
+    try:
+        terminalSize = shutil.get_terminal_size()
+        return terminalSize.columns
+    except OSError:
+        return 80
 
 def getFileExtension(filePath):
     with open(filePath, 'rb') as file:
@@ -377,6 +385,7 @@ def sortData(args, data):
             reverse=True
         )
         return sortedData
+
 def parseDate(date):
     try:
         return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
@@ -428,52 +437,49 @@ def getComments(poolManager, url, idSub):
     return commentList
 
 def printSearchResult(args, searchData):
+    # Get terminal width
+    terminalwidth = getTerminalWidth()
+
+    # Initialize header
     data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
 
+    # Iterate over search results
     for index, item in enumerate(searchData, start=1):
-        row = [index, item['title'], item['downloads'], item['upload_date'], item['uploader']]
+
+        # Shorten title if necessary
+        if args.grid:
+            title = textwrap.shorten(item['title'], width=terminalwidth - 40, placeholder="...")
+        else:
+            title = textwrap.shorten(item['title'], width=terminalwidth - 55, placeholder="...")
+
+        # Create row for table
+        row = [index, title, item['downloads'], item['upload_date'], item['uploader']]
+
+        # Append row to data
         data.append(row)
 
-    # Check flag --grid
-    if (args.grid == False):
-        print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
-    else:
+    # Print table
+    if args.grid:
         print(tabulate(data, headers='firstrow', tablefmt='fancy_grid', colalign=('center', 'center','decimal', 'center', 'center')))
+    else:
+        print(tabulate(data, headers='firstrow', tablefmt='pretty', colalign=('center', 'center','decimal')))
 
 def printSelectDescription(args, selection, searchData):
+    # Get terminal width
+    terminalwidth = getTerminalWidth()
+
+    # Initialize header
     descriptionSelect = [['Description']]
-    words = searchData[selection]['description'].split()
 
-    maxLengh = 77
-    count = 0
+    # Get description
+    description = searchData[selection]['description'].strip()
+    descriptionSelect.append([description])
 
-    line = ''
-    for word in words:
-        sizeWord = len(word)
-
-        if (count + sizeWord <= maxLengh):
-            line = '{} {}'.format(line, word)
-            count = count + sizeWord
-        elif (count + sizeWord > maxLengh):
-                # Slice word
-                missing = maxLengh - count
-                sliceOne = word[:missing]
-                sliceTwo = word[missing:]
-
-                line = '{} {}'.format(line, sliceOne)
-                count = count + len(sliceOne)
-
-                if (count == maxLengh):
-                    descriptionSelect.append([line])
-                    line = '{}'.format(sliceTwo)
-                    count = len(sliceTwo)
-    descriptionSelect.append([line])
-
-    # Check flag --grid
-    if (args.grid == False):
-        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='pretty', stralign='left'))
+    # Print table
+    if args.grid:
+        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='fancy_grid', stralign='left', maxcolwidths=[terminalwidth - 5]))
     else:
-        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='fancy_outline', stralign='left'))
+        print(tabulate(descriptionSelect, headers='firstrow', tablefmt='pretty', stralign='left', maxcolwidths=[terminalwidth - 5]))
 
 def getSubtitle(args, poolManager, url):
     if (args.verbose != True):
@@ -534,39 +540,22 @@ def getSubtitle(args, poolManager, url):
         print('Done')
 
 def printSelectComments(args, commentList):
+    # Get terminal width
+    terminalwidth = getTerminalWidth()
+
+    # Initialize header
     header = ['N°', 'Comments']
     comment = []
 
-    maxLengh = 77
+    # Iterate over comments
+    for index, text in enumerate(commentList, start=1):
+        comment.append([index, text.strip()])
 
-    for i in range(len(commentList)):
-        words = commentList[i].split()
-
-        count = 0
-        line = ''
-
-        for word in words:
-            lenWord = len(word)
-
-            if (count + lenWord < maxLengh):
-                line = '{} {}'.format(line, word)
-                count = count + lenWord
-            elif (count + lenWord >= maxLengh):
-                # Slice word
-                slice = []
-
-                missing = maxLengh - count
-                slice = word[:missing]
-
-                line = '{} {}'.format(line, slice)
-                count = count + len(slice)
-        comment.append([i + 1, line])
-
-    # Check flag --grid
-    if (args.grid == False):
-        print(tabulate(comment, headers=header, tablefmt='pretty', colalign=('center', 'left')))
+    # Print table
+    if args.grid:
+        print(tabulate(comment, headers=header, tablefmt='fancy_grid', colalign=('center', 'left'), maxcolwidths=[None, terminalwidth - 12]))
     else:
-        print(tabulate(comment, headers=header, tablefmt='fancy_outline', colalign=('center', 'left')))
+        print(tabulate(comment, headers=header, tablefmt='pretty', colalign=('center', 'left'), maxcolwidths=[None, terminalwidth - 10]))
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
