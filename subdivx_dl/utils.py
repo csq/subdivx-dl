@@ -141,11 +141,7 @@ def print_menu_content_dir(args, directory):
             try:
                 selection = int(user_input) - 1
                 file_name = header[selection + 1][1]
-            except ValueError:
-                print('\nInput only numbers')
-                delay(0)
-                continue
-            except IndexError:
+            except (ValueError, IndexError):
                 print('\nInput valid numbers')
                 delay(0)
                 continue

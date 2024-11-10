@@ -60,11 +60,7 @@ def main():
 			selection = int(user_input) - 1
 			id_subtitle = str(search_data[selection]['id_subtitle'])
 			url = f'https://subdivx.com/{id_subtitle}'
-		except ValueError:
-			print('\nInput valid options')
-			delay(0)
-			continue
-		except IndexError:
+		except (ValueError, IndexError):
 			print('\nInput valid numbers')
 			delay(0)
 			continue
