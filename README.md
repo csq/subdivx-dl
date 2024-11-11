@@ -33,7 +33,7 @@ Libraries:
     -s, --season                        Download full season subtitles
     -l, --location LOCATION             Download subtitle in destination directory
     -n, --lines LINES                   Limit the number of results
-    -g, --grid                          Print results in a grid format
+    -st --style STYLE                   Show results in selected style
     -nr, --no-rename                    Disable rename files
     -c, --comments                      Show subtitles comments in search
     -f, --first                         Download the first matching

@@ -131,10 +131,10 @@ def print_menu_content_dir(args, directory):
             clear()
 
             # Print table with of the subtitles available
-            if not args.grid:
+            if not args.style:
                 print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
             else:
-                print(tabulate(header, headers='firstrow', tablefmt='fancy_grid', stralign='left'))
+                print(tabulate(header, headers='firstrow', tablefmt=args.style, stralign='left'))
 
             user_input = select_menu()
 
@@ -448,7 +448,7 @@ def print_search_result(args, search_data):
     for index, item in enumerate(search_data, start=1):
 
         # Shorten title if necessary
-        if args.grid:
+        if args.style:
             title = textwrap.shorten(item['title'], width=terminal_width - 40, placeholder='...')
         else:
             title = textwrap.shorten(item['title'], width=terminal_width - 55, placeholder='...')
@@ -460,11 +460,11 @@ def print_search_result(args, search_data):
         data.append(row)
 
     # Print table
-    if args.grid:
+    if args.style:
         print(tabulate(
             data,
             headers='firstrow',
-            tablefmt='fancy_grid',
+            tablefmt=args.style,
             colalign=('center', 'center', 'decimal', 'center', 'center')
         ))
     else:
@@ -487,14 +487,14 @@ def print_select_description(args, selection, search_data):
     description_select.append([description])
 
     # Print table
-    if args.grid:
+    if args.style:
         print(tabulate(
             description_select,
             headers='firstrow',
-            tablefmt='fancy_grid',
+            tablefmt=args.style,
             stralign='left',
             maxcolwidths=[terminal_width - 5]
-        ))
+        ), end='\n\n')
     else:
         print(tabulate(
             description_select,
@@ -502,7 +502,7 @@ def print_select_description(args, selection, search_data):
             tablefmt='pretty',
             stralign='left',
             maxcolwidths=[terminal_width - 5]
-        ))
+        ), end='\n\n')
 
 def get_subtitle(args, poolManager, url):
     if not args.verbose:
@@ -575,11 +575,11 @@ def print_select_comments(args, comment_list):
         comment.append([index, text.strip()])
 
     # Print table
-    if args.grid:
+    if args.style:
         print(tabulate(
             comment,
             headers=header,
-            tablefmt='fancy_grid',
+            tablefmt=args.style,
             colalign=('center', 'left'),
             maxcolwidths=[None, terminal_width - 12]
         ))
