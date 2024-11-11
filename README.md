@@ -34,6 +34,7 @@ Libraries:
     -l, --location LOCATION             Download subtitle in destination directory
     -n, --lines LINES                   Limit the number of results
     -st --style STYLE                   Show results in selected style
+    -m, --minimal                       Set minimal style of results
     -nr, --no-rename                    Disable rename files
     -c, --comments                      Show subtitles comments in search
     -f, --first                         Download the first matching

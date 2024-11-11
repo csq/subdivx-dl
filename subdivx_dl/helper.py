@@ -44,6 +44,7 @@ parser.add_argument(
     nargs='?',
     const='rounded_grid'
 )
+parser.add_argument('-m', '--minimal', help='set minimal style of results', action='store_true')
 parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('-c', '--comments', help='show comments', action='store_true')
 parser.add_argument('-f', '--first', help='download the first matching', action='store_true')

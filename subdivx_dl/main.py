@@ -51,7 +51,7 @@ def main():
 		clear()
 
 		# Show Search Results
-		print_search_result(args, search_data)
+		print_search_results(args, search_data)
 
 		# Get the user selection
 		user_input = main_menu()

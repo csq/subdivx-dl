@@ -437,43 +437,33 @@ def get_comments(poolManager, url, id_subtitle):
 
     return comment_list
 
-def print_search_result(args, search_data):
+def print_search_results(args, search_data):
     # Get terminal width
     terminal_width = get_terminal_width()
 
-    # Initialize header
-    data = [['N°', 'Title', 'Downloads', 'Date', 'User']]
-
-    # Iterate over search results
-    for index, item in enumerate(search_data, start=1):
-
-        # Shorten title if necessary
-        if args.style:
-            title = textwrap.shorten(item['title'], width=terminal_width - 40, placeholder='...')
-        else:
-            title = textwrap.shorten(item['title'], width=terminal_width - 55, placeholder='...')
-
-        # Create row for table
-        row = [index, title, item['downloads'], item['upload_date'], item['uploader']]
-
-        # Append row to data
-        data.append(row)
-
-    # Print table
-    if args.style:
-        print(tabulate(
-            data,
-            headers='firstrow',
-            tablefmt=args.style,
-            colalign=('center', 'center', 'decimal', 'center', 'center')
-        ))
+    if args.minimal:
+        columns = ['N°', 'Title', 'Downloads', 'Date']
+        align = ['center', 'center', 'decimal', 'center']
     else:
-        print(tabulate(
-            data,
-            headers='firstrow',
-            tablefmt='pretty',
-            colalign=('center', 'center', 'decimal')
-        ))
+        columns = ['N°', 'Title', 'Downloads', 'Date', 'User']
+        align = ['center', 'center', 'decimal', 'center', 'center']
+
+    table_data = [columns]
+
+    for index, item in enumerate(search_data, start=1):
+        title = shorten_text(item['title'], terminal_width - 40)
+        table_data.append([
+            index,
+            title,
+            item['downloads'],
+            item['upload_date'],
+            item.get('uploader', '')
+        ][:len(columns)])
+
+    print(tabulate(table_data, headers='firstrow', tablefmt=args.style or 'pretty', colalign=align))
+
+def shorten_text(text, width):
+    return textwrap.shorten(text, width=width, placeholder='...')
 
 def print_select_description(args, selection, search_data):
     # Get terminal width
