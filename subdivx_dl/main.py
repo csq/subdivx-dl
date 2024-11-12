@@ -54,7 +54,7 @@ def main():
 		print_search_results(args, search_data)
 
 		# Get the user selection
-		user_input = main_menu()
+		user_input = prompt_user_for_selection()
 
 		try:
 			selection = int(user_input) - 1
@@ -74,7 +74,7 @@ def main():
 			exit(0)
 
 		clear()
-		print_select_description(args, selection, search_data)
+		print_description(args, selection, search_data)
 
 		# Checking flag for add comments view
 		if args.comments:
@@ -82,10 +82,10 @@ def main():
 			if not comment_list:
 				pass
 			else:
-				print_select_comments(args, comment_list)
+				print_comments(args, comment_list)
 
 		# Show selection menu
-		user_input = select_menu()
+		user_input = prompt_user_to_download()
 
 		try:
 			select_action = int(user_input)

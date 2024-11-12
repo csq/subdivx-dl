@@ -18,7 +18,9 @@ from rarfile import RarFile
 from zipfile import ZipFile
 from guessit import guessit
 
-subtitle_extensions = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+SUBTITLE_EXTENSIONS = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+
+DEFAULT_STYLE = 'pretty'
 
 def get_terminal_width():
     try:
@@ -52,7 +54,7 @@ def download_file(poolManager, url, location):
             address = url[:20] + 'sub' + str(i) + '/' + url[20:]
             helper.logger.info('Attempt on server N°%d with url %s', i, address)
 
-            response = poolManager.request('GET', address, preload_content=False)
+            response = poolManager.request('GET', address)
             temp_file.write(response.data)
             temp_file.seek(0)
 
@@ -78,7 +80,7 @@ def unzip(zip_file_path, destination):
         with ZipFile(zip_file_path, 'r') as z:
             helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
             for file in z.namelist():
-                if file.endswith(subtitle_extensions):
+                if file.endswith(SUBTITLE_EXTENSIONS):
                     helper.logger.info('Unzip [%s]', os.path.basename(file))
                     z.extract(file, destination)
             z.close()
@@ -96,14 +98,16 @@ def move_all_to_parent_folder(directory):
                 subfolder = os.path.join(directory, dirs[0])
                 for (root, dirs, files) in os.walk(subfolder, topdown=True):
                     for name in files:
-                        shutil.copy(os.path.join(root, name), os.path.join(directory, name))
+                        source_path = os.path.join(root, name)
+                        destination_path = os.path.join(directory, name)
+                        shutil.copy(source_path, destination_path)
 
 def unrar(rar_file_path, destination):
     helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(rar_file_path), destination)
     rf = RarFile(rar_file_path)
 
     for file in rf.namelist():
-        if file.endswith(subtitle_extensions):
+        if file.endswith(SUBTITLE_EXTENSIONS):
             helper.logger.info('Unrar [%s]', os.path.basename(file))
             rf.extract(file, destination)
     rf.close()
@@ -117,7 +121,7 @@ def print_menu_content_dir(args, directory):
     index = 1
     x = 0
     while x < len(files):
-        if files[x].endswith(subtitle_extensions):
+        if files[x].endswith(SUBTITLE_EXTENSIONS):
             data.append(index)
             data.append(os.path.basename(files[x]))
             header.append(data[:])
@@ -131,12 +135,14 @@ def print_menu_content_dir(args, directory):
             clear()
 
             # Print table with of the subtitles available
-            if not args.style:
-                print(tabulate(header, headers='firstrow', tablefmt='pretty', stralign='left'))
-            else:
-                print(tabulate(header, headers='firstrow', tablefmt=args.style, stralign='left'))
+            print(
+                tabulate(
+                    header, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, stralign='left'
+                )
+            )
 
-            user_input = select_menu()
+            # Select subtitle
+            user_input = prompt_user_to_download()
 
             try:
                 selection = int(user_input) - 1
@@ -166,7 +172,7 @@ def print_menu_content_dir(args, directory):
     else:
         # Return the file_name of the subtitle, excluding .zip or .rar extensions
         for x in range(2):
-            if files[x].endswith(subtitle_extensions):
+            if files[x].endswith(SUBTITLE_EXTENSIONS):
                 return os.path.basename(files[x])
 
 def movie_subtitle(args, file_path, destination):
@@ -229,7 +235,7 @@ def tv_show_subtitles(args, file_path, destination):
         file_origin = os.path.join(file_path, files[index])
         subtitle_file_extension = os.path.splitext(files[index])[1]
 
-        if files[index].endswith(subtitle_extensions) and not args.no_rename:
+        if files[index].endswith(SUBTITLE_EXTENSIONS) and not args.no_rename:
             result = re.search(patternSeriesTv, files[index])
 
             try:
@@ -238,8 +244,8 @@ def tv_show_subtitles(args, file_path, destination):
                 get_episode = result.group(3)
 
                 serie = get_tv_show
-                season = 'S' + get_season
-                episode = 'E' + get_episode
+                season = f'S{get_season}'
+                episode = f'E{get_episode}'
 
                 exclude = ['.', '-']
                 for i in exclude:
@@ -251,9 +257,9 @@ def tv_show_subtitles(args, file_path, destination):
                 # Format name example:
                 # Serie - S05E01.srt | S05E01.srt
                 if serie != '':
-                    new_name = serie + ' - ' + season + episode + subtitle_file_extension
+                    new_name = f'{serie} - {season}{episode}{subtitle_file_extension}'
                 else:
-                    new_name = season + episode + subtitle_file_extension
+                    new_name = f'{season}{episode}{subtitle_file_extension}'
 
             except Exception as e:
                 helper.logger.error(e)
@@ -286,7 +292,7 @@ def tv_show_subtitles(args, file_path, destination):
                     exit(0)
 
         # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif files[index].endswith(subtitle_extensions):
+        elif files[index].endswith(SUBTITLE_EXTENSIONS):
             file_destination = os.path.join(destination, files[index])
             helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
 
@@ -438,9 +444,9 @@ def get_comments(poolManager, url, id_subtitle):
     return comment_list
 
 def print_search_results(args, search_data):
-    # Get terminal width
     terminal_width = get_terminal_width()
 
+    # Check flag --minimal
     if args.minimal:
         columns = ['N°', 'Title', 'Downloads', 'Date']
         align = ['center', 'center', 'decimal', 'center']
@@ -460,39 +466,24 @@ def print_search_results(args, search_data):
             item.get('uploader', '')
         ][:len(columns)])
 
-    print(tabulate(table_data, headers='firstrow', tablefmt=args.style or 'pretty', colalign=align))
+    print(tabulate(table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align))
 
 def shorten_text(text, width):
     return textwrap.shorten(text, width=width, placeholder='...')
 
-def print_select_description(args, selection, search_data):
-    # Get terminal width
+def print_description(args, selection, search_data):
     terminal_width = get_terminal_width()
-
-    # Initialize header
-    description_select = [['Description']]
-
-    # Get description
     description = search_data[selection]['description'].strip()
-    description_select.append([description])
 
-    # Print table
-    if args.style:
-        print(tabulate(
-            description_select,
-            headers='firstrow',
-            tablefmt=args.style,
-            stralign='left',
-            maxcolwidths=[terminal_width - 5]
-        ), end='\n\n')
-    else:
-        print(tabulate(
-            description_select,
-            headers='firstrow',
-            tablefmt='pretty',
-            stralign='left',
-            maxcolwidths=[terminal_width - 5]
-        ), end='\n\n')
+    description_table = [['Description'], [description]]
+
+    print(tabulate(
+        description_table,
+        headers='firstrow',
+        tablefmt=args.style or DEFAULT_STYLE,
+        stralign='left',
+        maxcolwidths=[terminal_width - 5]
+    ), end='\n\n')
 
 def get_subtitle(args, poolManager, url):
     if not args.verbose:
@@ -550,53 +541,36 @@ def get_subtitle(args, poolManager, url):
 
     if not args.verbose:
         clear()
-        print('Done')
+        print('Done!')
 
-def print_select_comments(args, comment_list):
-    # Get terminal width
+def print_comments(args, comments):
     terminal_width = get_terminal_width()
 
-    # Initialize header
-    header = ['N°', 'Comments']
-    comment = []
+    table = [['N°', 'Comment']]
+    for index, comment_text in enumerate(comments, start=1):
+        table.append([index, comment_text.strip()])
 
-    # Iterate over comments
-    for index, text in enumerate(comment_list, start=1):
-        comment.append([index, text.strip()])
+    tablefmt = args.style or DEFAULT_STYLE
+    colalign = ['center', 'left']
+    maxcolwidths = [None, terminal_width - 12]
 
-    # Print table
-    if args.style:
-        print(tabulate(
-            comment,
-            headers=header,
-            tablefmt=args.style,
-            colalign=('center', 'left'),
-            maxcolwidths=[None, terminal_width - 12]
-        ))
-    else:
-        print(tabulate(
-            comment,
-            headers=header,
-            tablefmt='pretty',
-            colalign=('center', 'left'),
-            maxcolwidths=[None, terminal_width - 10]
-        ))
+    print(tabulate(table, headers='firstrow', tablefmt=tablefmt, colalign=colalign, maxcolwidths=maxcolwidths))
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def main_menu():
-    print('\n[1~9] Select')
-    print('[ 0 ] Exit\n')
+def prompt_user_for_selection():
+    print('\n[1-9] Select')
+    print('[ 0 ] Exit', end='\n')
 
-    user_input = input('Selection: ')
+    user_input = input('\nSelection: ')
     return user_input
 
-def select_menu():
+def prompt_user_to_download():
     print('\n[ 1 ] Download')
-    print('[ 0 ] Exit\n')
+    print('[ 0 ] Exit', end='\n')
 
-    user_input = input('Selection: ')
+    user_input = input('\nSelection: ')
     return user_input
 
 def get_web_version(poolManager):
@@ -627,11 +601,11 @@ def delay(factor=2):
 # Cookie functions
 ##############################################################################
 
-cookie_name = 'sdx-dl'
+COOKIE_NAME = 'sdx-dl'
 
 def exist_cookie():
     temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
 
     return os.path.exists(cookie_path)
 
@@ -639,7 +613,7 @@ def read_cookie():
     helper.logger.info('Read cookie')
 
     temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
 
     with open(cookie_path, 'r') as file:
         return file.read()
@@ -648,7 +622,7 @@ def get_cookie(poolManager, url):
     helper.logger.info('Get cookie from %s', url)
 
     # Request petition GET
-    response = poolManager.request('GET', url, timeout=10)
+    response = poolManager.request('GET', url)
 
     # Get cookie from response
     cookie = response.headers.get('Set-Cookie')
@@ -662,7 +636,7 @@ def get_cookie(poolManager, url):
 def save_cookie(sdx_cookie):
     # Save cookie in temporary folder
     temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
 
     with open(cookie_path, 'w') as file:
         file.write(sdx_cookie)
@@ -683,7 +657,7 @@ def set_cookie(poolManager, url, header):
 
 def delete_cookie():
     temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, cookie_name)
+    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
 
     if os.path.exists(cookie_path):
         os.remove(cookie_path)
@@ -691,7 +665,7 @@ def delete_cookie():
 def get_token(poolManager, url):
     helper.logger.info('Get token')
 
-    response = poolManager.request('GET', url + 'inc/gt.php?gt=1')
+    response = poolManager.request('GET', f'{url}inc/gt.php?gt=1')
     data = response.data
 
     token = json.loads(data)['token']
