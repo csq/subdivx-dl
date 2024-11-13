@@ -52,6 +52,10 @@ parser.add_argument('-odownloads', '--order-by-downloads', help='order results b
 parser.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
 parser.add_argument('-v', '--verbose', help='be verbose', action='store_true')
 
+# Parser for configuration
+parser.add_argument('-sc', '--save-config', help='save configuration file', action='store_true')
+parser.add_argument('-lc', '--load-config', help='load configuration file', action='store_true')
+
 # Create and configure logger
 logger = logging.getLogger(__name__)
 

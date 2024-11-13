@@ -594,7 +594,7 @@ def get_web_version(poolManager):
         helper.logger.error(error)
 
 def delay(factor=2):
-    delay = 2 ** factor # default value delay is 4 seconds
+    delay = 2 ** factor
     time.sleep(delay)
 
 ##############################################################################
@@ -672,3 +672,116 @@ def get_token(poolManager, url):
 
     return token
 
+##############################################################################
+# Class Args
+##############################################################################
+
+class Args():
+    def __init__(self, args=None, config=None):
+        super().__init__()
+
+        self.SEARCH = None
+
+        if args is not None:
+            for key, value in args.__dict__.items():
+                setattr(self, key, value)
+
+        if config is not None:
+            for key, value in config.items():
+                setattr(self, key, value)
+            self.SEARCH = args.SEARCH
+
+    def SEARCH(self):
+        return self.SEARCH
+
+    def comment(self):
+        return self.comment
+
+    def first(self):
+        return self.first
+
+    def lines(self):
+        return self.lines
+
+    def location(self):
+        return self.location
+
+    def minimal(self):
+        return self.minimal
+
+    def no_rename(self):
+        return self.no_rename
+
+    def order_by_downloads(self):
+        return self.order_by_downloads
+
+    def order_by_dates(self):
+        return self.order_by_dates
+
+    def save_config(self):
+        return self.save_config
+
+    def season(self):
+        return self.season
+
+    def style(self):
+        return self.style
+
+    def load_config(self):
+        return self.load_config
+
+    def verbose(self):
+        return self.verbose
+
+##############################################################################
+# Configuration functions
+##############################################################################
+
+CONFIG_FILE_NAME = 'config.json'
+
+def get_os_name():
+    if os.name == 'posix':
+        if os.uname().sysname == 'Darwin':
+            return 'macOS'
+        else:
+            return 'Linux'
+    elif os.name == 'nt':
+        return 'Windows'
+    else:
+        return 'Unknown'
+
+def create_config_directory():
+    platform_name = get_os_name()
+
+    local_appdata = os.getenv('LOCALAPPDATA')
+
+    directory_paths = {
+        'Linux': '~/.config/subdivx-dl/',
+        'macOS': '~/Library/Application Support/subdivx-dl/',
+        'Windows': f'{local_appdata}\\subdivx-dl\\'
+    }
+
+    config_directory = os.path.expanduser(directory_paths[platform_name])
+    os.makedirs(config_directory, exist_ok=True)
+
+    return config_directory
+
+def save_config(args):
+    config_directory = create_config_directory()
+    config_path = os.path.join(config_directory, CONFIG_FILE_NAME)
+
+    with open(config_path, 'w') as file:
+        json.dump(args.__dict__, file, indent=4, sort_keys=True)
+
+    helper.logger.info('Save configuration file %s', config_path)
+
+def load_config():
+    config_path = os.path.join(create_config_directory(), CONFIG_FILE_NAME)
+
+    if not os.path.exists(config_path):
+        helper.logger.info('Not found configuration file, usage default values')
+        return {}
+
+    with open(config_path, 'r') as file:
+        helper.logger.info('Load configuration file %s', config_path)
+        return json.load(file)

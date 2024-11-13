@@ -27,6 +27,15 @@ https = urllib3.PoolManager(
 set_cookie(https, SUBDIVX_MAIN_URL, headers)
 token = get_token(https, SUBDIVX_MAIN_URL)
 
+# Save or load configuration
+if args.save_config:
+	save_config(args)
+elif args.load_config:
+	config = load_config()
+	args = Args(args, config)
+else:
+	args = Args(args)
+
 def main():
 
 	# Get all data from search
