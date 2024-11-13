@@ -33,13 +33,15 @@ Libraries:
     -s, --season                        Download full season subtitles
     -l, --location LOCATION             Download subtitle in destination directory
     -n, --lines LINES                   Limit the number of results
-    -st --style STYLE                   Show results in selected style
+    -st, --style STYLE                  Show results in selected style
     -m, --minimal                       Set minimal style of results
     -nr, --no-rename                    Disable rename files
     -c, --comments                      Show subtitles comments in search
     -f, --first                         Download the first matching
     -odownloads, --order-by-downloads   Order results by downloads
     -odates, --order-by-dates           Order results by dates
+    -sc, --save-config                  Save configuration file
+    -lc, --load-config                  Load configuration file
     -v, --verbose                       Be verbose
 
 #### Examples
@@ -72,6 +74,18 @@ Search subtitle including their comments
 Download subtitle directly
 
     subdivx-dl -f 'It Crowd S02E01'
+
+#### Style
+It is possible to apply different styles to the tables that display the results using the ``-st`` or ``--style`` options and specifying the desired style name. The available options are: ``simple``, ``grid``, ``pipe``, ``presto``, ``orgtbl``, ``psql``, ``rst``, ``simple_grid``, ``rounded_grid``, ``fancy_grid``, ``heavy_grid``, ``double_grid`` and ``mixed_grid``. If no style is specified, the default ``rounded_grid`` will be used.
+
+#### Configuration Management
+To save frequently used options for the ``subdivx-dl`` command, the following options are implemented:
+*    ``-sc`` or ``--save-config``: allows you to save the entered arguments.
+*    ``-lc`` or ``--load-config``: allows you to perform searches with previously saved arguments.
+
+* The data is stored in:
+    * Windows: ``C:\Users\user_name\AppData\Local\subdivx-dl\``
+    * Linux: ``~/.config/subdivx-dl/``
 
 ### Screenshots
 Search results view  

@@ -33,13 +33,15 @@ Librerias:
     -s, --season                        Download full season subtitles
     -l, --location LOCATION             Download subtitle in destination directory
     -n, --lines LINES                   Limit the number of results
-    -st --style STYLE                   Show results in selected style
+    -st, --style STYLE                  Show results in selected style
     -m, --minimal                       Set minimal style of results
     -nr, --no-rename                    Disable rename files
     -c, --comments                      Show subtitles comments in search
     -f, --first                         Download the first matching
     -odownloads, --order-by-downloads   Order results by downloads
     -odates, --order-by-dates           Order results by dates
+    -sc, --save-config                  Save configuration file
+    -lc, --load-config                  Load configuration file
     -v, --verbose                       Be verbose
 
 #### Ejemplos
@@ -72,6 +74,18 @@ Buscar subtítulo incluyendo los comentarios
 Descargar el subtítulo directamente sin intervención
 
     subdivx-dl -f 'It Crowd S02E01'
+
+#### Estilos
+Es posible aplicar diferentes estilos a las tablas que muestan los resultados utilizando las opciones ``-st`` o ``--style`` y especificando el nombre del estilo deseado. Las opciones disponible son: ``simple``, ``grid``, ``pipe``, ``presto``, ``orgtbl``, ``psql``, ``rst``, ``simple_grid``, ``rounded_grid``, ``fancy_grid``, ``heavy_grid``, ``double_grid`` y ``mixed_grid``. Si no se especifica un estilo, se utilizará el predeterminado ``rounded_grid``.
+
+#### Gestión de la configuración
+Para guardar las opciones frecuentemente utilizadas con el comando ``subdivx-dl``, se implementan siguientes opciones:
+* ``-sc`` o ``--save-config``: permite guardar los argumentos ingresados.
+* ``-lc`` o ``--load-config``: permite realizar búsquedas con argumentos previamente guardados.
+
+Los datos se guardan en:
+    * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\subdivx-dl\``
+    * Linux: ``~/.config/subdivx-dl/``
 
 ### Capturas de pantalla
 Vista de resultados de búsqueda  
