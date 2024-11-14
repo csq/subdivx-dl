@@ -6,8 +6,7 @@ import certifi
 
 from .utils import *
 
-SUBDIVX_MAIN_URL = 'https://www.subdivx.com/'
-SUBDIVX_URL = 'https://www.subdivx.com/inc/ajax.php'
+SUBDIVX_URL = 'https://www.subdivx.com/'
 
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
@@ -24,8 +23,8 @@ https = urllib3.PoolManager(
 )
 
 # Set cookie and get token
-set_cookie(https, SUBDIVX_MAIN_URL, headers)
-token = get_token(https, SUBDIVX_MAIN_URL)
+set_cookie(https, SUBDIVX_URL, headers)
+token = get_token(https, SUBDIVX_URL)
 
 # Save or load configuration
 if args.save_config:
@@ -50,9 +49,8 @@ def main():
 
 	# Checking flag for switch to fast download mode
 	if args.first:
-		first_subtitle_id = search_data[0]['id_subtitle']
-		subtitle_url = f'https://subdivx.com/{first_subtitle_id}'
-		get_subtitle(args, https, subtitle_url)
+		id_subtitle = search_data[0]['id_subtitle']
+		get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
 		exit(0)
 
 	while True:
@@ -68,7 +66,6 @@ def main():
 		try:
 			selection = int(user_input) - 1
 			id_subtitle = str(search_data[selection]['id_subtitle'])
-			url = f'https://subdivx.com/{id_subtitle}'
 		except (ValueError, IndexError):
 			print('\nInput valid numbers')
 			delay(0)
@@ -109,7 +106,7 @@ def main():
 			continue
 		elif select_action == 1:
 			clear()
-			get_subtitle(args, https, url)
+			get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
 			exit(0)
 		elif select_action == 0:
 			clear()

@@ -10,6 +10,7 @@ import time
 import os
 import re
 
+from urllib3.exceptions import ProtocolError
 from tempfile import NamedTemporaryFile
 from json import JSONDecodeError
 from tabulate import tabulate
@@ -44,17 +45,17 @@ def get_file_extension(file_path):
 
         return '.bin'
 
-def download_file(poolManager, url, location):
-    helper.logger.info('Downloading archive from: %s in %s', url, location)
+def download_file(poolManager, url, id_subtitle, location):
+    helper.logger.info(f'Downloading archive from: {url}{id_subtitle} in {location}')
 
     success = False
 
     with NamedTemporaryFile(dir=location, delete=False) as temp_file:
         for i in range(9, 0, -1):
-            address = url[:20] + 'sub' + str(i) + '/' + url[20:]
-            helper.logger.info('Attempt on server N°%d with url %s', i, address)
+            server_address = f'{url}sub{i}/{id_subtitle}'
+            helper.logger.info(f'Attempt on server N°{i} with url {server_address}')
 
-            response = poolManager.request('GET', address)
+            response = poolManager.request('GET', server_address)
             temp_file.write(response.data)
             temp_file.seek(0)
 
@@ -73,7 +74,7 @@ def download_file(poolManager, url, location):
                 success = False
 
         if not success:
-            print(f'No suitable subtitles download for: {url}')
+            print(f'No suitable subtitles download for: {url}{id_subtitle}')
 
 def unzip(zip_file_path, destination):
     try:
@@ -321,7 +322,9 @@ def get_data_page(args, poolManager, url, token, search):
     print('Searching...', end='\r')
 
     query = parse_search_query(search)
-    version = get_web_version(poolManager)
+    version = get_web_version(poolManager, url)
+
+    url = f'{url}inc/ajax.php'
 
     payload = {
         'tabla': 'resultados',
@@ -341,10 +344,10 @@ def get_data_page(args, poolManager, url, token, search):
         if attempt > 0:
             delay()
 
-        request = poolManager.request('POST', url=url, fields=payload)
+        response = poolManager.request('POST', url=url, fields=payload)
 
         try:
-            data = json.loads(request.data).get('aaData')
+            data = json.loads(response.data).get('aaData')
         except JSONDecodeError:
             clear()
             print('Subtitles not found because cookie expired')
@@ -352,7 +355,7 @@ def get_data_page(args, poolManager, url, token, search):
             print('\nCookie deleted')
             print('\nTry again')
 
-            helper.logger.error('Response could not be serialized')
+            helper.logger.error('Failed to parse response')
             exit(0)
 
         for result in data:
@@ -421,27 +424,23 @@ def parse_search_query(search):
 
     return query
 
-def get_comments(poolManager, url, id_subtitle):
-
+def get_comments(poolManager, url, subtitle_id):
     payload = {
-        'getComentarios': id_subtitle
+        'getComentarios': subtitle_id
     }
 
-    request = poolManager.request('POST', url, fields=payload)
+    url = f'{url}inc/ajax.php'
 
     try:
-        data = json.loads(request.data).get('aaData')
-    except JSONDecodeError:
-        print('Comments not found')
-        helper.logger.error('Response could not be serialized')
-        exit(0)
+        response = poolManager.request('POST', url=url, fields=payload)
+        comments_data = json.loads(response.data).get('aaData', [])
+    except (ProtocolError, JSONDecodeError):
+        helper.logger.error('Failed to parse response')
+        return []
 
-    comment_list = []
+    comments = [comment['comentario'] for comment in comments_data]
 
-    for key in data:
-        comment_list.append(key['comentario'])
-
-    return comment_list
+    return comments
 
 def print_search_results(args, search_data):
     terminal_width = get_terminal_width()
@@ -485,7 +484,7 @@ def print_description(args, selection, search_data):
         maxcolwidths=[terminal_width - 5]
     ), end='\n\n')
 
-def get_subtitle(args, poolManager, url):
+def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
         print('Working...', end='\r')
 
@@ -498,7 +497,7 @@ def get_subtitle(args, poolManager, url):
     helper.logger.info('Create temporal directory %s', fpath)
 
     # Download zip/rar in temporal directory
-    download_file(poolManager, url, fpath)
+    download_file(poolManager, url, id_subtitle, fpath)
 
     # Determinate final path for subtitle
     if LOCATION_DESTINATION is None:
@@ -573,25 +572,21 @@ def prompt_user_to_download():
     user_input = input('\nSelection: ')
     return user_input
 
-def get_web_version(poolManager):
-    url = 'https://www.subdivx.com/'
-    request = poolManager.request('GET', url)
+def get_web_version(poolManager, url):
+
+    response = poolManager.request('GET', url)
+    response_data = response.data.decode('utf-8')
 
     label = 'id="vs">'
 
-    try:
-        response_data = request.data.decode('utf-8')
+    version_start_index = response_data.find(label) + len(label)
+    version_end_index = response_data.find('</div>', version_start_index)
 
-        version_start_index = response_data.find(label) + len(label)
-        version_end_index = response_data.find('</div>', version_start_index)
+    version_text = response_data[version_start_index:version_end_index]
 
-        version_text = response_data[version_start_index:version_end_index]
+    version = version_text.replace('v', '').replace('.', '')
 
-        version = version_text.replace('v', '').replace('.', '')
-
-        return version
-    except Exception as error:
-        helper.logger.error(error)
+    return version
 
 def delay(factor=2):
     delay = 2 ** factor
@@ -621,13 +616,9 @@ def read_cookie():
 def get_cookie(poolManager, url):
     helper.logger.info('Get cookie from %s', url)
 
-    # Request petition GET
     response = poolManager.request('GET', url)
 
-    # Get cookie from response
     cookie = response.headers.get('Set-Cookie')
-
-    # Split cookie
     cookie_parts = cookie.split(';')
 
     # Return sdx_cookie
@@ -665,7 +656,9 @@ def delete_cookie():
 def get_token(poolManager, url):
     helper.logger.info('Get token')
 
-    response = poolManager.request('GET', f'{url}inc/gt.php?gt=1')
+    url = f'{url}inc/gt.php?gt=1'
+
+    response = poolManager.request('GET', url)
     data = response.data
 
     token = json.loads(data)['token']
