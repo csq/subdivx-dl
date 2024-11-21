@@ -542,6 +542,84 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         clear()
         print('Done!')
 
+def get_best_match(args, search_data):
+    helper.logger.info('Finding the best match subtitle')
+
+    id_subtitle = search_data[0]['id_subtitle']
+    id_secondary_subtitle = ''
+
+    key_values = guessit(args.SEARCH)
+
+    # Normalize values
+    source = key_values.get('source')
+    if source:
+        key_values['source'] = source.replace('Blu-ray', 'BluRay')
+
+    video_codec = key_values.get('video_codec')
+    if video_codec:
+        key_values['video_codec'] = video_codec.replace('H.', '')
+
+    size = key_values.get('size')
+    if size:
+        key_values['size'] = str(size)
+
+    other = key_values.get('other')
+    if other:
+        key_values['other'] = ''.join(other)
+
+    attribute_weights = {
+        'source': 0.5,         # 50% importance
+        'release_group': 0.25, # 25% importance
+        'screen_size': 0.1,    # 10% importance
+        'video_codec': 0.05,   #  5% importance
+        'size': 0.05,          #  5% importance
+        'other': 0.05          #  5% importance
+    }
+
+    max_score = 0
+    max_similarity_percentage = 0.8
+
+    for subtitle in search_data:
+
+        if key_values['type'] == 'episode':
+            episode_number = f'E{key_values['episode']:02d}' if key_values.get('episode') else ''
+            title = f'{key_values['title']} S{key_values['season']:02d}{episode_number}'
+        else:
+            title = f'{key_values['title']} ({key_values['year']})' if key_values.get('year') else key_values['title']
+
+        # Search match text whith title of title
+        if title.lower() in subtitle['title'].lower():
+            id_secondary_subtitle = subtitle['id_subtitle']
+
+            score = 0
+
+            # Search match text whith title of description
+            for key in attribute_weights.keys():
+                try:
+                    if key_values[key].lower() in subtitle['description'].replace('Blu-Ray', 'BluRay').lower():
+                        score += attribute_weights[key]
+                        helper.logger.info('Found attribute [%s] in subtitle [%s]', key, subtitle['id_subtitle'])
+                except KeyError:
+                    pass
+
+            if max_score < score:
+                max_score = score
+                id_subtitle = subtitle['id_subtitle']
+                helper.logger.info('New best match with score %.2f is subtitle [%s]', max_score, id_subtitle)
+
+        if max_score >= max_similarity_percentage:
+            break
+
+    if max_score > 0:
+        helper.logger.info('Returning the best match for %s is subtitle [%s] with score %.2f', args.SEARCH, id_subtitle, max_score)
+        return id_subtitle
+    elif id_secondary_subtitle:
+        helper.logger.info('Returning the first subtitle found with matching with title')
+        return id_secondary_subtitle
+    else:
+        helper.logger.info('Returning the first subtitle found')
+        return id_subtitle
+
 def print_comments(args, comments):
     terminal_width = get_terminal_width()
 
