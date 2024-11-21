@@ -48,7 +48,7 @@ def main():
 	search_data = search_data[:args.lines] if args.lines is not None else search_data
 
 	# Checking flag for switch to fast download mode
-	if args.first:
+	if args.fast:
 		id_subtitle = get_best_match(args, search_data)
 		get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
 		exit(0)

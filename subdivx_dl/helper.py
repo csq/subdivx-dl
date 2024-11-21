@@ -47,7 +47,7 @@ parser.add_argument(
 parser.add_argument('-m', '--minimal', help='set minimal style of results', action='store_true')
 parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
 parser.add_argument('-c', '--comments', help='show comments', action='store_true')
-parser.add_argument('-f', '--first', help='download the first matching', action='store_true')
+parser.add_argument('-f', '--fast', help='download the best matching result directly, no search needed', action='store_true')
 parser.add_argument('-odownloads', '--order-by-downloads', help='order results by downloads', action='store_true')
 parser.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
 parser.add_argument('-v', '--verbose', help='be verbose', action='store_true')
