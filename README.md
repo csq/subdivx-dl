@@ -37,7 +37,7 @@ Libraries:
     -m, --minimal                       Set minimal style of results
     -nr, --no-rename                    Disable rename files
     -c, --comments                      Show subtitles comments in search
-    -f, --first                         Download the first matching
+    -f, --fast                          Download the best matching result directly, no search needed
     -odownloads, --order-by-downloads   Order results by downloads
     -odates, --order-by-dates           Order results by dates
     -sc, --save-config                  Save configuration file
@@ -71,7 +71,7 @@ Search subtitle including their comments
 
     subdivx-dl -c 'Halo S01E01'
 
-Download subtitle directly
+Download the best subtitle directly
 
     subdivx-dl -f 'It Crowd S02E01'
 
