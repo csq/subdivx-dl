@@ -12,7 +12,7 @@ args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
 headers = {
-	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0'
+	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'
 }
 
 # Create a PoolManager instance for HTTPS requests
