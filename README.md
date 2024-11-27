@@ -27,7 +27,7 @@ Libraries:
 ## USAGE AND OPTIONS
     subdivx-dl [OPTIONS][SEARCH]
 
-### Opciones Generales:
+### General options:
     -h, --help                          Print the help text and exit
     -V, --version                       Print program version and exit
     -s, --season                        Download subtitles for the entire season
