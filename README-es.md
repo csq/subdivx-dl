@@ -25,24 +25,24 @@ Librerias:
 * Guessit
 
 ## USO Y OPCIONES
-    subdivx-dl [OPTIONS][SEARCH]
+    subdivx-dl [OPCIONES][BUSQUEDA]
 
 ### Opciones Generales:
-    -h, --help                          Print the help text and exit
-    -V, --version                       Print program version and exit
-    -s, --season                        Download subtitles for the entire season
-    -l, --location LOCATION             Specify the destination directory
-    -n, --lines LINES                   Limit the number of results
-    -st, --style STYLE                  Show results in the selected style
-    -m, --minimal                       Use a minimal style for results
-    -nr, --no-rename                    Disable file renaming
-    -c, --comments                      Display comments
-    -f, --fast                          Directly download the best matching subtitle
-    -odownloads, --order-by-downloads   Order by number of downloads
-    -odates, --order-by-dates           Order results by dates
-    -sc, --save-config                  Save configuration
-    -lc, --load-config                  Load configuration
-    -v, --verbose                       Enable verbose output
+    -h, --help                          Imprimir el texto de ayuda y salir
+    -V, --version                       Imprimir la versión del programa y salir
+    -s, --season                        Descargar subtítulos para toda la temporada
+    -l, --location UBICACIÓN            Especificar el directorio de destino
+    -n, --lines LÍNEAS                  Limitar el número de resultados
+    -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
+    -m, --minimal                       Usar un estilo mínimo para los resultados
+    -nr, --no-rename                    Deshabilitar el renombrado de archivos
+    -c, --comments                      Mostrar comentarios
+    -f, --fast                          Descargar directamente el mejor subtítulo coincidente
+    -odownloads, --order-by-downloads   Ordenar por número de descargas
+    -odates, --order-by-dates           Ordenar resultados por fechas
+    -sc, --save-config                  Guardar configuración
+    -lc, --load-config                  Cargar configuración
+    -v, --verbose                       Habilitar salida detallada
 
 #### Ejemplos
 Estos ejemplos muestran la operación habitual  
