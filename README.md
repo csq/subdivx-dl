@@ -28,21 +28,21 @@ Libraries:
     subdivx-dl [OPTIONS][SEARCH]
 
 ### Opciones Generales:
-    -h, --help                          Print this help text and exit
+    -h, --help                          Print the help text and exit
     -V, --version                       Print program version and exit
-    -s, --season                        Download full season subtitles
-    -l, --location LOCATION             Download subtitle in destination directory
+    -s, --season                        Download subtitles for the entire season
+    -l, --location LOCATION             Specify the destination directory
     -n, --lines LINES                   Limit the number of results
-    -st, --style STYLE                  Show results in selected style
-    -m, --minimal                       Set minimal style of results
-    -nr, --no-rename                    Disable rename files
-    -c, --comments                      Show subtitles comments in search
-    -f, --fast                          Download the best matching result directly, no search needed
-    -odownloads, --order-by-downloads   Order results by downloads
+    -st, --style STYLE                  Show results in the selected style
+    -m, --minimal                       Use a minimal style for results
+    -nr, --no-rename                    Disable file renaming
+    -c, --comments                      Display comments
+    -f, --fast                          Directly download the best matching subtitle
+    -odownloads, --order-by-downloads   Order by number of downloads
     -odates, --order-by-dates           Order results by dates
-    -sc, --save-config                  Save configuration file
-    -lc, --load-config                  Load configuration file
-    -v, --verbose                       Be verbose
+    -sc, --save-config                  Save configuration
+    -lc, --load-config                  Load configuration
+    -v, --verbose                       Enable verbose output
 
 #### Examples
 These examples show habitual operation
