@@ -17,44 +17,47 @@ parser = argparse.ArgumentParser(
             \r<www.github.com/csq/subdivx-dl/issues>'''
 )
 
-parser.add_argument('SEARCH', help='name of the tv serie or movie to search for subtitle')
-parser.add_argument('-V', '--version', action='version', version=__version__)
-parser.add_argument('-s', '--season', help='download full season subtitles', action='store_true')
-parser.add_argument('-n', '--lines', help='limit the number of results', type=int)
-parser.add_argument('-l', '--location', help='destination directory')
-parser.add_argument(
-    '-st',
-    '--style',
-    help='show results in selected style',
+# Parser main
+parser.add_argument('SEARCH', help='name of the TV series or movie to search for subtitles')
+
+# Create a group for startup-related arguments
+startup_group = parser.add_argument_group('Startup')
+startup_group.add_argument('-V', '--version', action='version', version=__version__)
+startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
+
+# Create a group for download-related arguments
+download_group = parser.add_argument_group('Download')
+download_group.add_argument('-s', '--season', help='download subtitles for the entire season', action='store_true')
+download_group.add_argument('-l', '--location', help='specify the destination directory')
+download_group.add_argument('-nr', '--no-rename', help='disable file renaming', action='store_true')
+download_group.add_argument('-f', '--fast', help='directly download the best matching subtitle', action='store_true')
+
+# Create a group for results-related arguments
+results_group = parser.add_argument_group('Results')
+results_group.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
+results_group.add_argument('-odownloads', '--order-by-downloads', help='order results by number of downloads', action='store_true')
+results_group.add_argument('-n', '--lines', help='limit the number of results', type=int)
+results_group.add_argument('-c', '--comments', help='display comments', action='store_true')
+
+# Create a group for style-related arguments
+style_group = parser.add_argument_group('Style')
+style_group.add_argument('-m', '--minimal', help='use a minimal style for results', action='store_true')
+style_group.add_argument(
+    '-st', '--style',
+    help='show results in the selected style',
     choices=[
-        'simple',
-        'grid',
-        'pipe',
-        'presto',
-        'orgtbl',
-        'psql',
-        'rst',
-        'simple_grid',
-        'rounded_grid',
-        'fancy_grid',
-        'heavy_grid',
-        'double_grid',
-        'mixed_grid'
+        'simple', 'grid', 'pipe', 'presto', 'orgtbl', 'psql',
+        'rst', 'simple_grid', 'rounded_grid', 'fancy_grid',
+        'heavy_grid', 'double_grid', 'mixed_grid'
     ],
     nargs='?',
     const='rounded_grid'
 )
-parser.add_argument('-m', '--minimal', help='set minimal style of results', action='store_true')
-parser.add_argument('-nr', '--no-rename', help='disable rename files', action='store_true')
-parser.add_argument('-c', '--comments', help='show comments', action='store_true')
-parser.add_argument('-f', '--fast', help='download the best matching result directly, no search needed', action='store_true')
-parser.add_argument('-odownloads', '--order-by-downloads', help='order results by downloads', action='store_true')
-parser.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
-parser.add_argument('-v', '--verbose', help='be verbose', action='store_true')
 
-# Parser for configuration
-parser.add_argument('-sc', '--save-config', help='save configuration file', action='store_true')
-parser.add_argument('-lc', '--load-config', help='load configuration file', action='store_true')
+# Create a group for configuration-related arguments
+config_group = parser.add_argument_group('Configuration')
+config_group.add_argument('-sc', '--save-config', help='save configuration', action='store_true')
+config_group.add_argument('-lc', '--load-config', help='load configuration', action='store_true')
 
 # Create and configure logger
 logger = logging.getLogger(__name__)
