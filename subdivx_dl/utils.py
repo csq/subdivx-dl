@@ -843,6 +843,12 @@ def save_config(args):
     config_directory = create_config_directory()
     config_path = os.path.join(config_directory, CONFIG_FILE_NAME)
 
+    args_to_delete = ['SEARCH', 'load_config', 'save_config']
+
+    for arg in args_to_delete:
+        if arg in args.__dict__:
+            del args.__dict__[arg]
+
     with open(config_path, 'w') as file:
         json.dump(args.__dict__, file, indent=4, sort_keys=True)
 
