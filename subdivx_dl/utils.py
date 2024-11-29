@@ -81,10 +81,10 @@ def download_file(poolManager, url, id_subtitle, location):
 def unzip(zip_file_path, destination):
     try:
         with ZipFile(zip_file_path, 'r') as z:
-            helper.logger.info('Unpacking zip [%s]', os.path.basename(z.filename))
+            helper.logger.info(f'Unpacking zip [{os.path.basename(z.filename)}]')
             for file in z.namelist():
                 if file.endswith(SUBTITLE_EXTENSIONS):
-                    helper.logger.info('Unzip [%s]', os.path.basename(file))
+                    helper.logger.info(f'Unzip [{os.path.basename(file)}]')
                     z.extract(file, destination)
             z.close()
     except:
@@ -106,12 +106,12 @@ def move_all_to_parent_folder(directory):
                         shutil.copy(source_path, destination_path)
 
 def unrar(rar_file_path, destination):
-    helper.logger.info('Unpacking rar [%s] in %s', os.path.basename(rar_file_path), destination)
+    helper.logger.info(f'Unpacking rar [{os.path.basename(rar_file_path)}] in {destination}')
     rf = RarFile(rar_file_path)
 
     for file in rf.namelist():
         if file.endswith(SUBTITLE_EXTENSIONS):
-            helper.logger.info('Unrar [%s]', os.path.basename(file))
+            helper.logger.info(f'Unrar [{os.path.basename(file)}]')
             rf.extract(file, destination)
     rf.close()
 
@@ -167,7 +167,7 @@ def print_menu_content_dir(args, directory):
                 # Remove temp folder
                 try:
                     shutil.rmtree(directory)
-                    helper.logger.info('Delete temporal directory %s', directory)
+                    helper.logger.info(f'Delete temporal directory {directory}')
                 except OSError as error:
                     helper.logger.error(error)
                 clear()
@@ -183,7 +183,7 @@ def print_menu_content_dir(args, directory):
                 return os.path.basename(files[x])
 
 def movie_subtitle(args, file_path, destination):
-    helper.logger.info('Move subtitle to %s', destination)
+    helper.logger.info(f'Move subtitle to {destination}')
 
     file_name_select = print_menu_content_dir(args, file_path)
     file_path_select = os.path.join(file_path, file_name_select)
@@ -195,42 +195,44 @@ def movie_subtitle(args, file_path, destination):
     # Get file extension of subtitle downloaded
     subtitle_file_extension = os.path.splitext(file_path_select)[1]
 
+    origin_name = os.path.basename(file_path_select)
+
     if not args.no_rename:
         new_name = os.path.join(destination, f'{new_name}{subtitle_file_extension}')
-        helper.logger.info(
-            'Rename and move subtitle [%s] to [%s]',
-            os.path.basename(file_path_select),
-            os.path.basename(new_name)
-        )
 
-        os.makedirs(os.path.dirname(new_name), exist_ok=True)
+        destination_name = os.path.basename(new_name)
+        helper.logger.info(f'Rename and move subtitle [{origin_name}] to [{destination_name}]')
+
+        destination_path = os.path.dirname(new_name)
+        os.makedirs(destination_path, exist_ok=True)
 
         try:
             shutil.copy(file_path_select, new_name)
         except PermissionError:
             if not args.verbose:
                 clear()
-                print(f'You do not have permissions to write to {os.path.dirname(new_name)}')
+                print(f'You do not have permissions to write to {destination_path}')
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
     else:
-        new_name = os.path.join(destination, os.path.basename(file_path_select))
-        helper.logger.info('Just move subtitle [%s] to [%s]', os.path.basename(file_path_select), destination)
+        new_name = os.path.join(destination, origin_name)
+        helper.logger.info(f'Just move subtitle [{origin_name}] to [{destination}]')
 
-        os.makedirs(os.path.dirname(new_name), exist_ok=True)
+        destination_path = os.path.dirname(new_name)
+        os.makedirs(destination_path, exist_ok=True)
 
         try:
             shutil.copy(file_path_select, new_name)
         except PermissionError:
             if not args.verbose:
                 clear()
-                print(f'You do not have permissions to write to {os.path.dirname(new_name)}')
+                print(f'You do not have permissions to write to {destination_path}')
             helper.logger.warning('Permissions issues on destination directory')
             exit(0)
 
 def tv_show_subtitles(args, file_path, destination):
-    helper.logger.info('Moves subtitles to %s', destination)
+    helper.logger.info(f'Moves subtitles to {destination}')
     files = os.listdir(file_path)
 
     # TV series season and episode names
@@ -271,7 +273,7 @@ def tv_show_subtitles(args, file_path, destination):
             except Exception as e:
                 helper.logger.error(e)
                 file_destination = os.path.join(destination, files[index])
-                helper.logger.info('No match Regex: Just move subtitle [%s]', files[index])
+                helper.logger.info(f'No match Regex: Just move subtitle [{files[index]}]')
 
                 os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
@@ -285,7 +287,7 @@ def tv_show_subtitles(args, file_path, destination):
                     exit(0)
             else:
                 file_destination = os.path.join(destination, new_name)
-                helper.logger.info('Move subtitle [%s] as [%s]', files[index], new_name)
+                helper.logger.info(f'Move subtitle [{files[index]}] as [{new_name}]')
 
                 os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
@@ -301,7 +303,7 @@ def tv_show_subtitles(args, file_path, destination):
         # Move (rename same name for override) files without rename if flag --no-rename is True
         elif files[index].endswith(SUBTITLE_EXTENSIONS):
             file_destination = os.path.join(destination, files[index])
-            helper.logger.info('Move subtitle [%s] to [%s]',  files[index], destination)
+            helper.logger.info(f'Move subtitle [{files[index]}] to [{destination}]')
 
             os.makedirs(os.path.dirname(file_destination), exist_ok=True)
 
@@ -339,13 +341,13 @@ def get_data_page(args, poolManager, url, token, search):
         'token': token
     }
 
-    helper.logger.info('Starting request to subdivx.com with search: %s parsed as: %s', search, query)
+    helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
 
     max_attempts = 3
     search_results = []
 
     for attempt in range(max_attempts):
-        helper.logger.info('Attempt number %s', attempt + 1)
+        helper.logger.info(f'Attempt number {attempt + 1}')
 
         if attempt > 0:
             delay()
@@ -378,10 +380,10 @@ def get_data_page(args, poolManager, url, token, search):
         if not search_results and attempt < (max_attempts - 1):
             continue
         elif search_results:
-            helper.logger.info('Subtitles found for: %s', query)
+            helper.logger.info(f'Subtitles found for: {query}')
             break
         elif not search_results and attempt == max_attempts - 1:
-            helper.logger.info('Subtitles not found for: %s', query)
+            helper.logger.info(f'Subtitles not found for: {query}')
             if not args.verbose:
                 print('Subtitles not found')
             exit(0)
@@ -500,7 +502,7 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     # Create temporal directory
     temp_dir = tempfile.TemporaryDirectory()
     fpath = temp_dir.name
-    helper.logger.info('Create temporal directory %s', fpath)
+    helper.logger.info(f'Create temporal directory {fpath}')
 
     # Download zip/rar in temporal directory
     download_file(poolManager, url, id_subtitle, fpath)
@@ -517,7 +519,7 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     if not list_directory:
         helper.logger.info('Remote server not found file')
 
-        helper.logger.info('Delete temporal directory %s', fpath)
+        helper.logger.info(f'Delete temporal directory {fpath}')
         temp_dir.cleanup()
 
         if not args.verbose:
@@ -540,7 +542,7 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     # Remove temp folder
     try:
         temp_dir.cleanup()
-        helper.logger.info('Delete temporal directory %s', fpath)
+        helper.logger.info(f'Delete temporal directory {fpath}')
     except OSError as error:
         helper.logger.error(error)
 
@@ -606,22 +608,25 @@ def get_best_match(args, search_data):
             # Search match text whith title of description
             for key in attribute_weights.keys():
                 try:
-                    if normalized_key_values[key].lower() in subtitle['description'].replace('Blu-Ray', 'BluRay').lower():
+                    subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
+                    atribute = normalized_key_values[key].lower()
+
+                    if atribute in subtitle_description:
                         score += attribute_weights[key]
-                        helper.logger.info('Found attribute [%s] in subtitle [%s]', key, subtitle['id_subtitle'])
+                        helper.logger.info(f'Found attribute [{key}] in subtitle [{subtitle['id_subtitle']}]')
                 except KeyError:
                     pass
 
             if max_score < score:
                 max_score = score
                 id_subtitle = subtitle['id_subtitle']
-                helper.logger.info('New best match with score %.2f is subtitle [%s]', max_score, id_subtitle)
+                helper.logger.info(f'New best match with score {max_score:.2f} is subtitle [{id_subtitle}]')
 
         if max_score >= max_similarity_percentage:
             break
 
     if max_score > 0:
-        helper.logger.info('Returning the best match for %s is subtitle [%s] with score %.2f', args.SEARCH, id_subtitle, max_score)
+        helper.logger.info(f'Returning the best match for {args.SEARCH} is subtitle [{id_subtitle}] with score {max_score:.2f}')
         return id_subtitle
     elif id_secondary_subtitle:
         helper.logger.info('Returning the first subtitle found with matching with title')
@@ -702,7 +707,7 @@ def read_cookie():
         return file.read()
 
 def get_cookie(poolManager, url):
-    helper.logger.info('Get cookie from %s', url)
+    helper.logger.info(f'Get cookie from {url}')
 
     response = poolManager.request('GET', url)
 
@@ -861,7 +866,7 @@ def save_config(args):
     with open(config_path, 'w') as file:
         json.dump(args_copy, file, indent=4, sort_keys=True)
 
-    helper.logger.info('Save configuration file %s', config_path)
+    helper.logger.info(f'Save configuration file {config_path}')
 
 def load_config():
     config_path = os.path.join(create_config_directory(), CONFIG_FILE_NAME)
@@ -871,5 +876,5 @@ def load_config():
         return {}
 
     with open(config_path, 'r') as file:
-        helper.logger.info('Load configuration file %s', config_path)
+        helper.logger.info(f'Load configuration file {config_path}')
         return json.load(file)
