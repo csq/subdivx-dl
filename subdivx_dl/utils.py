@@ -548,15 +548,8 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         clear()
         print('Done!')
 
-def get_best_match(args, search_data):
-    helper.logger.info('Finding the best match subtitle')
+def normalize_key_values(key_values):
 
-    id_subtitle = search_data[0]['id_subtitle']
-    id_secondary_subtitle = ''
-
-    key_values = guessit(args.SEARCH)
-
-    # Normalize values
     source = key_values.get('source')
     if source:
         key_values['source'] = source.replace('Blu-ray', 'BluRay')
@@ -572,6 +565,17 @@ def get_best_match(args, search_data):
     other = key_values.get('other')
     if other:
         key_values['other'] = ''.join(other)
+
+    return key_values
+
+def get_best_match(args, search_data):
+    helper.logger.info('Finding the best match subtitle')
+
+    id_subtitle = search_data[0]['id_subtitle']
+    id_secondary_subtitle = ''
+
+    key_values = guessit(args.SEARCH)
+    normalized_key_values = normalize_key_values(key_values)
 
     attribute_weights = {
         'source': 0.5,         # 50% importance
@@ -602,7 +606,7 @@ def get_best_match(args, search_data):
             # Search match text whith title of description
             for key in attribute_weights.keys():
                 try:
-                    if key_values[key].lower() in subtitle['description'].replace('Blu-Ray', 'BluRay').lower():
+                    if normalized_key_values[key].lower() in subtitle['description'].replace('Blu-Ray', 'BluRay').lower():
                         score += attribute_weights[key]
                         helper.logger.info('Found attribute [%s] in subtitle [%s]', key, subtitle['id_subtitle'])
                 except KeyError:
