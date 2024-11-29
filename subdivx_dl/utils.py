@@ -132,6 +132,10 @@ def print_menu_content_dir(args, directory):
             index += 1
         x += 1
 
+    if args.fast and index > 2:
+        file_name = header[1][1]
+        return file_name
+
     if index > 2:
         while True:
             # Clear screen
