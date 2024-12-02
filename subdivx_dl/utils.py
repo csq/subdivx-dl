@@ -115,6 +115,57 @@ def unrar(rar_file_path, destination):
             rf.extract(file, destination)
     rf.close()
 
+def get_attribute_weights():
+    attribute_weights = {
+        'source': 0.5,         # 50% importance
+        'release_group': 0.25, # 25% importance
+        'screen_size': 0.1,    # 10% importance
+        'video_codec': 0.05,   #  5% importance
+        'size': 0.05,          #  5% importance
+        'other': 0.05          #  5% importance
+    }
+
+    return attribute_weights
+
+def select_best_subtitle_from_list(args, data):
+    helper.logger.info('Selecting the best subtitle from the list')
+
+    key_values = guessit(args.SEARCH)
+    normalized_key_values = normalize_key_values(key_values)
+
+    weights = get_attribute_weights()
+
+    max_score = 0
+
+    file_name = ''
+    first_file = data[1][1]
+
+    for i in range(1, len(data)):
+        # Search match text with name of subtitle
+        score = 0
+        for key in weights.keys():
+            try:
+                subtitle_name = data[i][1].strip().lower()
+                atribute = normalized_key_values[key].lower()
+
+                if atribute in subtitle_name:
+                    score += weights[key]
+                    helper.logger.info(f'Found attribute [{key}] in subtitle [{i}]')
+            except KeyError:
+                pass
+
+        if max_score < score:
+            max_score = score
+            file_name = data[i][1]
+            helper.logger.info(f'New best match with score {max_score:.2f} in subtitle [{i}]')
+
+    if max_score > 0:
+        helper.logger.info(f'The best matching subtitle has been selected with a score {max_score:.2f}')
+        return file_name
+    else:
+        helper.logger.info('The first available subtitle has been selected')
+        return first_file
+
 def print_menu_content_dir(args, directory):
     header = [['N°', 'File name']]
     files = os.listdir(directory)
@@ -133,7 +184,7 @@ def print_menu_content_dir(args, directory):
         x += 1
 
     if args.fast and index > 2:
-        file_name = header[1][1]
+        file_name = select_best_subtitle_from_list(args, header)
         return file_name
 
     if index > 2:
@@ -579,14 +630,7 @@ def get_best_match(args, search_data):
     key_values = guessit(args.SEARCH)
     normalized_key_values = normalize_key_values(key_values)
 
-    attribute_weights = {
-        'source': 0.5,         # 50% importance
-        'release_group': 0.25, # 25% importance
-        'screen_size': 0.1,    # 10% importance
-        'video_codec': 0.05,   #  5% importance
-        'size': 0.05,          #  5% importance
-        'other': 0.05          #  5% importance
-    }
+    weights = get_attribute_weights()
 
     max_score = 0
     max_similarity_percentage = 0.8
@@ -606,13 +650,13 @@ def get_best_match(args, search_data):
             score = 0
 
             # Search match text whith title of description
-            for key in attribute_weights.keys():
+            for key in weights.keys():
                 try:
                     subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
                     atribute = normalized_key_values[key].lower()
 
                     if atribute in subtitle_description:
-                        score += attribute_weights[key]
+                        score += weights[key]
                         helper.logger.info(f'Found attribute [{key}] in subtitle [{subtitle['id_subtitle']}]')
                 except KeyError:
                     pass
