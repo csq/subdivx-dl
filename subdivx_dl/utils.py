@@ -1,23 +1,23 @@
 # Copyright: (c) 2022, subdivx-dl
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-import tempfile
-import textwrap
-import datetime
-import shutil
-import json
-import time
 import os
 import re
+import json
+import time
+import shutil
+import datetime
+import tempfile
+import textwrap
 
+from json import JSONDecodeError
 from urllib3.exceptions import ProtocolError
 from tempfile import NamedTemporaryFile
-from json import JSONDecodeError
 from tabulate import tabulate
-from subdivx_dl import helper
-from rarfile import RarFile
 from zipfile import ZipFile
+from rarfile import RarFile
 from guessit import guessit
+from subdivx_dl import helper
 
 SUBTITLE_EXTENSIONS = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
 

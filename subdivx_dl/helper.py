@@ -1,12 +1,12 @@
 # Copyright: (c) 2022, subdivx-dl
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+import os
+import logging
 import argparse
 import tempfile
-import logging
-import os
 
-from subdivx_dl.version import __version__
+from .version import __version__
 
 # Parser for command-line
 parser = argparse.ArgumentParser(
