@@ -9,6 +9,7 @@ import shutil
 import datetime
 import tempfile
 import textwrap
+import platform
 
 from json import JSONDecodeError
 from urllib3.exceptions import ProtocolError
@@ -869,25 +870,14 @@ class Args():
 
 CONFIG_FILE_NAME = 'config.json'
 
-def get_os_name():
-    if os.name == 'posix':
-        if os.uname().sysname == 'Darwin':
-            return 'macOS'
-        else:
-            return 'Linux'
-    elif os.name == 'nt':
-        return 'Windows'
-    else:
-        return 'Unknown'
-
 def create_config_directory():
-    platform_name = get_os_name()
+    platform_name = platform.system()
 
     local_appdata = os.getenv('LOCALAPPDATA')
 
     directory_paths = {
         'Linux': '~/.config/subdivx-dl/',
-        'macOS': '~/Library/Application Support/subdivx-dl/',
+        'Darwin': '~/Library/Application Support/subdivx-dl/',
         'Windows': f'{local_appdata}\\subdivx-dl\\'
     }
 
