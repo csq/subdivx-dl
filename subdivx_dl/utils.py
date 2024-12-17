@@ -194,7 +194,7 @@ def print_menu_content_dir(args, directory):
             clear()
 
             # Print table with of the subtitles available
-            print(
+            print_centered(
                 tabulate(
                     header, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, stralign='left'
                 )
@@ -525,7 +525,19 @@ def print_search_results(args, search_data):
             item.get('uploader', '')
         ][:len(columns)])
 
-    print(tabulate(table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align))
+    # Print the centered table
+    print_centered(
+        tabulate(
+            table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align
+        )
+    )
+
+def print_centered(text, end=None):
+    terminal_width = get_terminal_width()
+
+    centered_text = '\n'.join(line.center(terminal_width) for line in text.splitlines())
+
+    print(centered_text, end=end)
 
 def shorten_text(text, width):
     return textwrap.shorten(text, width=width, placeholder='...')
@@ -536,13 +548,15 @@ def print_description(args, selection, search_data):
 
     description_table = [['Description'], [description]]
 
-    print(tabulate(
-        description_table,
-        headers='firstrow',
-        tablefmt=args.style or DEFAULT_STYLE,
-        stralign='left',
-        maxcolwidths=[terminal_width - 5]
-    ), end='\n\n')
+    print_centered(
+        tabulate(
+            description_table,
+            headers='firstrow',
+            tablefmt=args.style or DEFAULT_STYLE,
+            stralign='left',
+            maxcolwidths=[terminal_width - 5]
+        ), end='\n\n'
+    )
 
 def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
@@ -691,7 +705,11 @@ def print_comments(args, comments):
     colalign = ['center', 'left']
     maxcolwidths = [None, terminal_width - 12]
 
-    print(tabulate(table, headers='firstrow', tablefmt=tablefmt, colalign=colalign, maxcolwidths=maxcolwidths))
+    print_centered(
+        tabulate(
+            table, headers='firstrow', tablefmt=tablefmt, colalign=colalign, maxcolwidths=maxcolwidths
+        )
+    )
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
