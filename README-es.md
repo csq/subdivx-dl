@@ -78,6 +78,11 @@ Descarga directamente el mejor subtítulo
 #### Estilos
 Es posible aplicar diferentes estilos a las tablas que muestan los resultados utilizando las opciones ``-st`` o ``--style`` y especificando el nombre del estilo deseado. Las opciones disponible son: ``simple``, ``grid``, ``pipe``, ``presto``, ``orgtbl``, ``psql``, ``rst``, ``simple_grid``, ``rounded_grid``, ``fancy_grid``, ``heavy_grid``, ``double_grid`` y ``mixed_grid``. Si no se especifica un estilo, se utilizará el predeterminado ``rounded_grid``.
 
+#### Todos los estilos
+<p align="center">
+  <img src="img/styles.gif" alt="animated" />
+</p>
+
 #### Gestión de la configuración
 Para guardar las opciones frecuentemente utilizadas con el comando ``subdivx-dl``, se implementan siguientes opciones:
 * ``-sc`` o ``--save-config``: permite guardar los argumentos ingresados.
