@@ -507,11 +507,11 @@ def print_search_results(args, search_data):
 
     # Check flag --minimal
     if args.minimal:
-        columns = ['N°', 'Title', 'Downloads', 'Date']
+        columns = ['N°', 'Title', 'Downloads'.ljust(11), 'Date']
         align = ['center', 'center', 'decimal', 'center']
         min_width = 40
     else:
-        columns = ['N°', 'Title', 'Downloads', 'Date', 'User']
+        columns = ['N°', 'Title', 'Downloads'.ljust(11), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
         min_width = 50
 
@@ -553,7 +553,7 @@ def print_description(args, selection, search_data):
     terminal_width = get_terminal_width()
     description = search_data[selection]['description'].strip()
 
-    description_table = [['Description'], [description]]
+    description_table = [['Description'.center(terminal_width - 8)], [description]]
 
     print_centered(
         tabulate(
@@ -704,7 +704,7 @@ def get_best_match(args, search_data):
 def print_comments(args, comments):
     terminal_width = get_terminal_width()
 
-    table = [['N°', 'Comment']]
+    table = [['N°', 'Comment'.center(terminal_width - 15)]]
     for index, comment_text in enumerate(comments, start=1):
         table.append([index, comment_text.strip()])
 
