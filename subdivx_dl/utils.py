@@ -537,7 +537,11 @@ def print_search_results(args, search_data):
 def print_centered(text, end=None):
     terminal_width = get_terminal_width()
 
-    centered_text = '\n'.join(line.center(terminal_width) for line in text.splitlines())
+    first_line_length = len(text.splitlines()[0])
+    padding_width = (terminal_width - first_line_length) // 2
+
+    centered_lines = [' ' * padding_width + line for line in text.splitlines()]
+    centered_text = '\n'.join(centered_lines)
 
     print(centered_text, end=end)
 
