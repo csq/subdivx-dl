@@ -502,16 +502,24 @@ def get_comments(poolManager, url, subtitle_id):
 
     return comments
 
+def get_style_column_name(args):
+    style = args.style or DEFAULT_STYLE
+
+    if style == 'pretty':
+        return 'Downloads'
+    else:
+        return 'Downloads'.ljust(11)
+
 def print_search_results(args, search_data):
     terminal_width = get_terminal_width()
 
     # Check flag --minimal
     if args.minimal:
-        columns = ['N°', 'Title', 'Downloads'.ljust(11), 'Date']
+        columns = ['N°', 'Title', get_style_column_name(args), 'Date']
         align = ['center', 'center', 'decimal', 'center']
         min_width = 40
     else:
-        columns = ['N°', 'Title', 'Downloads'.ljust(11), 'Date', 'User']
+        columns = ['N°', 'Title', get_style_column_name(args), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
         min_width = 50
 
