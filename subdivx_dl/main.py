@@ -61,7 +61,7 @@ def main():
 		print_search_results(args, search_data)
 
 		# Get the user selection
-		user_input = prompt_user_for_selection()
+		user_input = prompt_user_selection('subtitle')
 
 		try:
 			selection = int(user_input) - 1
@@ -91,7 +91,7 @@ def main():
 				print_comments(args, comment_list)
 
 		# Show selection menu
-		user_input = prompt_user_to_download()
+		user_input = prompt_user_selection('download')
 
 		try:
 			select_action = int(user_input)

@@ -201,7 +201,7 @@ def print_menu_content_dir(args, directory):
             )
 
             # Select subtitle
-            user_input = prompt_user_to_download()
+            user_input = prompt_user_selection('download')
 
             try:
                 selection = int(user_input) - 1
@@ -733,18 +733,18 @@ def print_comments(args, comments):
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def prompt_user_for_selection():
-    print('\n[1-9] Select')
-    print('[ 0 ] Exit', end='\n')
+def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download']):
+    terminal_width = get_terminal_width()
+    padding = ' ' * ((terminal_width // 2) - 6)
 
-    user_input = input('\nSelection: ')
-    return user_input
+    menu_options = {
+        'download': '[ 1 ] Download [ 0 ] Exit',
+        'subtitle': '[1-9] Select [ 0 ] Exit'
+    }[menu_name]
 
-def prompt_user_to_download():
-    print('\n[ 1 ] Download')
-    print('[ 0 ] Exit', end='\n')
+    print('\n' + menu_options.center(terminal_width))
 
-    user_input = input('\nSelection: ')
+    user_input = input('\n' + padding + 'Selection: ')
     return user_input
 
 def get_web_version(poolManager, url):
