@@ -672,10 +672,10 @@ def get_best_match(args, search_data):
     for subtitle in search_data:
 
         if key_values['type'] == 'episode':
-            episode_number = f'E{key_values['episode']:02d}' if key_values.get('episode') else ''
-            title = f'{key_values['title']} S{key_values['season']:02d}{episode_number}'
+            episode_number = f'E{key_values.get("episode"):02d}' if key_values.get('episode') is not None else ''
+            title = f'{key_values.get("title")} S{key_values.get("season"):02d}{episode_number}'
         else:
-            title = f'{key_values['title']} ({key_values['year']})' if key_values.get('year') else key_values['title']
+            title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
 
         # Search match text whith title of title
         if title.lower() in subtitle['title'].lower():
@@ -691,7 +691,7 @@ def get_best_match(args, search_data):
 
                     if atribute in subtitle_description:
                         score += weights[key]
-                        helper.logger.info(f'Found attribute [{key}] in subtitle [{subtitle['id_subtitle']}]')
+                        helper.logger.info(f'Found attribute [{key}] in subtitle [{subtitle["id_subtitle"]}]')
                 except KeyError:
                     pass
 
