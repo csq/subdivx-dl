@@ -195,6 +195,7 @@ def print_menu_content_dir(args, directory):
 
             # Print table with of the subtitles available
             print_centered(
+                args,
                 tabulate(
                     header, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, stralign='left'
                 )
@@ -537,15 +538,20 @@ def print_search_results(args, search_data):
 
     # Print the centered table
     print_centered(
+        args,
         tabulate(
             table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align
         )
     )
 
-def print_centered(text, end=None):
+def print_centered(args, text, end=None):
     terminal_width = get_terminal_width()
 
-    first_line_length = len(text.splitlines()[0])
+    if args.style in ['simple', 'presto']:
+        first_line_length = len(text.splitlines()[1])
+    else:
+        first_line_length = len(text.splitlines()[0])
+
     padding_width = (terminal_width - first_line_length) // 2
 
     centered_lines = [' ' * padding_width + line for line in text.splitlines()]
@@ -568,6 +574,7 @@ def print_description(args, selection, search_data):
     description_table = [['Description'.center(terminal_width - 8)], [description]]
 
     print_centered(
+        args,
         tabulate(
             description_table,
             headers='firstrow',
@@ -725,6 +732,7 @@ def print_comments(args, comments):
     maxcolwidths = [None, terminal_width - 12]
 
     print_centered(
+        args,
         tabulate(
             table, headers='firstrow', tablefmt=tablefmt, colalign=colalign, maxcolwidths=maxcolwidths
         )
