@@ -7,6 +7,13 @@ import argparse
 import tempfile
 
 from .version import __version__
+from .verchk import run_check_version
+
+# Check for updates
+class CheckUpdateAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        run_check_version()
+        exit(0)
 
 # Parser for command-line
 parser = argparse.ArgumentParser(
@@ -24,6 +31,7 @@ parser.add_argument('SEARCH', help='name of the TV series or movie to search for
 startup_group = parser.add_argument_group('Startup')
 startup_group.add_argument('-V', '--version', action='version', version=__version__)
 startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
+startup_group.add_argument('-cu', '--check-update', help='check availability of updates', action=CheckUpdateAction, nargs=0)
 
 # Create a group for download-related arguments
 download_group = parser.add_argument_group('Download')
