@@ -678,19 +678,20 @@ def get_best_match(args, search_data):
 
     for subtitle in search_data:
 
+        # Search for match in title
         if key_values['type'] == 'episode':
             episode_number = f'E{key_values.get("episode"):02d}' if key_values.get('episode') is not None else ''
             title = f'{key_values.get("title")} S{key_values.get("season"):02d}{episode_number}'
         else:
             title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
 
-        # Search match text whith title of title
-        if title.lower() in subtitle['title'].lower():
+        # Search for match in title of subtitle
+        if title.lower() in subtitle['title'].lower() or key_values['title'].lower() in subtitle['title'].lower():
             id_secondary_subtitle = subtitle['id_subtitle']
 
             score = 0
 
-            # Search match text whith title of description
+            # Search for match in description
             for key in weights.keys():
                 try:
                     subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
