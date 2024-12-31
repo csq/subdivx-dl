@@ -30,6 +30,7 @@ Librerias:
 ### Opciones Generales:
     -h, --help                          Imprimir el texto de ayuda y salir
     -V, --version                       Imprimir la versión del programa y salir
+    -cu, --check-update                 Comprobar disponibilidad de actualizaciones
     -s, --season                        Descargar subtítulos para toda la temporada
     -l, --location UBICACIÓN            Especificar el directorio de destino
     -n, --lines LÍNEAS                  Limitar el número de resultados

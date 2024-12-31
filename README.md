@@ -30,6 +30,7 @@ Libraries:
 ### General options:
     -h, --help                          Print the help text and exit
     -V, --version                       Print program version and exit
+    -cu, --check-update                 Check availability of updates
     -s, --season                        Download subtitles for the entire season
     -l, --location LOCATION             Specify the destination directory
     -n, --lines LINES                   Limit the number of results
