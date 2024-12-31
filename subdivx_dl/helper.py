@@ -6,7 +6,8 @@ import logging
 import argparse
 import tempfile
 
-from .version import __version__, run_check_version
+from .version import __version__
+from .verchk import run_check_version
 
 # Check for updates
 class CheckUpdateAction(argparse.Action):
