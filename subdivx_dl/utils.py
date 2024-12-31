@@ -557,7 +557,7 @@ def print_centered(args, text, end=None):
     centered_lines = [' ' * padding_width + line for line in text.splitlines()]
     centered_text = '\n'.join(centered_lines)
 
-    print(centered_text, end=end)
+    print('\n' + centered_text, end=end)
 
 def shorten_text(text, width):
     placeholder = '...'
