@@ -495,6 +495,7 @@ def get_comments(poolManager, url, subtitle_id):
     try:
         response = poolManager.request('POST', url=url, fields=payload)
         comments_data = json.loads(response.data).get('aaData', [])
+        helper.logger.info('Downloaded comments')
     except (ProtocolError, JSONDecodeError):
         helper.logger.error('Failed to parse response')
         return []
@@ -958,3 +959,57 @@ def load_config():
     with open(config_path, 'r') as file:
         helper.logger.info(f'Load configuration file {config_path}')
         return json.load(file)
+
+##############################################################################
+# Class TTLCache
+##############################################################################
+
+# Get from https://medium.com/@denis.volokh/caching-methods-implementations-and-comparisons-in-python-7d29a2b0cd80
+
+class TTLCache:
+    def __init__(self, capacity, ttl):
+        # Initialize the TTLCache with a given capacity and time-to-live (ttl)
+        self.capacity = capacity
+        self.ttl = ttl
+        # cache stores the key-value pairs
+        self.cache = {}
+        # timestamps stores the time when each key was added or last updated
+        self.timestamps = {}
+
+    def get(self, key):
+        # Retrieve the value associated with 'key' if it hasn't expired
+        if key in self.cache:
+            # Check if the key has expired by comparing current time with its timestamp
+            if time.time() - self.timestamps[key] < self.ttl:
+                # Return the value if it's still valid
+                return self.cache[key]
+            else:
+                # If the key has expired, remove it from cache and timestamps
+                del self.cache[key]
+                del self.timestamps[key]
+        # Return -1 if the key is not found or has expired
+        return -1
+
+    def put(self, key, value):
+        # Add or update a key-value pair in the cache
+        if len(self.cache) >= self.capacity and key not in self.cache:
+            # Evict items if the cache is full and the key is not already present
+            self.evict()
+        # Store the value in the cache and record the current timestamp
+        self.cache[key] = value
+        self.timestamps[key] = time.time()
+
+    def evict(self):
+        # Evict expired items from the cache
+        current_time = time.time()
+        # Find all keys that have expired
+        expired = [k for k, t in self.timestamps.items() if current_time - t >= self.ttl]
+        for key in expired:
+            # Remove expired keys from cache and timestamps
+            del self.cache[key]
+            del self.timestamps[key]
+        if not expired and self.cache:
+            # If no expired items are found, evict the oldest item in the cache
+            oldest = min(self.timestamps, key=self.timestamps.get)
+            del self.cache[oldest]
+            del self.timestamps[oldest]

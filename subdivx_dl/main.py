@@ -53,6 +53,10 @@ def main():
 		get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
 		exit(0)
 
+	# Initialize cache for comments
+	if args.comments:
+		cache_comments = TTLCache(capacity=len(search_data), ttl=60)
+
 	while True:
 		# Clear screen
 		clear()
@@ -84,11 +88,18 @@ def main():
 
 		# Checking flag for add comments view
 		if args.comments:
-			comment_list = get_comments(https, SUBDIVX_URL, id_subtitle)
-			if not comment_list:
-				pass
+
+			comment_from_cache = cache_comments.get(id_subtitle)
+
+			if comment_from_cache and comment_from_cache != -1:
+				helper.logger.info('Getting comments from cache')
+				print_comments(args, comment_from_cache)
 			else:
-				print_comments(args, comment_list)
+				comment_list = get_comments(https, SUBDIVX_URL, id_subtitle)
+				cache_comments.put(id_subtitle, comment_list)
+
+				if comment_list:
+					print_comments(args, comment_list)
 
 		# Show selection menu
 		user_input = prompt_user_selection('download')
