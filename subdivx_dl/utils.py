@@ -904,6 +904,9 @@ class Args():
     def minimal(self):
         return self.minimal
 
+    def alternative(self):
+        return self.alternative
+
     def no_rename(self):
         return self.no_rename
 
