@@ -602,6 +602,27 @@ def print_description(args, selection, search_data):
         ), end='\n\n'
     )
 
+def print_summary(args, selection, search_data):
+    terminal_width = get_terminal_width()
+
+    summary = []
+
+    summary.append(['Title', search_data[selection]['title']])
+    summary.append(['Downloads', search_data[selection]['downloads']])
+    summary.append(['Upload date', search_data[selection]['upload_date']])
+    summary.append(['User', search_data[selection]['uploader']])
+
+    print_centered(
+        args,
+        tabulate(
+            summary,
+            headers='firstrow',
+            tablefmt=args.style or DEFAULT_STYLE,
+            stralign='left',
+            maxcolwidths=[terminal_width - 5]
+        ), end='\n\n'
+    )
+
 def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
         print('Working...', end='\r')

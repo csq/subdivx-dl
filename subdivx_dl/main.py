@@ -85,7 +85,10 @@ def main():
 
 		clear()
 
-		print_description(args, selection, search_data)
+		if args.alternative:
+			print_summary(args, selection, search_data)
+		else:
+			print_description(args, selection, search_data)
 
 		# Checking flag for add comments view
 		if args.comments:
