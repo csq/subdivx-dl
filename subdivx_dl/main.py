@@ -84,6 +84,7 @@ def main():
 			exit(0)
 
 		clear()
+
 		print_description(args, selection, search_data)
 
 		# Checking flag for add comments view

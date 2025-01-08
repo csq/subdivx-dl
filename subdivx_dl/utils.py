@@ -519,29 +519,46 @@ def print_search_results(args, search_data):
     if args.minimal:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date']
         align = ['center', 'center', 'decimal', 'center']
+        maxcolwidths=[]
         min_width = 40
+
+    elif args.alternative:
+        columns = ['N°', 'Title', 'Description']
+        align = ['center', 'center', 'left']
+        maxcolwidths=[None, (terminal_width // 3) + 5,  terminal_width // 2]
+        min_width = 0
+
     else:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
+        maxcolwidths=[]
         min_width = 50
 
     table_data = [columns]
 
     for index, item in enumerate(search_data, start=1):
         title = shorten_text(item['title'], terminal_width - min_width)
-        table_data.append([
-            index,
-            title,
-            item['downloads'],
-            item['upload_date'],
-            item.get('uploader', '')
-        ][:len(columns)])
+
+        if args.alternative:
+            table_data.append([
+                index,
+                item['title'],
+                item['description']
+            ][:len(columns)])
+        else:
+            table_data.append([
+                index,
+                title,
+                item['downloads'],
+                item['upload_date'],
+                item.get('uploader', '')
+            ][:len(columns)])
 
     # Print the centered table
     print_centered(
         args,
         tabulate(
-            table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align
+            table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align, maxcolwidths=maxcolwidths
         )
     )
 

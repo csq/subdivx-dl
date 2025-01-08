@@ -49,6 +49,7 @@ results_group.add_argument('-c', '--comments', help='display comments', action='
 
 # Create a group for style-related arguments
 style_group = parser.add_argument_group('Style')
+style_group.add_argument('-a', '--alternative', help='use an alternative style for results', action='store_true')
 style_group.add_argument('-m', '--minimal', help='use a minimal style for results', action='store_true')
 style_group.add_argument(
     '-st', '--style',
