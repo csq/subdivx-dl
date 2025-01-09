@@ -62,7 +62,10 @@ def main():
 		clear()
 
 		# Show Search Results
-		print_search_results(args, search_data)
+		if args.compact:
+			print_search_results_compact(args, search_data)
+		else:
+			print_search_results(args, search_data)
 
 		# Get the user selection
 		user_input = prompt_user_selection('subtitle')
@@ -85,7 +88,7 @@ def main():
 
 		clear()
 
-		if args.alternative:
+		if args.alternative or args.compact:
 			print_summary(args, selection, search_data)
 		else:
 			print_description(args, selection, search_data)

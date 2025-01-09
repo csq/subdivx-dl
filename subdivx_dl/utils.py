@@ -562,6 +562,31 @@ def print_search_results(args, search_data):
         )
     )
 
+def print_search_results_compact(args, search_data):
+    terminal_width = get_terminal_width()
+
+    table_data = []
+
+    maxcolwidths = [None, terminal_width - 12]
+    align = ['center', 'left']
+    min_width = 50
+
+    for index, item in enumerate(search_data, start=1):
+        title = shorten_text(item['title'], terminal_width - min_width)
+
+        table_data.append([index, item['title'].center(terminal_width - 12)])
+        table_data.append([None, item['description']])
+
+        # Print the centered table
+        print_centered(
+            args,
+            tabulate(
+                table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align, maxcolwidths=maxcolwidths
+            )
+        )
+
+        table_data.clear()
+
 def print_centered(args, text, end=None):
     terminal_width = get_terminal_width()
 
@@ -927,6 +952,9 @@ class Args():
 
     def alternative(self):
         return self.alternative
+
+    def compact(self):
+        return self.compact
 
     def no_rename(self):
         return self.no_rename
