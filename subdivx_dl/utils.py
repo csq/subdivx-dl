@@ -422,8 +422,8 @@ def get_data_page(args, poolManager, url, token, search):
         for result in data:
             subtitle = {
                 'id_subtitle': result['id'],
-                'title': result['titulo'],
-                'description': result['descripcion'],
+                'title': filter_text(result['titulo']),
+                'description': filter_text(result['descripcion']),
                 'downloads': result['descargas'],
                 'uploader': result['nick'],
                 'upload_date': parse_date(result['fecha_subida']) if result['fecha_subida'] else '-'
@@ -519,19 +519,19 @@ def print_search_results(args, search_data):
     if args.minimal:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date']
         align = ['center', 'center', 'decimal', 'center']
-        maxcolwidths=[]
+        maxcolwidths = []
         min_width = 40
 
     elif args.alternative:
         columns = ['N°', 'Title', 'Description']
         align = ['center', 'center', 'left']
-        maxcolwidths=[None, (terminal_width // 3) + 5,  terminal_width // 2]
+        maxcolwidths = [None, (terminal_width // 3) + 5,  terminal_width // 2]
         min_width = 0
 
     else:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
-        maxcolwidths=[]
+        maxcolwidths = []
         min_width = 50
 
     table_data = [columns]
@@ -572,7 +572,6 @@ def print_search_results_compact(args, search_data):
     min_width = 50
 
     for index, item in enumerate(search_data, start=1):
-        title = shorten_text(item['title'], terminal_width - min_width)
 
         table_data.append([index, item['title'].center(terminal_width - 12)])
         table_data.append([None, item['description']])
@@ -609,6 +608,18 @@ def shorten_text(text, width):
         width = len(placeholder)
 
     return textwrap.shorten(text, width=width, placeholder=placeholder)
+
+def filter_text(text):
+    # Remove HTML tags from the text
+    text = re.sub(r'<[^>]+>', '', text)
+
+    # Replace multiple consecutive spaces with a single space
+    text = re.sub(r'(?<=\S) {2,}(?=\S)', ' ', text)
+
+    # Replace &amp; with &
+    text = text.replace('&amp;', '&')
+
+    return text
 
 def print_description(args, selection, search_data):
     terminal_width = get_terminal_width()
