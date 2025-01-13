@@ -643,10 +643,9 @@ def print_summary(args, selection, search_data):
 
     summary = []
 
-    summary.append(['Title', search_data[selection]['title']])
-    summary.append(['Downloads', search_data[selection]['downloads']])
-    summary.append(['Upload date', search_data[selection]['upload_date']])
-    summary.append(['User', search_data[selection]['uploader']])
+    attributes = ['title', 'downloads', 'upload_date', 'uploader']
+    for attribute in attributes:
+        summary.append([attribute.capitalize().replace('_', ' '), search_data[selection][attribute]])
 
     print_centered(
         args,
