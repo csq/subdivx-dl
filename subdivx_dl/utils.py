@@ -515,29 +515,27 @@ def get_style_column_name(args):
 def print_search_results(args, search_data):
     terminal_width = get_terminal_width()
 
+    maxcolwidths = []
+
     # Check flag --minimal
     if args.minimal:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date']
         align = ['center', 'center', 'decimal', 'center']
-        maxcolwidths = []
         min_width = 40
 
     elif args.alternative:
         columns = ['N°', 'Title', 'Description']
         align = ['center', 'center', 'left']
         maxcolwidths = [None, (terminal_width // 3) + 5,  terminal_width // 2]
-        min_width = 0
 
     else:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
-        maxcolwidths = []
         min_width = 50
 
     table_data = [columns]
 
     for index, item in enumerate(search_data, start=1):
-        title = shorten_text(item['title'], terminal_width - min_width)
 
         if args.alternative:
             table_data.append([
@@ -546,6 +544,7 @@ def print_search_results(args, search_data):
                 item['description']
             ][:len(columns)])
         else:
+            title = shorten_text(item['title'], terminal_width - min_width)
             table_data.append([
                 index,
                 title,
