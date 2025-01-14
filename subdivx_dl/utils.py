@@ -524,7 +524,7 @@ def print_search_results(args, search_data):
         min_width = 40
 
     elif args.alternative:
-        columns = ['N°', 'Title', 'Description']
+        columns = ['N°', 'Title', 'Description'.center(terminal_width // 2)]
         align = ['center', 'center', 'left']
         maxcolwidths = [None, (terminal_width // 3) + 5,  terminal_width // 2]
 
@@ -568,7 +568,6 @@ def print_search_results_compact(args, search_data):
 
     maxcolwidths = [None, terminal_width - 12]
     align = ['center', 'left']
-    min_width = 50
 
     for index, item in enumerate(search_data, start=1):
 
@@ -580,7 +579,7 @@ def print_search_results_compact(args, search_data):
             args,
             tabulate(
                 table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align, maxcolwidths=maxcolwidths
-            )
+            ), end='\n\n'
         )
 
         table_data.clear()
@@ -797,7 +796,7 @@ def get_best_match(args, search_data):
 def print_comments(args, comments):
     terminal_width = get_terminal_width()
 
-    table = [['N°', 'Comment'.center(terminal_width - 15)]]
+    table = [['N°', 'Comment'.center(terminal_width - 20)]]
     for index, comment_text in enumerate(comments, start=1):
         table.append([index, comment_text.strip()])
 
