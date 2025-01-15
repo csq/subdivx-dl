@@ -14,7 +14,7 @@ import platform
 from json import JSONDecodeError
 from urllib3.exceptions import ProtocolError
 from tempfile import NamedTemporaryFile
-from tabulate import tabulate
+from tabulate import tabulate, SEPARATING_LINE
 from zipfile import ZipFile
 from rarfile import RarFile
 from guessit import guessit
@@ -543,6 +543,9 @@ def print_search_results(args, search_data):
                 item['title'],
                 item['description']
             ][:len(columns)])
+
+            if index < len(search_data) and (not args.style.endswith('grid') if args.style else True):
+                table_data.append(SEPARATING_LINE)
         else:
             title = shorten_text(item['title'], terminal_width - min_width)
             table_data.append([
