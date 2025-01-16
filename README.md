@@ -35,7 +35,9 @@ Libraries:
     -l, --location LOCATION             Specify the destination directory
     -n, --lines LINES                   Limit the number of results
     -st, --style STYLE                  Show results in the selected style
-    -m, --minimal                       Use a minimal style for results
+    -a, --alternative                   Show results using an alternative layout
+    -cmp, --compact                     Show results in a condensed layout
+    -m, --minimal                       Show results in a simplified layout
     -nr, --no-rename                    Disable file renaming
     -c, --comments                      Display comments
     -f, --fast                          Directly download the best matching subtitle
@@ -83,6 +85,17 @@ It is possible to apply different styles to the tables that display the results 
 <p align="center">
   <img src="img/styles.gif" alt="animated" />
 </p>
+
+#### Layout Options
+
+- **`-a`, `--alternative`**: Displays results in an alternative format, presenting the title and description side by side.  
+![example](img/img-06.png)
+
+- **`-cmp`, `--compact`**: Shows results in individual tables, with the title and description presented in the same table.  
+![example](img/img-07.png)
+
+- **`-m`, `--minimal`**: Presents results in a minimalist format, showcasing the title, downloads, and dates.  
+![example](img/img-08.png)
 
 #### Configuration Management
 To save frequently used options for the ``subdivx-dl`` command, the following options are implemented:

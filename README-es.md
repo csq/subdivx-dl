@@ -35,7 +35,9 @@ Librerias:
     -l, --location UBICACIÓN            Especificar el directorio de destino
     -n, --lines LÍNEAS                  Limitar el número de resultados
     -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
-    -m, --minimal                       Usar un estilo mínimo para los resultados
+    -a, --alternative                   Mostrar resultados utilizando un diseño alternativo
+    -cmp, --compact                     Mostrar resultados en un diseño compacto
+    -m, --minimal                       Mostrar resultados en un diseño simplificado
     -nr, --no-rename                    Deshabilitar el renombrado de archivos
     -c, --comments                      Mostrar comentarios
     -f, --fast                          Descargar directamente el mejor subtítulo coincidente
@@ -83,6 +85,17 @@ Es posible aplicar diferentes estilos a las tablas que muestan los resultados ut
 <p align="center">
   <img src="img/styles.gif" alt="animated" />
 </p>
+
+#### Opciones de Diseño
+
+- **`-a`, `--alternative`**: Muestra los resultados en un formato alternativo, presentando el título y la descripción uno al lado del otro.  
+![ejemplo](img/img-06.png)
+
+- **`-cmp`, `--compact`**: Muestra los resultados en tablas individuales, con el título y la descripción presentados en la misma tabla.  
+![ejemplo](img/img-07.png)
+
+- **`-m`, `--minimal`**: Presenta los resultados en un formato minimalista, mostrando el título, las descargas y las fechas.  
+![ejemplo](img/img-08.png)
 
 #### Gestión de la configuración
 Para guardar las opciones frecuentemente utilizadas con el comando ``subdivx-dl``, se implementan siguientes opciones:
