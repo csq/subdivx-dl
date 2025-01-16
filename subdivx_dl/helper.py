@@ -47,11 +47,14 @@ results_group.add_argument('-odownloads', '--order-by-downloads', help='order re
 results_group.add_argument('-n', '--lines', help='limit the number of results', type=int)
 results_group.add_argument('-c', '--comments', help='display comments', action='store_true')
 
+# Create a group form layout-related arguments
+layout_group = parser.add_argument_group('Layout')
+layout_group.add_argument('-m', '--minimal', help='use a minimal layout for results', action='store_true')
+layout_group.add_argument('-a', '--alternative', help='use an alternative layout for results', action='store_true')
+layout_group.add_argument('-cmp', '--compact', help='use an compact layout for results', action='store_true')
+
 # Create a group for style-related arguments
 style_group = parser.add_argument_group('Style')
-style_group.add_argument('-a', '--alternative', help='use an alternative style for results', action='store_true')
-style_group.add_argument('-cmp', '--compact', help='use an compact style for results', action='store_true')
-style_group.add_argument('-m', '--minimal', help='use a minimal style for results', action='store_true')
 style_group.add_argument(
     '-st', '--style',
     help='show results in the selected style',
