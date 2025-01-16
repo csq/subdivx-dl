@@ -577,12 +577,14 @@ def print_search_results_compact(args, search_data):
         table_data.append([index, item['title'].center(terminal_width - 12)])
         table_data.append([None, item['description']])
 
+        styles = ['presto', 'simple', 'pipe', 'orgtbl']
+
         # Print the centered table
         print_centered(
             args,
             tabulate(
                 table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align, maxcolwidths=maxcolwidths
-            ), end='\n\n'
+            ), end=('\n\n' if args.style in styles else '\n')
         )
 
         table_data.clear()
