@@ -36,8 +36,8 @@ Libraries:
     -n, --lines LINES                   Limit the number of results
     -st, --style STYLE                  Show results in the selected style
     -a, --alternative                   Show results using an alternative layout
-    -cmp, --compact                     Show results in a condensed layout
-    -m, --minimal                       Show results in a simplified layout
+    -cmp, --compact                     Show results in a compact layout
+    -m, --minimal                       Show results in a minimal layout
     -nr, --no-rename                    Disable file renaming
     -c, --comments                      Display comments
     -f, --fast                          Directly download the best matching subtitle
@@ -55,7 +55,7 @@ Search and download a single subtitle in the current directory
     subdivx-dl 'Silicon Valley S01E01'  
 
     or  
-    
+ 
     subdivx-dl 'The.Matrix.Revolutions.2003.REMASTERED.1080p.10bit.BluRay.8CH.x265.HEVC-PSA.mkv'  
 
 Search and download multiples subtitles in same directory

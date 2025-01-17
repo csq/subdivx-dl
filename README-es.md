@@ -37,7 +37,7 @@ Librerias:
     -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
     -a, --alternative                   Mostrar resultados utilizando un diseño alternativo
     -cmp, --compact                     Mostrar resultados en un diseño compacto
-    -m, --minimal                       Mostrar resultados en un diseño simplificado
+    -m, --minimal                       Mostrar resultados en un diseño minimo
     -nr, --no-rename                    Deshabilitar el renombrado de archivos
     -c, --comments                      Mostrar comentarios
     -f, --fast                          Descargar directamente el mejor subtítulo coincidente
