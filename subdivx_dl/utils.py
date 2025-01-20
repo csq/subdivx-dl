@@ -830,7 +830,11 @@ def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download
 
     print('\n' + menu_options.center(terminal_width))
 
-    user_input = input('\n' + padding + 'Selection: ')
+    try:
+        user_input = input('\n' + padding + 'Selection: ')
+    except (KeyboardInterrupt, EOFError):
+        exit(1)
+
     return user_input
 
 def get_web_version(poolManager, url):
