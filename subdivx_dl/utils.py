@@ -819,13 +819,16 @@ def print_comments(args, comments):
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download']):
+def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download', 'pagination']):
     terminal_width = get_terminal_width()
     padding = ' ' * ((terminal_width // 2) - 6)
 
+    basic_menu = '[1-9] Select [ 0 ] Exit'.center(terminal_width)
+
     menu_options = {
         'download': '[ 1 ] Download [ 0 ] Exit',
-        'subtitle': '[1-9] Select [ 0 ] Exit'
+        'subtitle': basic_menu,
+        'pagination': basic_menu + '[ n ] Next page [ p ] Previous page'.center(terminal_width),
     }[menu_name]
 
     print('\n' + menu_options.center(terminal_width))

@@ -44,8 +44,11 @@ def main():
 	if args.order_by_downloads or args.order_by_dates:
 		search_data = sort_data(args, search_data)
 
-	# Limit the number of results displayed based on the user's preference
-	search_data = search_data[:args.lines] if args.lines is not None else search_data
+	# Save a copy of the original data
+	search_data_complete = search_data
+
+	# Limit the number of results displayed based on the user's preference, default is 10
+	search_data = search_data[:args.lines] if args.lines is not None else search_data[:10]
 
 	# Checking flag for switch to fast download mode
 	if args.fast:
@@ -57,9 +60,15 @@ def main():
 	if args.comments:
 		cache_comments = TTLCache(capacity=len(search_data), ttl=60)
 
+	current_index = 0
+	block_size = (10 if args.lines is None else args.lines)
+
 	while True:
 		# Clear screen
 		clear()
+
+		# Slice data
+		search_data = search_data_complete[current_index:current_index + block_size]
 
 		# Show Search Results
 		if args.compact:
@@ -67,15 +76,37 @@ def main():
 		else:
 			print_search_results(args, search_data)
 
+		# Show the pagination
+		total_pages = len(search_data_complete) // block_size + (len(search_data_complete) % block_size > 0)
+		current_page = (current_index // block_size + 1)
+		page_info = f'[{current_page}/{total_pages}]'
+		print(page_info.center(get_terminal_width()))
+
 		# Get the user selection
-		user_input = prompt_user_selection('subtitle')
+		if len(search_data_complete) > block_size:
+			user_input = prompt_user_selection('pagination')
+		else:
+			user_input = prompt_user_selection('subtitle')
 
 		try:
 			selection = int(user_input) - 1
 			id_subtitle = str(search_data[selection]['id_subtitle'])
 		except (ValueError, IndexError):
-			print('\nInput valid numbers')
-			delay(0)
+			main_search_data = len(search_data_complete)
+			if user_input.lower() == 'n':
+				if current_index >= main_search_data:
+					current_index = main_search_data - block_size
+				elif current_index + block_size < main_search_data:
+					current_index += block_size
+			elif user_input.lower() == 'p':
+				current_index -= block_size
+				if current_index < 0:
+					current_index = 0
+			else:
+				print('\nInput only numbers')
+				delay(0)
+				continue
+			clear()
 			continue
 
 		if selection < -1:
