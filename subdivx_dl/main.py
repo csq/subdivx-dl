@@ -76,14 +76,15 @@ def main():
 		else:
 			print_search_results(args, search_data)
 
-		# Show the pagination
-		total_pages = len(search_data_complete) // block_size + (len(search_data_complete) % block_size > 0)
-		current_page = (current_index // block_size + 1)
-		page_info = f'[{current_page}/{total_pages}]'
-		print(page_info.center(get_terminal_width()))
-
 		# Get the user selection
 		if len(search_data_complete) > block_size:
+
+			# Show the pagination
+			total_pages = len(search_data_complete) // block_size + (len(search_data_complete) % block_size > 0)
+			current_page = (current_index // block_size + 1)
+			page_info = f'[{current_page}/{total_pages}]'
+			print(page_info.center(get_terminal_width()))
+
 			user_input = prompt_user_selection('pagination')
 		else:
 			user_input = prompt_user_selection('subtitle')
