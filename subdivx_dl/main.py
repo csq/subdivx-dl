@@ -60,8 +60,12 @@ def main():
 	if args.comments:
 		cache_comments = TTLCache(capacity=len(search_data), ttl=60)
 
+	# Pagination
 	current_index = 0
 	block_size = (10 if args.lines is None else args.lines)
+
+	# Get the size of the complete data
+	search_data_complete_size = len(search_data_complete)
 
 	while True:
 		# Clear screen
@@ -77,11 +81,11 @@ def main():
 			print_search_results(args, search_data)
 
 		# Get the user selection
-		if len(search_data_complete) > block_size:
+		if search_data_complete_size > block_size:
 
 			# Show the pagination
-			total_pages = len(search_data_complete) // block_size + (len(search_data_complete) % block_size > 0)
-			current_page = (current_index // block_size + 1)
+			total_pages = (search_data_complete_size // block_size) + (search_data_complete_size % block_size > 0)
+			current_page = (current_index // block_size) + 1
 			page_info = f'[{current_page}/{total_pages}]'
 			print(page_info.center(get_terminal_width()))
 
@@ -93,11 +97,10 @@ def main():
 			selection = int(user_input) - 1
 			id_subtitle = str(search_data[selection]['id_subtitle'])
 		except (ValueError, IndexError):
-			main_search_data = len(search_data_complete)
 			if user_input.lower() == 'n':
-				if current_index >= main_search_data:
-					current_index = main_search_data - block_size
-				elif current_index + block_size < main_search_data:
+				if current_index >= search_data_complete_size:
+					current_index = search_data_complete_size - block_size
+				elif current_index + block_size < search_data_complete_size:
 					current_index += block_size
 			elif user_input.lower() == 'p':
 				current_index -= block_size
