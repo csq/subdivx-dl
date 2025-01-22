@@ -47,8 +47,20 @@ def main():
 	# Save a copy of the original data
 	search_data_complete = search_data
 
-	# Limit the number of results displayed based on the user's preference, default is 10
-	search_data = search_data[:args.lines] if args.lines is not None else search_data[:10]
+	# Limit the number of results displayed based on the user's preference
+	if args.compact:
+		result_limit = 2
+	elif args.alternative:
+		result_limit = 3
+	elif args.style.endswith('grid') if args.style else False:
+		result_limit = 5
+	else:
+		result_limit = 10
+
+	if args.lines is not None:
+		result_limit = args.lines
+
+	search_data = search_data[:result_limit]
 
 	# Checking flag for switch to fast download mode
 	if args.fast:
@@ -62,7 +74,7 @@ def main():
 
 	# Pagination
 	current_index = 0
-	block_size = (10 if args.lines is None else args.lines)
+	block_size = (result_limit if args.lines is None else args.lines)
 
 	# Get the size of the complete data
 	search_data_complete_size = len(search_data_complete)
