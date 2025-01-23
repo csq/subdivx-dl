@@ -101,9 +101,9 @@ def main():
 			page_info = f'[{current_page}/{total_pages}]'
 			print(page_info.center(get_terminal_width()))
 
-			user_input = prompt_user_selection('pagination')
+			user_input = prompt_user_selection(args, 'pagination')
 		else:
-			user_input = prompt_user_selection('subtitle')
+			user_input = prompt_user_selection(args, 'subtitle')
 
 		try:
 			selection = int(user_input) - 1
@@ -156,7 +156,7 @@ def main():
 					print_comments(args, comment_list)
 
 		# Show selection menu
-		user_input = prompt_user_selection('download')
+		user_input = prompt_user_selection(args, 'download')
 
 		try:
 			select_action = int(user_input)

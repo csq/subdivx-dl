@@ -819,7 +819,7 @@ def print_comments(args, comments):
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download', 'pagination']):
+def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'download', 'pagination']):
     terminal_width = get_terminal_width()
     padding = ' ' * ((terminal_width // 2) - 6)
 
@@ -831,7 +831,8 @@ def prompt_user_selection(menu_name: str, options: list = ['subtitle', 'download
         'pagination': basic_menu + '[ n ] Next page [ p ] Previous page'.center(terminal_width),
     }[menu_name]
 
-    print('\n' + menu_options.center(terminal_width))
+    if not args.disable_help:
+        print('\n' + menu_options.center(terminal_width))
 
     try:
         user_input = input('\n' + padding + 'Selection: ')
@@ -996,6 +997,9 @@ class Args():
 
     def load_config(self):
         return self.load_config
+
+    def disable_help(self):
+        return self.disable_help
 
     def verbose(self):
         return self.verbose

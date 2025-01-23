@@ -32,6 +32,7 @@ startup_group = parser.add_argument_group('Startup')
 startup_group.add_argument('-V', '--version', action='version', version=__version__)
 startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
 startup_group.add_argument('-cu', '--check-update', help='check availability of updates', action=CheckUpdateAction, nargs=0)
+startup_group.add_argument('-dh', '--disable-help', help='disable help messages', action='store_true')
 
 # Create a group for download-related arguments
 download_group = parser.add_argument_group('Download')
