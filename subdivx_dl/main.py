@@ -48,17 +48,11 @@ def main():
 	search_data_complete = search_data
 
 	# Limit the number of results displayed based on the user's preference
-	if args.compact:
-		result_limit = 2
-	elif args.alternative:
-		result_limit = 3
-	elif args.style.endswith('grid') if args.style else False:
-		result_limit = 5
-	else:
-		result_limit = 10
-
-	if args.lines is not None:
+	if args.lines:
 		result_limit = args.lines
+	else:
+		base_limit = 2 if args.compact else 3 if args.alternative else 5 if args.style and args.style.endswith('grid') else 10
+		result_limit = base_limit + (1 if args.disable_help else 0)
 
 	search_data = search_data[:result_limit]
 
