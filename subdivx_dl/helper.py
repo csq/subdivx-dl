@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('SEARCH', help='name of the TV series or movie to search for subtitles')
 
 # Create a group for startup-related arguments
-startup_group = parser.add_argument_group('Startup')
+startup_group = parser.add_argument_group('Startup').add_mutually_exclusive_group()
 startup_group.add_argument('-V', '--version', action='version', version=__version__)
 startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
 startup_group.add_argument('-cu', '--check-update', help='check availability of updates', action=CheckUpdateAction, nargs=0)
@@ -51,15 +51,18 @@ download_group.add_argument('-l', '--location', help='specify the destination di
 download_group.add_argument('-nr', '--no-rename', help='disable file renaming', action='store_true')
 download_group.add_argument('-f', '--fast', help='directly download the best matching subtitle', action='store_true')
 
+# Create a group for ordering-related arguments
+order_group = parser.add_argument_group('Order-by').add_mutually_exclusive_group()
+order_group.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
+order_group.add_argument('-odownloads', '--order-by-downloads', help='order results by number of downloads', action='store_true')
+
 # Create a group for results-related arguments
 results_group = parser.add_argument_group('Results')
-results_group.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
-results_group.add_argument('-odownloads', '--order-by-downloads', help='order results by number of downloads', action='store_true')
 results_group.add_argument('-n', '--lines', help='limit the number of results', type=positive_int)
 results_group.add_argument('-c', '--comments', help='display comments', action='store_true')
 
 # Create a group form layout-related arguments
-layout_group = parser.add_argument_group('Layout')
+layout_group = parser.add_argument_group('Layout').add_mutually_exclusive_group()
 layout_group.add_argument('-m', '--minimal', help='use a minimal layout for results', action='store_true')
 layout_group.add_argument('-a', '--alternative', help='use an alternative layout for results', action='store_true')
 layout_group.add_argument('-cmp', '--compact', help='use an compact layout for results', action='store_true')
@@ -79,7 +82,7 @@ style_group.add_argument(
 )
 
 # Create a group for configuration-related arguments
-config_group = parser.add_argument_group('Configuration')
+config_group = parser.add_argument_group('Configuration').add_mutually_exclusive_group()
 config_group.add_argument('-sc', '--save-config', help='save configuration', action='store_true')
 config_group.add_argument('-lc', '--load-config', help='load configuration', action='store_true')
 
