@@ -15,6 +15,16 @@ class CheckUpdateAction(argparse.Action):
         run_check_version()
         exit(0)
 
+# Check positive int
+def positive_int(value):
+    try:
+        ivalue = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f'{value} is not a positive int')
+    if ivalue <= 0:
+        raise argparse.ArgumentTypeError(f'{value} is not a positive int')
+    return ivalue
+
 # Parser for command-line
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -45,7 +55,7 @@ download_group.add_argument('-f', '--fast', help='directly download the best mat
 results_group = parser.add_argument_group('Results')
 results_group.add_argument('-odates', '--order-by-dates', help='order results by dates', action='store_true')
 results_group.add_argument('-odownloads', '--order-by-downloads', help='order results by number of downloads', action='store_true')
-results_group.add_argument('-n', '--lines', help='limit the number of results', type=int)
+results_group.add_argument('-n', '--lines', help='limit the number of results', type=positive_int)
 results_group.add_argument('-c', '--comments', help='display comments', action='store_true')
 
 # Create a group form layout-related arguments
