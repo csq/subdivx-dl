@@ -58,7 +58,7 @@ def main():
 
 	# Checking flag for switch to fast download mode
 	if args.fast:
-		id_subtitle = get_best_match(args, search_data)
+		id_subtitle = get_best_match(args, search_data_complete)
 		get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
 		exit(0)
 
