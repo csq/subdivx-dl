@@ -500,7 +500,7 @@ def get_comments(poolManager, url, subtitle_id):
         helper.logger.error('Failed to parse response')
         return []
 
-    comments = [comment['comentario'] for comment in comments_data]
+    comments = [filter_text(comment['comentario']) for comment in comments_data]
 
     return comments
 
@@ -623,7 +623,7 @@ def filter_text(text):
     text = text.replace('&amp;', '&')
 
     # Replace &quot; with "
-    text = text.replace('&quot;', '"')
+    text = text.replace('\\&quot;', '"')
 
     return text
 
