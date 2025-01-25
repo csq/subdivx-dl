@@ -622,6 +622,9 @@ def filter_text(text):
     # Replace &amp; with &
     text = text.replace('&amp;', '&')
 
+    # Replace &quot; with "
+    text = text.replace('&quot;', '"')
+
     return text
 
 def print_description(args, selection, search_data):
