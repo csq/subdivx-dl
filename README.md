@@ -28,24 +28,40 @@ Libraries:
     subdivx-dl [OPTIONS][SEARCH]
 
 ### General options:
-    -h, --help                          Print the help text and exit
-    -V, --version                       Print program version and exit
-    -cu, --check-update                 Check availability of updates
-    -s, --season                        Download subtitles for the entire season
-    -l, --location LOCATION             Specify the destination directory
-    -n, --lines LINES                   Limit the number of results
-    -st, --style STYLE                  Show results in the selected style
-    -a, --alternative                   Show results using an alternative layout
-    -cmp, --compact                     Show results in a compact layout
-    -m, --minimal                       Show results in a minimal layout
-    -nr, --no-rename                    Disable file renaming
-    -c, --comments                      Display comments
-    -f, --fast                          Directly download the best matching subtitle
-    -odownloads, --order-by-downloads   Order by number of downloads
-    -odates, --order-by-dates           Order results by dates
-    -sc, --save-config                  Save configuration
-    -lc, --load-config                  Load configuration
-    -v, --verbose                       Enable verbose output
+    Options:
+        -h, --help                          Print the help text and exit
+
+    Startup:
+        -V, --version                       Print program version and exit
+        -v, --verbose                       Enable verbose output
+        -cu, --check-update                 Check availability of updates
+        -dh, --disable-help                 Disable help messages
+
+    Download:
+        -s, --season                        Download subtitles for the entire season
+        -l, --location LOCATION             Specify the destination directory
+        -nr, --no-rename                    Disable file renaming
+        -f, --fast                          Directly download the best matching subtitle
+
+    Order-by:
+        -odates, --order-by-dates           Order results by dates
+        -odownloads, --order-by-downloads   Order by number of downloads
+
+    Results:
+        -n, --lines LINES                   Limit the number of results
+        -c, --comments                      Display comments
+
+    Layout:
+        -m, --minimal                       Show results in a minimal layout
+        -a, --alternative                   Show results using an alternative layout
+        -cmp, --compact                     Show results in a compact layout
+
+    Style:
+        -st, --style STYLE                  Show results in the selected style
+
+    Configuration:
+        -sc, --save-config                  Save configuration
+        -lc, --load-config                  Load configuration
 
 #### Examples
 These examples show habitual operation

@@ -28,24 +28,40 @@ Librerias:
     subdivx-dl [OPCIONES][BUSQUEDA]
 
 ### Opciones Generales:
-    -h, --help                          Imprimir el texto de ayuda y salir
-    -V, --version                       Imprimir la versión del programa y salir
-    -cu, --check-update                 Comprobar disponibilidad de actualizaciones
-    -s, --season                        Descargar subtítulos para toda la temporada
-    -l, --location UBICACIÓN            Especificar el directorio de destino
-    -n, --lines LÍNEAS                  Limitar el número de resultados
-    -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
-    -a, --alternative                   Mostrar resultados utilizando un diseño alternativo
-    -cmp, --compact                     Mostrar resultados en un diseño compacto
-    -m, --minimal                       Mostrar resultados en un diseño minimo
-    -nr, --no-rename                    Deshabilitar el renombrado de archivos
-    -c, --comments                      Mostrar comentarios
-    -f, --fast                          Descargar directamente el mejor subtítulo coincidente
-    -odownloads, --order-by-downloads   Ordenar por número de descargas
-    -odates, --order-by-dates           Ordenar resultados por fechas
-    -sc, --save-config                  Guardar configuración
-    -lc, --load-config                  Cargar configuración
-    -v, --verbose                       Habilitar salida detallada
+    Opciones:
+        -h, --help                          Imprimir el texto de ayuda y salir
+
+    Inicio:
+        -V, --version                       Imprimir la versión del programa y salir
+        -v, --verbose                       Habilitar salida detallada
+        -cu, --check-update                 Comprobar disponibilidad de actualizaciones
+        -dh, --disable-help                 Desabilitar los mensajes de ayuda
+
+    Descargar:
+        -s, --season                        Descargar subtítulos para toda la temporada
+        -l, --location UBICACIÓN            Especificar el directorio de destino
+        -nr, --no-rename                    Deshabilitar el renombrado de archivos
+        -f, --fast                          Descargar directamente el mejor subtítulo coincidente
+
+    Ordenar por:
+        -odownloads, --order-by-downloads   Ordenar por número de descargas
+        -odates, --order-by-dates           Ordenar resultados por fechas
+
+    Resultados:
+        -n, --lines LÍNEAS                  Limitar el número de resultados
+        -c, --comments                      Mostrar comentarios
+
+    Diseño:
+        -m, --minimal                       Mostrar resultados en un diseño minimo
+        -a, --alternative                   Mostrar resultados utilizando un diseño alternativo
+        -cmp, --compact                     Mostrar resultados en un diseño compacto
+
+    Estilo:
+        -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
+
+    Configuración:
+        -sc, --save-config                  Guardar configuración
+        -lc, --load-config                  Cargar configuración
 
 #### Ejemplos
 Estos ejemplos muestran la operación habitual  
