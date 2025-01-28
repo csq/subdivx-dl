@@ -12,7 +12,7 @@ import textwrap
 import platform
 
 from json import JSONDecodeError
-from urllib3.exceptions import ProtocolError
+from urllib3.exceptions import ProtocolError, MaxRetryError, TimeoutError
 from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
 from zipfile import ZipFile
@@ -56,7 +56,8 @@ def download_file(poolManager, url, id_subtitle, location):
             server_address = f'{url}sub{i}/{id_subtitle}'
             helper.logger.info(f'Attempt on server N°{i} with url {server_address}')
 
-            response = poolManager.request('GET', server_address)
+            response = https_request(poolManager, 'GET', server_address)
+
             temp_file.write(response.data)
             temp_file.seek(0)
 
@@ -405,7 +406,7 @@ def get_data_page(args, poolManager, url, token, search):
         if attempt > 0:
             delay()
 
-        response = poolManager.request('POST', url=url, fields=payload)
+        response = https_request(poolManager, 'POST', url=url, fields=payload)
 
         try:
             data = json.loads(response.data).get('aaData')
@@ -846,7 +847,7 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
 
 def get_web_version(poolManager, url):
 
-    response = poolManager.request('GET', url)
+    response = https_request(poolManager, 'GET', url)
     response_data = response.data.decode('utf-8')
 
     label = 'id="vs">'
@@ -863,6 +864,26 @@ def get_web_version(poolManager, url):
 def delay(factor=2):
     delay = 2 ** factor
     time.sleep(delay)
+
+def https_request(https, method, url, **kwargs):
+    try:
+        response = https.request(method, url, **kwargs)
+        if 400 <= response.status < 600:
+            raise Exception(f'HTTP Error: {response.status}')
+    except TimeoutError:
+        print('Timeout error, check your internet connection')
+        helper.logger.error('Timeout error')
+        exit(1)
+    except MaxRetryError:
+        print('Connection error, check your internet connection')
+        helper.logger.error('Connection error')
+        exit(1)
+    except Exception as e:
+        print(f'An Error occurred: {e}')
+        helper.logger.error(f'{e}')
+        exit(1)
+
+    return response
 
 ##############################################################################
 # Cookie functions
@@ -888,7 +909,7 @@ def read_cookie():
 def get_cookie(poolManager, url):
     helper.logger.info(f'Get cookie from {url}')
 
-    response = poolManager.request('GET', url)
+    response = https_request(poolManager, 'GET', url)
 
     cookie = response.headers.get('Set-Cookie')
     cookie_parts = cookie.split(';')
@@ -930,7 +951,8 @@ def get_token(poolManager, url):
 
     url = f'{url}inc/gt.php?gt=1'
 
-    response = poolManager.request('GET', url)
+    response = https_request(poolManager, 'GET', url)
+
     data = response.data
 
     token = json.loads(data)['token']
