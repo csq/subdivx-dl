@@ -19,7 +19,9 @@ headers = {
 https = urllib3.PoolManager(
     headers=headers,
     cert_reqs='CERT_REQUIRED',
-    ca_certs=certifi.where()
+    ca_certs=certifi.where(),
+	timeout=5,
+	retries=3
 )
 
 # Set cookie and get token
