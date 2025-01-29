@@ -12,7 +12,12 @@ class VersionChecker():
 
     def get_latest_version(self):
         url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/version.py'
-        response = urllib3.request('GET', url)
+        try:
+            response = urllib3.request('GET', url)
+        except Exception as e:
+            print(f'Failed to check for updates')
+            print('Please check your internet connection')
+            exit(1)
         if response.status == 200:
             content = response.data.decode('utf-8')
             version_pattern = r"__version__ = '(\d+\.\d+\.\d+)'"
