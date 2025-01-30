@@ -641,7 +641,7 @@ def print_description(args, selection, search_data):
             headers='firstrow',
             tablefmt=args.style or DEFAULT_STYLE,
             stralign='left',
-            maxcolwidths=[terminal_width - 5]
+            maxcolwidths=[terminal_width - 8]
         ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
@@ -805,13 +805,13 @@ def get_best_match(args, search_data):
 def print_comments(args, comments):
     terminal_width = get_terminal_width()
 
-    table = [['N°', 'Comment'.center(terminal_width - 20)]]
+    table = [['N°', 'Comment'.center(terminal_width - 15)]]
     for index, comment_text in enumerate(comments, start=1):
         table.append([index, comment_text.strip()])
 
     tablefmt = args.style or DEFAULT_STYLE
     colalign = ['center', 'left']
-    maxcolwidths = [None, terminal_width - 12]
+    maxcolwidths = [None, terminal_width - 15]
 
     print_centered(
         args,
