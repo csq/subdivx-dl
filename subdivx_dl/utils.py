@@ -642,7 +642,7 @@ def print_description(args, selection, search_data):
             tablefmt=args.style or DEFAULT_STYLE,
             stralign='left',
             maxcolwidths=[terminal_width - 5]
-        ), end='\n\n'
+        ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
 def print_summary(args, selection, search_data):
@@ -662,7 +662,7 @@ def print_summary(args, selection, search_data):
             tablefmt=args.style or DEFAULT_STYLE,
             stralign='left',
             maxcolwidths=[terminal_width - 5]
-        ), end='\n\n'
+        ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
 def get_subtitle(args, poolManager, url, id_subtitle):
@@ -817,7 +817,7 @@ def print_comments(args, comments):
         args,
         tabulate(
             table, headers='firstrow', tablefmt=tablefmt, colalign=colalign, maxcolwidths=maxcolwidths
-        )
+        ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
 def clear():
