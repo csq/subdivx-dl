@@ -66,7 +66,7 @@ def main():
 
 	# Initialize cache for comments
 	if args.comments:
-		cache_comments = TTLCache(capacity=len(search_data), ttl=60)
+		cache_comments = TTLCache(capacity=len(search_data), ttl=120)
 
 	# Pagination
 	current_index = 0
