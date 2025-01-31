@@ -527,12 +527,12 @@ def print_search_results(args, search_data):
     elif args.alternative:
         columns = ['N°', 'Title', 'Description'.center(terminal_width // 2)]
         align = ['center', 'center', 'left']
-        maxcolwidths = [None, (terminal_width // 3) + 5,  terminal_width // 2]
+        maxcolwidths = [None, terminal_width // 3,  terminal_width // 2]
 
     else:
         columns = ['N°', 'Title', get_style_column_name(args), 'Date', 'User']
         align = ['center', 'center', 'decimal', 'center', 'center']
-        min_width = 50
+        min_width = 55
 
     table_data = [columns]
 
