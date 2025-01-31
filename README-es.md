@@ -122,22 +122,6 @@ Los datos se guardan en:
     * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\subdivx-dl\``
     * Linux: ``~/.config/subdivx-dl/``
 
-### Capturas de pantalla
-Vista de resultados de búsqueda  
-![example](img/img-01.png)
-
-Vista de descripción  
-![example](img/img-02.png)
-
-Vista de selección: en caso de tener múltiples subtítulos  
-![example](img/img-03.png)
-
-Vista de resultados de búsqueda en formato ``rounded_grid``  
-![example](img/img-04.png)
-
-Vista de descripción con comentarios en formato ``rounded_grid``  
-![example](img/img-05.png)
-
 ## Solución de problemas
 
 **Subtitles not found**

@@ -122,23 +122,6 @@ To save frequently used options for the ``subdivx-dl`` command, the following op
     * Windows: ``C:\Users\user_name\AppData\Local\subdivx-dl\``
     * Linux: ``~/.config/subdivx-dl/``
 
-### Screenshots
-Search results view  
-![example](img/img-01.png)
-
-Description view  
-![example](img/img-02.png)
-
-Selection view: in case of having multiple subtitles  
-![example](img/img-03.png)
-
-Search results view with ``rounded_grid`` format  
-![example](img/img-04.png)
-
-Description view with comments with ``rounded_grid`` format  
-![example](img/img-05.png)
-
-
 ## Troubleshooting
 **Subtitles not found**  
 
