@@ -168,6 +168,8 @@ def main():
 		elif select_action == 1:
 			clear()
 			get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
+			if args.no_exit:
+				continue
 			exit(0)
 		elif select_action == 0:
 			clear()

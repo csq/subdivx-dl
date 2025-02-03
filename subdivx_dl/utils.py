@@ -1005,6 +1005,9 @@ class Args():
     def no_rename(self):
         return self.no_rename
 
+    def no_exit(self):
+        return self.no_exit
+
     def order_by_downloads(self):
         return self.order_by_downloads
 

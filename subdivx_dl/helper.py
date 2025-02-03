@@ -49,6 +49,7 @@ download_group = parser.add_argument_group('Download')
 download_group.add_argument('-s', '--season', help='download subtitles for the entire season', action='store_true')
 download_group.add_argument('-l', '--location', help='specify the destination directory')
 download_group.add_argument('-nr', '--no-rename', help='disable file renaming', action='store_true')
+download_group.add_argument('-ne', '--no-exit', help='disable automatic exit', action='store_true')
 download_group.add_argument('-f', '--fast', help='directly download the best matching subtitle', action='store_true')
 
 # Create a group for ordering-related arguments
