@@ -41,6 +41,7 @@ Libraries:
         -s, --season                        Download subtitles for the entire season
         -l, --location LOCATION             Specify the destination directory
         -nr, --no-rename                    Disable file renaming
+        -ne, --no-exit                      Disable automatic exit
         -f, --fast                          Directly download the best matching subtitle
 
     Order-by:
@@ -130,7 +131,6 @@ If you always see the 'Subtitles not found' message, follow these steps:
     * Windows: ``C:\Users\user_name\AppData\Local\Temp``  
     * Linux: ``/tmp``  
 * Perform the search again
-
 
 **Uncompress rar files**  
 
