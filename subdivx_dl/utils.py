@@ -148,9 +148,9 @@ def select_best_subtitle_from_list(args, data):
         for key in weights.keys():
             try:
                 subtitle_name = data[i][1].strip().lower()
-                atribute = normalized_key_values[key].lower()
+                attribute = normalized_key_values[key].lower()
 
-                if atribute in subtitle_name:
+                if attribute in subtitle_name:
                     score += weights[key]
                     helper.logger.info(f'Found attribute [{key}] in subtitle [{i}]')
             except KeyError:
@@ -306,21 +306,21 @@ def tv_show_subtitles(args, file_path, destination):
                 get_season = result.group(2)
                 get_episode = result.group(3)
 
-                serie = get_tv_show
+                series = get_tv_show
                 season = f'S{get_season}'
                 episode = f'E{get_episode}'
 
                 exclude = ['.', '-']
                 for i in exclude:
-                    serie = serie.replace(i, ' ')
+                    series = series.replace(i, ' ')
 
                 # Remove double spaces and end space in name tv show
-                serie = serie.replace('  ', '').rstrip()
+                series = series.replace('  ', '').rstrip()
 
                 # Format name example:
-                # Serie - S05E01.srt | S05E01.srt
-                if serie != '':
-                    new_name = f'{serie} - {season}{episode}{subtitle_file_extension}'
+                # Series - S05E01.srt | S05E01.srt
+                if series != '':
+                    new_name = f'{series} - {season}{episode}{subtitle_file_extension}'
                 else:
                     new_name = f'{season}{episode}{subtitle_file_extension}'
 
@@ -776,9 +776,9 @@ def get_best_match(args, search_data):
             for key in weights.keys():
                 try:
                     subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
-                    atribute = normalized_key_values[key].lower()
+                    attribute = normalized_key_values[key].lower()
 
-                    if atribute in subtitle_description:
+                    if attribute in subtitle_description:
                         score += weights[key]
                         helper.logger.info(f'Found attribute [{key}] in subtitle [{subtitle["id_subtitle"]}]')
                 except KeyError:
