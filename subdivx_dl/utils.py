@@ -767,7 +767,7 @@ def get_best_match(args, search_data):
             title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
 
         # Search for match in title of subtitle
-        if title.lower() in subtitle['title'].lower() or key_values['title'].lower() in subtitle['title'].lower():
+        if title.lower() == subtitle['title'].lower() or key_values['title'].lower() == subtitle['title'].lower():
             id_secondary_subtitle = subtitle['id_subtitle']
 
             score = 0
