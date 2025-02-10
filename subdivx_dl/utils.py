@@ -757,17 +757,35 @@ def get_best_match(args, search_data):
     max_score = 0
     max_similarity_percentage = 0.8
 
+    # Format the title based on the user input
+    if key_values['type'] == 'episode':
+        episode_number = f'E{key_values.get("episode"):02d}' if key_values.get('episode') is not None else ''
+        title = f'{key_values.get("title")} S{key_values.get("season"):02d}{episode_number}'
+        alt_title = f'{key_values.get("episode_title")}' if key_values.get('episode_title') else title
+    else:
+        title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
+        alternative_title = key_values.get('alternative_title', '').replace('aka', '').strip()
+        alt_title = (f'{alternative_title} ({key_values.get("year")})' if alternative_title else key_values.get('title')).strip()
+
     for subtitle in search_data:
+        title_values = guessit(subtitle['title'])
 
-        # Search for match in title
         if key_values['type'] == 'episode':
-            episode_number = f'E{key_values.get("episode"):02d}' if key_values.get('episode') is not None else ''
-            title = f'{key_values.get("title")} S{key_values.get("season"):02d}{episode_number}'
+            episode_number = f'E{title_values.get("episode"):02d}' if title_values.get('episode') is not None else ''
+            title_filtered = f'{title_values.get("title")} S{title_values.get("season"):02d}{episode_number}'.replace(':', '').replace('.', '').strip()
+            alt_title_filtered = f'{title_values.get("episode_title")}' if title_values.get('episode_title') else title_filtered
         else:
-            title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
+            title_filtered = f'{title_values.get("title")} ({title_values.get("year")})' if title_values.get('year') else title_values['title']
+            alternative_title = title_values.get('alternative_title', '').replace('aka', '').strip()
+            alt_title_filtered = (f'{alternative_title} ({title_values.get("year")})' if alternative_title else title_values.get('title')).strip()
 
-        # Search for match in title of subtitle
-        if title.lower() == subtitle['title'].lower() or key_values['title'].lower() == subtitle['title'].lower():
+        main_title_lower = title_filtered.lower()
+        alt_title_lower = alt_title_filtered.lower()
+
+        if (title.lower() == main_title_lower or
+            title.lower() == alt_title_lower or
+            alt_title.lower() == main_title_lower or
+            alt_title.lower() == alt_title_lower):
             id_secondary_subtitle = subtitle['id_subtitle']
 
             score = 0
