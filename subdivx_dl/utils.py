@@ -203,7 +203,7 @@ def print_menu_content_dir(args, directory):
             )
 
             # Select subtitle
-            user_input = prompt_user_selection('download')
+            user_input = prompt_user_selection(args, 'download')
 
             try:
                 selection = int(user_input) - 1
