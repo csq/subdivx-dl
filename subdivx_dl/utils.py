@@ -868,7 +868,7 @@ def delay(factor=2):
 def https_request(https, method, url, **kwargs):
     try:
         response = https.request(method, url, **kwargs)
-        if 400 <= response.status < 600:
+        if 400 <= response.status < 600 and 'www.subdivx.com/sub' not in url:
             raise Exception(f'HTTP Error: {response.status}')
     except TimeoutError:
         print('Timeout error, check your internet connection')
