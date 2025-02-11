@@ -19,10 +19,11 @@ Enter into the folder ``subdivx-dl`` and execute
 Python versions 3.6+ are supported. Other versions and implementations may or may not work correctly.
 
 Libraries:
-* Tabulate
-* Urllib3
-* Rarfile
-* Guessit
+* **Guessit**: Extracts metadata from media filenames.
+* **Certifi**: Collection of root certificates for SSL/TLS validation.
+* **Urllib3**: HTTP client for making requests and handling responses.
+* **Tabulate**: Formats and displays data in tables for better readability.
+* **Rarfile**: Reads and extracts files from RAR archives.
 
 ## USAGE AND OPTIONS
     subdivx-dl [OPTIONS][SEARCH]
@@ -104,7 +105,6 @@ It is possible to apply different styles to the tables that display the results 
 </p>
 
 #### Layout Options
-
 - **`-a`, `--alternative`**: Displays results in an alternative format, presenting the title and description side by side.  
 ![example](img/img-06.png)
 

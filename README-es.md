@@ -19,10 +19,11 @@ Ingresa en la carpeta ``subdivx-dl`` y ejecuta
 Python 3.6+ son compatibles. Otras versiones e implementaciones pueden funcionar correctamente o no.
 
 Librerias:
-* Tabulate
-* Urllib3
-* Rarfile
-* Guessit
+* **Guessit**: Extrae metadatos de los nombres de archivos multimedia.
+* **Certifi**: Colección de certificados raíz para la validación de SSL/TLS.
+* **Urllib3**: Cliente HTTP para realizar solicitudes y manejar respuestas.
+* **Tabulate**: Formatea y muestra datos en tablas para una mejor legibilidad.
+* **Rarfile**: Lee y extrae archivos de archivos RAR.
 
 ## USO Y OPCIONES
     subdivx-dl [OPCIONES][BUSQUEDA]
@@ -71,7 +72,7 @@ Buscar y descargar un solo subtítulo en el directorio actual
 
     subdivx-dl 'Silicon Valley S01E01'  
 
-    or  
+    o  
 
     subdivx-dl 'The.Matrix.Revolutions.2003.REMASTERED.1080p.10bit.BluRay.8CH.x265.HEVC-PSA.mkv'  
 
@@ -104,7 +105,6 @@ Es posible aplicar diferentes estilos a las tablas que muestan los resultados ut
 </p>
 
 #### Opciones de Diseño
-
 - **`-a`, `--alternative`**: Muestra los resultados en un formato alternativo, presentando el título y la descripción uno al lado del otro.  
 ![ejemplo](img/img-06.png)
 
@@ -124,7 +124,6 @@ Los datos se guardan en:
     * Linux: ``~/.config/subdivx-dl/``
 
 ## Solución de problemas
-
 **Subtitles not found**
 
 Si el mensaje 'Subtitles not found', se muestra constantemente, sigue estos pasos:
