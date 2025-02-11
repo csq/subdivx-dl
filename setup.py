@@ -11,7 +11,7 @@ setup(
     version=__version__,
     url='https://github.com/csq/subdivx-dl',
     license='GPLv3+',
-    description='A subtitle downloader for the website subdvix.com',
+    description='A subtitle downloader for the website subdivx.com',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=['subdivx_dl'],

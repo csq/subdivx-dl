@@ -143,7 +143,7 @@ Therefore, you must have one of these tools installed.
 subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
 
 ### Disclaimer
-subdvix.com does not participate in this development.
+subdivx.com does not participate in this development.
 
 ### License
 GNU General Public License v3.0 or later

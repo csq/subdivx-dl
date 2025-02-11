@@ -144,7 +144,7 @@ Por lo tanto, debes tener una de estas herramientas instaladas.
 subdivx-dl fue creado por [Carlos Quiroz](https://github.com/csq/)
 
 ### Descargo de responsabilidad
-subdvix.com no participa en este desarrollo.
+subdivx.com no participa en este desarrollo.
 
 ### Licencia
 Licencia Pública General de GNU v3.0 o posterior  
