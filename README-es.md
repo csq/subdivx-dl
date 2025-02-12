@@ -1,24 +1,24 @@
 # Subdivx-dl
-Herramienta de línea de comandos para buscar y descargar subtítulos del sitio www.subdivx.com
+Herramienta de línea de comandos para buscar y descargar subtítulos de www.subdivx.com
 
-## Otro idioma
-- [English](README.md) 
+### Otro idioma
+- [English](README.md)
 
 ## INSTALACIÓN
 Puedes instalar subdivx-dl siguiendo estos pasos:
 
-Descarga el repositorio
-
+* Descarga el repositorio
+```bash
     git clone www.github.com/csq/subdivx-dl
-
-Ingresa en la carpeta ``subdivx-dl`` y ejecuta
-
+```
+* Ingresa en la carpeta ``subdivx-dl`` y ejecuta
+```bash
     pip install .
+```
 
-### DEPENDENCIAS
+## DEPENDENCIAS
 Python 3.6+ son compatibles. Otras versiones e implementaciones pueden funcionar correctamente o no.
 
-Librerias:
 * **Guessit**: Extrae metadatos de los nombres de archivos multimedia.
 * **Certifi**: Colección de certificados raíz para la validación de SSL/TLS.
 * **Urllib3**: Cliente HTTP para realizar solicitudes y manejar respuestas.
@@ -26,9 +26,11 @@ Librerias:
 * **Rarfile**: Lee y extrae archivos de archivos RAR.
 
 ## USO Y OPCIONES
-    subdivx-dl [OPCIONES][BUSQUEDA]
-
+```bash
+    subdivx-dl [OPCIONES] [BUSQUEDA]
+```
 ### Opciones Generales:
+```
     Opciones:
         -h, --help                          Imprimir el texto de ayuda y salir
 
@@ -64,57 +66,59 @@ Librerias:
     Configuración:
         -sc, --save-config                  Guardar configuración
         -lc, --load-config                  Cargar configuración
+```
 
-#### Ejemplos
-Estos ejemplos muestran la operación habitual  
+## EJEMPLOS DE USO
+Estos ejemplos muestran la operación habitual
 
-Buscar y descargar un solo subtítulo en el directorio actual  
-
-    subdivx-dl 'Silicon Valley S01E01'  
-
-    o  
-
-    subdivx-dl 'The.Matrix.Revolutions.2003.REMASTERED.1080p.10bit.BluRay.8CH.x265.HEVC-PSA.mkv'  
-
-Buscar y descargar múltiples subtítulos en el mismo directorio  
-
+Buscar y descargar un solo subtítulo en el directorio actual
+```bash
+    subdivx-dl 'Silicon Valley S01E01'
+```
+```bash
+    subdivx-dl 'The.Matrix.Revolutions.2003.REMASTERED.1080p.10bit.BluRay.8CH.x265.HEVC-PSA.mkv'
+```
+Buscar y descargar múltiples subtítulos en el mismo directorio
+```bash
     subdivx-dl -s 'Silicon Valley S01'
-
+```
 Buscar y descargar un subtítulo en un directorio específico (el directorio se crea si no existe)
-
+```bash
     subdivx-dl -l ~/Downloads/MyDirectory/ 'Silicon Valley S01E01'
-
-Buscar y descargar un subtítulo pero sin cambiar el nombre del archivo (mantener el nombre de origen)  
-
+```
+Buscar y descargar un subtítulo pero sin cambiar el nombre del archivo (mantener el nombre de origen)
+```bash
     subdivx-dl -nr 'Matrix'
-
-Buscar subtítulo incluyendo los comentarios  
-
+```
+Buscar subtítulo incluyendo los comentarios
+```bash
     subdivx-dl -c 'Halo S01E01'
-
+```
 Descarga directamente el mejor subtítulo
-
+```bash
     subdivx-dl -f 'It Crowd S02E01'
+```
 
-#### Estilos
+## PERSONALIZACIÓN VISUAL
+### Estilos
 Es posible aplicar diferentes estilos a las tablas que muestan los resultados utilizando las opciones ``-st`` o ``--style`` y especificando el nombre del estilo deseado. Las opciones disponible son: ``simple``, ``grid``, ``pipe``, ``presto``, ``orgtbl``, ``psql``, ``rst``, ``simple_grid``, ``rounded_grid``, ``fancy_grid``, ``heavy_grid``, ``double_grid`` y ``mixed_grid``. Si no se especifica un estilo, se utilizará el predeterminado ``rounded_grid``.
 
-#### Todos los estilos
 <p align="center">
   <img src="img/styles.gif" alt="animated" />
 </p>
 
-#### Opciones de Diseño
-- **`-a`, `--alternative`**: Muestra los resultados en un formato alternativo, presentando el título y la descripción uno al lado del otro.  
+### Opciones de Diseño
+- **`-a`, `--alternative`**: Muestra los resultados en un formato alternativo, presentando el título y la descripción uno al lado del otro.
 ![ejemplo](img/img-06.png)
 
-- **`-cmp`, `--compact`**: Muestra los resultados en tablas individuales, con el título y la descripción presentados en la misma tabla.  
+- **`-cmp`, `--compact`**: Muestra los resultados en tablas individuales, con el título y la descripción presentados en la misma tabla.
 ![ejemplo](img/img-07.png)
 
-- **`-m`, `--minimal`**: Presenta los resultados en un formato minimalista, mostrando el título, las descargas y las fechas.  
+- **`-m`, `--minimal`**: Presenta los resultados en un formato minimalista, mostrando el título, las descargas y las fechas.
 ![ejemplo](img/img-08.png)
 
-#### Gestión de la configuración
+## CONFIGURACIÓN
+### Gestión de la configuración
 Para guardar las opciones frecuentemente utilizadas con el comando ``subdivx-dl``, se implementan siguientes opciones:
 * ``-sc`` o ``--save-config``: permite guardar los argumentos ingresados.
 * ``-lc`` o ``--load-config``: permite realizar búsquedas con argumentos previamente guardados.
@@ -124,15 +128,6 @@ Los datos se guardan en:
     * Linux: ``~/.config/subdivx-dl/``
 
 ## Solución de problemas
-**Subtitles not found**
-
-Si el mensaje 'Subtitles not found', se muestra constantemente, sigue estos pasos:
-
-* Elimina la cookie llamada **sdx-dl** en la carpeta temporal.  
-    * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\Temp``  
-    * Linux: ``/tmp``  
-* Realiza la búsqueda nuevamente
-
 **Uncompress rar files**
 
 El módulo ``rarfile`` especifica:
@@ -140,13 +135,13 @@ El módulo ``rarfile`` especifica:
 
 Por lo tanto, debes tener una de estas herramientas instaladas.
 
+# CRÉDITOS Y LEGAL
 ### Autor
 subdivx-dl fue creado por [Carlos Quiroz](https://github.com/csq/)
 
 ### Descargo de responsabilidad
-subdivx.com no participa en este desarrollo.
+subdivx.com no está involucrado en este desarrollo.
 
 ### Licencia
-Licencia Pública General de GNU v3.0 o posterior  
-
+Licencia Pública General de GNU v3.0 o posterior
 Consulta [COPYING](COPYING) para ver el texto completo.
