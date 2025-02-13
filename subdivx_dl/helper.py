@@ -15,14 +15,14 @@ class CheckUpdateAction(argparse.Action):
         run_check_version()
         exit(0)
 
-# Check positive int
-def positive_int(value):
+# Check positive number
+def positive_number(value):
     try:
         ivalue = int(value)
     except ValueError:
-        raise argparse.ArgumentTypeError(f'{value} is not a positive int')
+        raise argparse.ArgumentTypeError(f'{value} must be a numeric value')
     if ivalue <= 0:
-        raise argparse.ArgumentTypeError(f'{value} is not a positive int')
+        raise argparse.ArgumentTypeError(f'{value} should be greater than zero')
     return ivalue
 
 # Parser for command-line
@@ -59,7 +59,7 @@ order_group.add_argument('-odownloads', '--order-by-downloads', help='order resu
 
 # Create a group for results-related arguments
 results_group = parser.add_argument_group('Results')
-results_group.add_argument('-n', '--lines', help='limit the number of results', type=positive_int)
+results_group.add_argument('-n', '--lines', help='limit the number of results', type=positive_number)
 results_group.add_argument('-c', '--comments', help='display comments', action='store_true')
 
 # Create a group form layout-related arguments
