@@ -29,10 +29,9 @@ def positive_int(value):
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     usage='subdivx-dl [OPTIONS] [SEARCH]',
-    description='Subdivx-dl is a subtitle downloader for the website subdivx.com',
-    epilog='''Disclaimer: subdivx.com not involve in this development.\n
-            \rAny bug report, questions about this software do it at\n \
-            \r<www.github.com/csq/subdivx-dl/issues>'''
+    description='Subdivx-dl is a subtitle downloader for subdivx.com',
+    epilog='''Disclaimer: subdivx.com is not involved in this development.\n
+            \rReport bugs or ask questions at <www.github.com/csq/subdivx-dl/issues>'''
 )
 
 # Parser main
