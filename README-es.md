@@ -94,6 +94,13 @@ Buscar subtítulo incluyendo los comentarios
 ```bash
     subdivx-dl -c 'Halo S01E01'
 ```
+Buscar subtítulos usando el ID de IMDb
+```bash
+    subdivx-dl 'tt0113243'
+```
+```bash
+    subdivx-dl 'https://www.imdb.com/es/title/tt0113243/'
+```
 Descarga directamente el mejor subtítulo
 ```bash
     subdivx-dl -f 'It Crowd S02E01'
@@ -134,6 +141,10 @@ El módulo ``rarfile`` especifica:
 >Los archivos comprimidos se extraen ejecutando una herramienta externa: unrar (preferido), unar, 7zip o bsdtar.
 
 Por lo tanto, debes tener una de estas herramientas instaladas.
+
+**ID IMDb válido sin resultados**
+
+Un ID de IMDb válido puede no devolver resultados debido a un problema externo con subdivx.com. La solución es buscar por nombre de archivo o palabras clave.
 
 # CRÉDITOS Y LEGAL
 ### Autor

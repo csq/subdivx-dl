@@ -94,6 +94,13 @@ Search subtitle including their comments
 ```bash
     subdivx-dl -c 'Halo S01E01'
 ```
+Search subtitles using IMDb ID
+```bash
+    subdivx-dl 'tt0113243'
+```
+```bash
+    subdivx-dl 'https://www.imdb.com/es/title/tt0113243/'
+```
 Download the best subtitle directly
 ```bash
     subdivx-dl -f 'It Crowd S02E01'
@@ -134,6 +141,10 @@ The module ``rarfile`` specifies:
 >Compressed files are extracted by executing external tool: unrar (preferred), unar, 7zip or bsdtar.
 
 Therefore, you must have one of these tools installed.
+
+**Valid IMDb ID returns no results**
+
+A valid IMDb ID may not return results due to an external issue with subdivx.com. The solution is to search by file name or keywords.
 
 ## CREDITS AND LEGAL
 ### Author
