@@ -838,6 +838,52 @@ def print_comments(args, comments):
         ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
+def paginate_comments(args, comments_list, block_size=10, selection=None, description_list=None):
+    comments_list_length = len(comments_list)
+    current_index = 0
+
+    # Data pagination
+    total_pages = (comments_list_length // block_size) + (comments_list_length % block_size > 0)
+    current_page = (current_index // block_size) + 1
+    page_info = f'[{current_page}/{total_pages}]'
+
+    while current_page <= total_pages:
+        start_index = current_index
+        end_index = min(current_index + block_size, comments_list_length)
+        page_comments = comments_list[start_index:end_index]
+
+        clear()
+
+        if args.alternative or args.compact:
+            print_summary(args, selection, description_list)
+        else:
+            print_description(args, selection, description_list)
+
+        print_comments(args, page_comments)
+        print(page_info.center(get_terminal_width()))
+
+        if total_pages > 1:
+            user_input = prompt_user_selection(args, 'comments')
+        else:
+            user_input = prompt_user_selection(args, 'download')
+
+        # Menu pagination
+        if total_pages >= 1:
+            if user_input.lower() == 'n' and total_pages > 1:
+                if current_page == total_pages:
+                    current_page = total_pages
+                else:
+                    current_page += 1
+            elif user_input.lower() == 'p' and total_pages > 1:
+                if current_page == 1:
+                    current_page = 1
+                elif current_page > 1:
+                    current_page -= 1
+            else:
+                return user_input
+            current_index = (current_page - 1) * block_size
+            page_info = f'[{current_page}/{total_pages}]'
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -845,12 +891,15 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
     terminal_width = get_terminal_width()
     padding = ' ' * ((terminal_width // 2) - 6)
 
-    basic_menu = '[1-9] Select [ 0 ] Exit'.center(terminal_width)
+    main_menu = '[1-9] Select [ 0 ] Exit'.center(terminal_width)
+    secondary_menu = '[ 1 ] Download [ 0 ] Exit'.center(terminal_width)
+    paginate_menu = '[ n ] Next page [ p ] Previous page'.center(terminal_width)
 
     menu_options = {
-        'download': '[ 1 ] Download [ 0 ] Exit',
-        'subtitle': basic_menu,
-        'pagination': basic_menu + '[ n ] Next page [ p ] Previous page'.center(terminal_width),
+        'subtitle': main_menu,
+        'pagination': main_menu + paginate_menu,
+        'download': secondary_menu,
+        'comments': secondary_menu + paginate_menu
     }[menu_name]
 
     if not args.disable_help:

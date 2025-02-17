@@ -139,22 +139,23 @@ def main():
 			print_description(args, selection, search_data)
 
 		# Checking flag for add comments view
-		if args.comments:
+		comments_selection = None
 
+		if args.comments:
 			comment_from_cache = cache_comments.get(id_subtitle)
 
 			if comment_from_cache and comment_from_cache != -1:
 				helper.logger.info('Getting comments from cache')
-				print_comments(args, comment_from_cache)
+				comments_selection = paginate_comments(args, comment_from_cache, block_size, selection, search_data)
 			else:
 				comment_list = get_comments(https, SUBDIVX_URL, id_subtitle)
 				cache_comments.put(id_subtitle, comment_list)
 
 				if comment_list:
-					print_comments(args, comment_list)
+					comments_selection = paginate_comments(args, comment_list, block_size, selection, search_data)
 
 		# Show selection menu
-		user_input = prompt_user_selection(args, 'download')
+		user_input = prompt_user_selection(args, 'download') if comments_selection is None else comments_selection
 
 		try:
 			select_action = int(user_input)
