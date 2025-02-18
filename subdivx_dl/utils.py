@@ -120,8 +120,9 @@ def unrar(rar_file_path, destination):
 def get_attribute_weights():
     attribute_weights = {
         'source': 0.5,         # 50% importance
-        'release_group': 0.25, # 25% importance
-        'screen_size': 0.1,    # 10% importance
+        'edition': 0.12,       # 12% importance
+        'release_group': 0.12, # 12% importance
+        'screen_size': 0.11,   # 11% importance
         'video_codec': 0.05,   #  5% importance
         'size': 0.05,          #  5% importance
         'other': 0.05          #  5% importance
