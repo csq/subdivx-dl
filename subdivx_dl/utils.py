@@ -739,7 +739,7 @@ def normalize_key_values(key_values):
 
     other = key_values.get('other')
     if other:
-        key_values['other'] = ''.join(other)
+        key_values['other'] = ' '.join(other)
 
     return key_values
 
