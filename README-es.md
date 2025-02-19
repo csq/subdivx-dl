@@ -116,13 +116,19 @@ Es posible aplicar diferentes estilos a las tablas que muestan los resultados ut
 
 ### Opciones de Diseño
 - **`-a`, `--alternative`**: Muestra los resultados en un formato alternativo, presentando el título y la descripción uno al lado del otro.
-![ejemplo](img/img-06.png)
+<p align="center">
+  <img src="img/img-06.png" alt="vista previa diseño alternative" />
+</p>
 
 - **`-cmp`, `--compact`**: Muestra los resultados en tablas individuales, con el título y la descripción presentados en la misma tabla.
-![ejemplo](img/img-07.png)
+<p align="center">
+  <img src="img/img-07.png" alt="vista previa diseño compact" />
+</p>
 
 - **`-m`, `--minimal`**: Presenta los resultados en un formato minimalista, mostrando el título, las descargas y las fechas.
-![ejemplo](img/img-08.png)
+<p align="center">
+  <img src="img/img-08.png" alt="vista previa diseño minimal" />
+</p>
 
 ## CONFIGURACIÓN
 ### Gestión de la configuración

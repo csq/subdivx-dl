@@ -116,13 +116,19 @@ It is possible to apply different styles to the tables that display the results 
 
 ### Layout Options
 - **`-a`, `--alternative`**: Displays results in an alternative format, presenting the title and description side by side.
-![example](img/img-06.png)
+<p align="center">
+  <img src="img/img-06.png" alt="preview alternative layout" />
+</p>
 
 - **`-cmp`, `--compact`**: Shows results in individual tables, with the title and description presented in the same table.
-![example](img/img-07.png)
+<p align="center">
+  <img src="img/img-07.png" alt="preview compact layout" />
+</p>
 
 - **`-m`, `--minimal`**: Presents results in a minimalist format, showcasing the title, downloads, and dates.
-![example](img/img-08.png)
+<p align="center">
+  <img src="img/img-08.png" alt="preview minimal layout" />
+</p>
 
 ## CONFIGURATION
 ### Configuration Management
