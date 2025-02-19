@@ -120,9 +120,8 @@ def unrar(rar_file_path, destination):
 def get_attribute_weights():
     attribute_weights = {
         'source': 0.5,         # 50% importance
-        'edition': 0.12,       # 12% importance
-        'release_group': 0.12, # 12% importance
-        'screen_size': 0.11,   # 11% importance
+        'release_group': 0.25, # 25% importance
+        'screen_size': 0.1,    # 10% importance
         'video_codec': 0.05,   #  5% importance
         'size': 0.05,          #  5% importance
         'other': 0.05          #  5% importance
@@ -795,6 +794,11 @@ def get_best_match(args, search_data):
             for key in weights.keys():
                 try:
                     subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
+
+                    # If the edition is found in the subtitle description, consider it as the best match
+                    if key_values.get('edition') and key_values['edition'].lower() in subtitle_description:
+                        id_subtitle = subtitle['id_subtitle']
+
                     attribute = normalized_key_values[key].lower()
 
                     if attribute in subtitle_description:
