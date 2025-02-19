@@ -8,13 +8,13 @@ Herramienta de línea de comandos para buscar y descargar subtítulos de www.sub
 Puedes instalar subdivx-dl siguiendo estos pasos:
 
 * Descarga el repositorio
-```bash
-    git clone www.github.com/csq/subdivx-dl
-```
+    ```bash
+        git clone www.github.com/csq/subdivx-dl
+    ```
 * Ingresa en la carpeta ``subdivx-dl`` y ejecuta
-```bash
-    pip install .
-```
+    ```bash
+        pip install .
+    ```
 
 ## DEPENDENCIAS
 Python 3.6+ son compatibles. Otras versiones e implementaciones pueden funcionar correctamente o no.

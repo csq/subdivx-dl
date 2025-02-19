@@ -127,8 +127,8 @@ It is possible to apply different styles to the tables that display the results 
 ## CONFIGURATION
 ### Configuration Management
 To save frequently used options for the ``subdivx-dl`` command, the following options are implemented:
-*    ``-sc`` or ``--save-config``: allows you to save the entered arguments.
-*    ``-lc`` or ``--load-config``: allows you to perform searches with previously saved arguments.
+* ``-sc`` or ``--save-config``: allows you to save the entered arguments.
+* ``-lc`` or ``--load-config``: allows you to perform searches with previously saved arguments.
 
 * The data is stored in:
     * Windows: ``C:\Users\user_name\AppData\Local\subdivx-dl\``
