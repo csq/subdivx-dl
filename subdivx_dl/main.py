@@ -94,10 +94,9 @@ def main():
 		if search_data_complete_size > block_size:
 
 			# Show the pagination
-			total_pages = (search_data_complete_size // block_size) + (search_data_complete_size % block_size > 0)
-			current_page = (current_index // block_size) + 1
-			page_info = f'[{current_page}/{total_pages}]'
-			print(page_info.center(get_terminal_width()))
+			page_info = get_pagination_info(search_data_complete_size, block_size, current_index)
+			page_info_format = f'[{page_info['current_page']}/{page_info['total_pages']}]'
+			print(page_info_format.center(get_terminal_width()))
 
 			user_input = prompt_user_selection(args, 'pagination')
 		else:

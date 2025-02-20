@@ -843,14 +843,23 @@ def print_comments(args, comments):
         ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
+def get_pagination_info(list_size, block_size, current_index):
+    total_pages = (list_size // block_size) + (list_size % block_size > 0)
+    current_page = (current_index // block_size) + 1
+    page_info = {
+        'current_page': current_page,
+        'total_pages': total_pages}
+    return page_info
+
 def paginate_comments(args, comments_list, block_size=10, selection=None, description_list=None):
     comments_list_length = len(comments_list)
     current_index = 0
 
     # Data pagination
-    total_pages = (comments_list_length // block_size) + (comments_list_length % block_size > 0)
-    current_page = (current_index // block_size) + 1
-    page_info = f'[{current_page}/{total_pages}]'
+    page_info = get_pagination_info(comments_list_length, block_size, current_index)
+
+    current_page = page_info['current_page']
+    total_pages = page_info['total_pages']
 
     while current_page <= total_pages:
         start_index = current_index
@@ -865,7 +874,8 @@ def paginate_comments(args, comments_list, block_size=10, selection=None, descri
             print_description(args, selection, description_list)
 
         print_comments(args, page_comments)
-        print(page_info.center(get_terminal_width()))
+        page_info_format = f'[{current_page}/{total_pages}]'
+        print(page_info_format.center(get_terminal_width()))
 
         if total_pages > 1:
             user_input = prompt_user_selection(args, 'comments')
