@@ -967,10 +967,7 @@ def https_request(https, method, url, **kwargs):
 
     return response
 
-##############################################################################
-# Cookie functions
-##############################################################################
-
+# -- Cookie functions -- #
 COOKIE_NAME = 'sdx-dl'
 
 def exist_cookie():
@@ -1028,10 +1025,7 @@ def delete_cookie():
     if os.path.exists(cookie_path):
         os.remove(cookie_path)
 
-##############################################################################
-# Class Token
-##############################################################################
-
+# -- Class Token -- #
 class Token:
     def __init__(self, poolManager, url):
         self._token = self._generate_token(poolManager, url)
@@ -1044,10 +1038,7 @@ class Token:
     def get_token(self):
         return self._token
 
-##############################################################################
-# Class Args
-##############################################################################
-
+# -- Class Args -- #
 class Args():
     def __init__(self, args=None, config=None):
         super().__init__()
@@ -1117,10 +1108,7 @@ class Args():
     def verbose(self):
         return self.verbose
 
-##############################################################################
-# Configuration functions
-##############################################################################
-
+# -- Configuration functions -- #
 CONFIG_FILE_NAME = 'config.json'
 
 def create_config_directory():
@@ -1166,10 +1154,7 @@ def load_config():
         helper.logger.info(f'Load configuration file {config_path}')
         return json.load(file)
 
-##############################################################################
-# Class TTLCache
-##############################################################################
-
+# -- Class TTLCache -- #
 # Get from https://medium.com/@denis.volokh/caching-methods-implementations-and-comparisons-in-python-7d29a2b0cd80
 
 class TTLCache:
