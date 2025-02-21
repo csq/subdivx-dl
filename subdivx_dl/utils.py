@@ -1028,18 +1028,21 @@ def delete_cookie():
     if os.path.exists(cookie_path):
         os.remove(cookie_path)
 
-def get_token(poolManager, url):
-    helper.logger.info('Get token')
+##############################################################################
+# Class Token
+##############################################################################
 
-    url = f'{url}inc/gt.php?gt=1'
+class Token:
+    def __init__(self, poolManager, url):
+        self._token = self._generate_token(poolManager, url)
 
-    response = https_request(poolManager, 'GET', url)
+    def _generate_token(self, poolManager, url):
+        response = https_request(poolManager, 'GET', f'{url}inc/gt.php?gt=1')
+        data = response.data
+        return json.loads(data)['token']
 
-    data = response.data
-
-    token = json.loads(data)['token']
-
-    return token
+    def get_token(self):
+        return self._token
 
 ##############################################################################
 # Class Args
