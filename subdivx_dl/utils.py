@@ -928,7 +928,6 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
     return user_input
 
 def get_web_version(poolManager, url):
-
     response = https_request(poolManager, 'GET', url)
     response_data = response.data.decode('utf-8')
 
@@ -967,63 +966,58 @@ def https_request(https, method, url, **kwargs):
 
     return response
 
-# -- Cookie functions -- #
-COOKIE_NAME = 'sdx-dl'
+# -- Class Cookie -- #
+class Cookie:
+    _COOKIE_NAME = 'sdx-dl'
+    _PATH_COOKIE = os.path.join(tempfile.gettempdir(), _COOKIE_NAME)
 
-def exist_cookie():
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
+    def __init__(self, poolManager, url, header):
+        self.poolManager = poolManager
+        self.url = url
+        self.header = header
+        self.set_cookie()
 
-    return os.path.exists(cookie_path)
+    def _exist_cookie(self):
+        return os.path.exists(self._PATH_COOKIE)
 
-def read_cookie():
-    helper.logger.info('Read cookie')
+    def _read_cookie(self):
+        helper.logger.info('Read cookie')
 
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
+        with open(self._PATH_COOKIE, 'r') as file:
+            return file.read()
 
-    with open(cookie_path, 'r') as file:
-        return file.read()
+    def get_cookie(self, poolManager, url):
+        helper.logger.info(f'Get cookie from {url}')
 
-def get_cookie(poolManager, url):
-    helper.logger.info(f'Get cookie from {url}')
+        response = https_request(poolManager, 'GET', url)
 
-    response = https_request(poolManager, 'GET', url)
+        cookie = response.headers.get('Set-Cookie')
+        cookie_parts = cookie.split(';')
 
-    cookie = response.headers.get('Set-Cookie')
-    cookie_parts = cookie.split(';')
+        # Return sdx_cookie
+        return cookie_parts[0]
 
-    # Return sdx_cookie
-    return cookie_parts[0]
+    def save_cookie(self, sdx_cookie):
+        with open(self._PATH_COOKIE, 'w') as file:
+            file.write(sdx_cookie)
+            file.close()
 
-def save_cookie(sdx_cookie):
-    # Save cookie in temporary folder
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
+        helper.logger.info('Save cookie')
 
-    with open(cookie_path, 'w') as file:
-        file.write(sdx_cookie)
-        file.close()
+    def set_cookie(self):
+        cookie = None
 
-    helper.logger.info('Save cookie')
+        if not self._exist_cookie():
+            cookie = self.get_cookie(self.poolManager, self.url)
+            self.save_cookie(cookie)
+        else:
+            cookie = self._read_cookie()
 
-def set_cookie(poolManager, url, header):
-    cookie = None
+        self.header['cookie'] = cookie
 
-    if not exist_cookie():
-        cookie = get_cookie(poolManager, url)
-        save_cookie(cookie)
-    else:
-        cookie = read_cookie()
-
-    header['cookie'] = cookie
-
-def delete_cookie():
-    temp_dir = tempfile.gettempdir()
-    cookie_path = os.path.join(temp_dir, COOKIE_NAME)
-
-    if os.path.exists(cookie_path):
-        os.remove(cookie_path)
+    def delete_cookie(self):
+        if self._exist_cookie():
+            os.remove(self._PATH_COOKIE)
 
 # -- Class Token -- #
 class Token:

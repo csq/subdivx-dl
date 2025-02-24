@@ -27,7 +27,7 @@ https = urllib3.PoolManager(
 )
 
 # Set cookie and get token
-set_cookie(https, SUBDIVX_URL, headers)
+Cookie(https, SUBDIVX_URL, headers).set_cookie()
 token = Token(https, SUBDIVX_URL).get_token()
 
 # Save or load configuration
