@@ -412,11 +412,8 @@ def get_data_page(args, poolManager, url, token, search):
             data = json.loads(response.data).get('aaData')
         except JSONDecodeError:
             clear()
-            print('Subtitles not found because cookie expired')
-            delete_cookie()
-            print('\nCookie deleted')
-            print('\nTry again')
-
+            print('Failed to parse response')
+            print('Clear cache and try again')
             helper.logger.error('Failed to parse response')
             exit(0)
 
