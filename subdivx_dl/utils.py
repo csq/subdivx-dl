@@ -1062,6 +1062,80 @@ class Token:
     def _exists_token(self):
         return os.path.exists(self._PATH_TOKEN)
 
+# -- Class DataClient -- #
+class DataClient():
+    _PATH_DATA = os.path.join(tempfile.gettempdir(), 'sdx-dl.json')
+
+    def __init__(self, web_version, sdx_cookie, token, expiration_date):
+        self.web_version = web_version
+        self.sdx_cookie = sdx_cookie
+        self.token = token
+        self.expiration_date = expiration_date
+
+    def save_data(self):
+        data = {
+            'web_version': self.web_version,
+            'sdx_cookie': self.sdx_cookie,
+            'token': self.token,
+            'expiration_date': self.expiration_date.isoformat().replace('+00:00', '')
+        }
+
+        with open(self._PATH_DATA, 'w') as file:
+            json.dump(data, file, indent=4)
+            file.close()
+
+    def load_data(self):
+        if os.path.exists(self._PATH_DATA):
+            with open(self._PATH_DATA, 'r') as file:
+                data = json.load(file)
+
+            self.web_version = data['web_version']
+            self.sdx_cookie = data['sdx_cookie']
+            self.token = data['token']
+            self.expiration_date = datetime.fromisoformat(data['expiration_date'])
+
+    def get_web_version(self):
+        return self.web_version
+
+    def get_sdx_cookie(self):
+        return self.sdx_cookie
+
+    def get_token(self):
+        return self.token
+
+    def get_expiration_date(self):
+        return self.expiration_date
+
+    def update_data(self, key, value):
+        with open(self._PATH_DATA, 'r') as file:
+            data = json.load(file)
+
+        data[key] = value
+
+        with open(self._PATH_DATA, 'w') as file:
+            json.dump(data, file, indent=4)
+            file.close()
+
+    def set_web_version(self, web_version):
+        key = 'web_version'
+        self.update_data(key, web_version)
+
+    def set_sdx_cookie(self, sdx_cookie):
+        key = 'sdx_cookie'
+        self.update_data(key, sdx_cookie)
+
+    def set_token(self, token):
+        key = 'token'
+        self.update_data(key, token)
+
+    def set_expiration_date(self, expiration_date):
+        key = 'expiration_date'
+        self.update_data(key, expiration_date.isoformat().replace('+00:00', ''))
+
+    def delete_data(self):
+        if os.path.exists(self._PATH_DATA):
+            os.remove(self._PATH_DATA)
+
 # -- Class Args -- #
 class Args():
     def __init__(self, args=None, config=None):
