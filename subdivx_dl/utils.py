@@ -6,13 +6,13 @@ import re
 import json
 import time
 import shutil
-import datetime
 import tempfile
 import textwrap
 import platform
 
 from json import JSONDecodeError
 from urllib3.exceptions import ProtocolError, MaxRetryError, TimeoutError
+from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
 from zipfile import ZipFile
@@ -451,7 +451,7 @@ def sort_data(args, data):
         sorted_data = sorted(
             data,
             key=lambda item: (
-                datetime.datetime.strptime(item['upload_date'], '%d/%m/%Y'
+                datetime.strptime(item['upload_date'], '%d/%m/%Y'
                 if item['upload_date'] != '-' else '-')
             ),
             reverse = True
@@ -460,7 +460,7 @@ def sort_data(args, data):
 
 def parse_date(date):
     try:
-        return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+        return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
     except ValueError:
         return None
 
@@ -1027,16 +1027,49 @@ def delete_cookie():
 
 # -- Class Token -- #
 class Token:
+    _NAME_TOKEN = 'tkn_sdx_dl.json'
+    _PATH_TOKEN = os.path.join(tempfile.gettempdir(), _NAME_TOKEN)
+
+    _expiration_date = datetime.now() + timedelta(hours=6)
+
     def __init__(self, poolManager, url):
-        self._token = self._generate_token(poolManager, url)
+        if self._exists_token():
+            token, expiration_date = self._read_token()
+            if expiration_date < datetime.now():
+                self._token = self._generate_token(poolManager, url)
+                self._save_token(self._token)
+            else:
+                self._token = token
+        else:
+            self._token = self._generate_token(poolManager, url)
+            self._save_token(self._token)
 
     def _generate_token(self, poolManager, url):
         response = https_request(poolManager, 'GET', f'{url}inc/gt.php?gt=1')
         data = response.data
         return json.loads(data)['token']
 
+    def _read_token(self):
+        with open(self._PATH_TOKEN, 'r') as file:
+            token_data = json.load(file)
+
+        return token_data['token'], datetime.fromisoformat(token_data['expiration_date'])
+
     def get_token(self):
         return self._token
+
+    def _save_token(self, token):
+        data = {
+            'token': token,
+            'expiration_date': self._expiration_date.isoformat().replace('+00:00', '')
+        }
+
+        with open(self._PATH_TOKEN, 'w') as file:
+            json.dump(data, file, indent=4)
+            file.close()
+
+    def _exists_token(self):
+        return os.path.exists(self._PATH_TOKEN)
 
 # -- Class Args -- #
 class Args():
