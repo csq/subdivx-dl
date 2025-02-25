@@ -26,9 +26,16 @@ https = urllib3.PoolManager(
 	retries=3
 )
 
-# Set cookie and get token
-Cookie(https, SUBDIVX_URL, headers).set_cookie()
-token = Token(https, SUBDIVX_URL).get_token()
+# Create a DataClient instance
+data_client = DataClient(https, headers, SUBDIVX_URL)
+
+# Load or generate data session
+if data_client.does_data_exist() and not data_client.does_data_session_expire():
+	data_session = data_client.get_data_session()
+else:
+	data_client.generate_data()
+	data_client.save_data()
+	data_session = data_client.get_data_session()
 
 # Save or load configuration
 if args.save_config:
@@ -42,7 +49,7 @@ else:
 def main():
 
 	# Get all data from search
-	search_data = get_data_page(args, https, SUBDIVX_URL, token, FIND_SUBTITLE)
+	search_data = get_data_page(args, https, SUBDIVX_URL, data_session, FIND_SUBTITLE)
 
 	# Sorting data if flag is set
 	if args.order_by_downloads or args.order_by_dates:

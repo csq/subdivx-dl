@@ -380,19 +380,18 @@ def rename_and_move_subtitle(args, file_path, destination):
         # Move and rename bulk srt
         tv_show_subtitles(args, file_path, destination)
 
-def get_data_page(args, poolManager, url, token, search):
+def get_data_page(args, poolManager, url, data_session, search):
     print('Searching...', end='\r')
 
     query = parse_search_query(search)
-    version = get_web_version(poolManager, url)
 
     url = f'{url}inc/ajax.php'
 
     payload = {
         'tabla': 'resultados',
         'filtros': '',
-        f'buscar{version}': query,
-        'token': token
+        f'buscar{data_session['web_version']}': query,
+        'token': data_session['token']
     }
 
     helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
@@ -965,176 +964,98 @@ def https_request(https, method, url, **kwargs):
 
 # -- Class Cookie -- #
 class Cookie:
-    _COOKIE_NAME = 'sdx-dl'
-    _PATH_COOKIE = os.path.join(tempfile.gettempdir(), _COOKIE_NAME)
-
-    def __init__(self, poolManager, url, header):
+    def __init__(self, poolManager, url):
         self.poolManager = poolManager
         self.url = url
-        self.header = header
-        self.set_cookie()
 
-    def _exist_cookie(self):
-        return os.path.exists(self._PATH_COOKIE)
-
-    def _read_cookie(self):
-        helper.logger.info('Read cookie')
-
-        with open(self._PATH_COOKIE, 'r') as file:
-            return file.read()
-
-    def get_cookie(self, poolManager, url):
-        helper.logger.info(f'Get cookie from {url}')
-
-        response = https_request(poolManager, 'GET', url)
+    def get_cookie(self):
+        response = https_request(self.poolManager, 'GET', self.url)
 
         cookie = response.headers.get('Set-Cookie')
         cookie_parts = cookie.split(';')
 
-        # Return sdx_cookie
-        return cookie_parts[0]
-
-    def save_cookie(self, sdx_cookie):
-        with open(self._PATH_COOKIE, 'w') as file:
-            file.write(sdx_cookie)
-            file.close()
-
-        helper.logger.info('Save cookie')
-
-    def set_cookie(self):
-        cookie = None
-
-        if not self._exist_cookie():
-            cookie = self.get_cookie(self.poolManager, self.url)
-            self.save_cookie(cookie)
-        else:
-            cookie = self._read_cookie()
-
-        self.header['cookie'] = cookie
-
-    def delete_cookie(self):
-        if self._exist_cookie():
-            os.remove(self._PATH_COOKIE)
+        return cookie_parts[0] # sdx_cookie
 
 # -- Class Token -- #
 class Token:
-    _NAME_TOKEN = 'tkn_sdx_dl.json'
-    _PATH_TOKEN = os.path.join(tempfile.gettempdir(), _NAME_TOKEN)
+    _TIMEDELTA = timedelta(hours=1)
 
-    _expiration_date = datetime.now() + timedelta(hours=6)
+    def __init__(self, poolManager, url, cookie):
+        self.poolManager = poolManager
+        self.url = url
+        self.cookie = cookie
+        self._generate_token()
 
-    def __init__(self, poolManager, url):
-        if self._exists_token():
-            token, expiration_date = self._read_token()
-            if expiration_date < datetime.now():
-                self._token = self._generate_token(poolManager, url)
-                self._save_token(self._token)
-            else:
-                self._token = token
-        else:
-            self._token = self._generate_token(poolManager, url)
-            self._save_token(self._token)
+    def _generate_token(self):
+        self.poolManager.headers['cookie'] = self.cookie
 
-    def _generate_token(self, poolManager, url):
-        response = https_request(poolManager, 'GET', f'{url}inc/gt.php?gt=1')
+        response = https_request(self.poolManager, 'GET', f'{self.url}inc/gt.php?gt=1')
         data = response.data
-        return json.loads(data)['token']
 
-    def _read_token(self):
-        with open(self._PATH_TOKEN, 'r') as file:
-            token_data = json.load(file)
+        self._TOKEN_VALUE = json.loads(data)['token']
+        self._expiration_date = datetime.now() + self._TIMEDELTA
 
-        return token_data['token'], datetime.fromisoformat(token_data['expiration_date'])
-
-    def get_token(self):
-        return self._token
-
-    def _save_token(self, token):
+    def get_token_data(self):
         data = {
-            'token': token,
+            'token': self._TOKEN_VALUE,
             'expiration_date': self._expiration_date.isoformat().replace('+00:00', '')
         }
 
-        with open(self._PATH_TOKEN, 'w') as file:
-            json.dump(data, file, indent=4)
-            file.close()
-
-    def _exists_token(self):
-        return os.path.exists(self._PATH_TOKEN)
+        return data
 
 # -- Class DataClient -- #
 class DataClient():
     _PATH_DATA = os.path.join(tempfile.gettempdir(), 'sdx-dl.json')
 
-    def __init__(self, web_version, sdx_cookie, token, expiration_date):
-        self.web_version = web_version
-        self.sdx_cookie = sdx_cookie
-        self.token = token
-        self.expiration_date = expiration_date
+    def __init__(self, poolManager, header, url):
+        self.poolManager = poolManager
+        self.header = header
+        self.url = url
+
+    def generate_data(self):
+        helper.logger.info('Generate data session')
+        self.web_version = get_web_version(self.poolManager, self.url)
+        self.sdx_cookie = Cookie(self.poolManager, self.url).get_cookie()
+        self.token_data = Token(self.poolManager, self.url, self.sdx_cookie).get_token_data()
 
     def save_data(self):
         data = {
             'web_version': self.web_version,
             'sdx_cookie': self.sdx_cookie,
-            'token': self.token,
-            'expiration_date': self.expiration_date.isoformat().replace('+00:00', '')
+            'token': self.token_data['token'],
+            'expiration_date': self.token_data['expiration_date']
         }
 
         with open(self._PATH_DATA, 'w') as file:
             json.dump(data, file, indent=4)
             file.close()
 
-    def load_data(self):
-        if os.path.exists(self._PATH_DATA):
+    def get_data_session(self):
+        if self.does_data_exist():
+            helper.logger.info('Load data session')
+            with open(self._PATH_DATA, 'r') as file:
+                data = json.load(file)
+                self.header['cookie'] = data['sdx_cookie'] # Set cookie in header
+            return data
+
+    def delete_data(self):
+        if self.does_data_exist():
+            os.remove(self._PATH_DATA)
+
+    def does_data_exist(self):
+        return os.path.exists(self._PATH_DATA)
+
+    def does_data_session_expire(self):
+        if self.does_data_exist():
             with open(self._PATH_DATA, 'r') as file:
                 data = json.load(file)
 
-            self.web_version = data['web_version']
-            self.sdx_cookie = data['sdx_cookie']
-            self.token = data['token']
-            self.expiration_date = datetime.fromisoformat(data['expiration_date'])
+            expiration_date = datetime.fromisoformat(data['expiration_date'])
 
-    def get_web_version(self):
-        return self.web_version
+            if datetime.now() > expiration_date:
+                return True
 
-    def get_sdx_cookie(self):
-        return self.sdx_cookie
-
-    def get_token(self):
-        return self.token
-
-    def get_expiration_date(self):
-        return self.expiration_date
-
-    def update_data(self, key, value):
-        with open(self._PATH_DATA, 'r') as file:
-            data = json.load(file)
-
-        data[key] = value
-
-        with open(self._PATH_DATA, 'w') as file:
-            json.dump(data, file, indent=4)
-            file.close()
-
-    def set_web_version(self, web_version):
-        key = 'web_version'
-        self.update_data(key, web_version)
-
-    def set_sdx_cookie(self, sdx_cookie):
-        key = 'sdx_cookie'
-        self.update_data(key, sdx_cookie)
-
-    def set_token(self, token):
-        key = 'token'
-        self.update_data(key, token)
-
-    def set_expiration_date(self, expiration_date):
-        key = 'expiration_date'
-        self.update_data(key, expiration_date.isoformat().replace('+00:00', ''))
-
-    def delete_data(self):
-        if os.path.exists(self._PATH_DATA):
-            os.remove(self._PATH_DATA)
+            return False
 
 # -- Class Args -- #
 class Args():
