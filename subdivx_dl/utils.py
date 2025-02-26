@@ -406,14 +406,14 @@ def get_data_page(args, poolManager, url, data_session, search):
             delay()
 
         response = https_request(poolManager, 'POST', url=url, fields=payload)
-
         try:
             data = json.loads(response.data).get('aaData')
         except JSONDecodeError:
             clear()
             print('Failed to parse response')
-            print('Clear cache and try again')
-            helper.logger.error('Failed to parse response')
+            DataClient().delete_data()
+            print('Please try again')
+            helper.logger.error('Failed to parse response, delete data session')
             exit(0)
 
         for result in data:
@@ -1007,7 +1007,7 @@ class Token:
 class DataClient():
     _PATH_DATA = os.path.join(tempfile.gettempdir(), 'sdx-dl.json')
 
-    def __init__(self, poolManager, header, url):
+    def __init__(self, poolManager=None, header=None, url=None):
         self.poolManager = poolManager
         self.header = header
         self.url = url
