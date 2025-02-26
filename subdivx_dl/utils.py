@@ -390,7 +390,7 @@ def get_data_page(args, poolManager, url, data_session, search):
     payload = {
         'tabla': 'resultados',
         'filtros': '',
-        f'buscar{data_session['web_version']}': query,
+        f'buscar{data_session["web_version"]}': query,
         'token': data_session['token']
     }
 
