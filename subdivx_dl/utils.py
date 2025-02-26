@@ -1030,13 +1030,17 @@ class DataClient():
             json.dump(data, file, indent=4)
             file.close()
 
+    def _read_data(self):
+        with open(self._PATH_DATA, 'r') as file:
+            self._data = json.load(file)
+            file.close()
+
     def get_data_session(self):
         if self.does_data_exist():
             helper.logger.info('Load data session')
-            with open(self._PATH_DATA, 'r') as file:
-                data = json.load(file)
-                self.header['cookie'] = data['sdx_cookie'] # Set cookie in header
-            return data
+            self._read_data()
+            self.header['cookie'] = self._data['sdx_cookie'] # Set cookie in header
+            return self._data
 
     def delete_data(self):
         if self.does_data_exist():
@@ -1047,10 +1051,9 @@ class DataClient():
 
     def does_data_session_expire(self):
         if self.does_data_exist():
-            with open(self._PATH_DATA, 'r') as file:
-                data = json.load(file)
+            self._read_data()
 
-            expiration_date = datetime.fromisoformat(data['expiration_date'])
+            expiration_date = datetime.fromisoformat(self._data['expiration_date'])
 
             if datetime.now() > expiration_date:
                 return True
