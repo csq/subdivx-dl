@@ -396,48 +396,38 @@ def get_data_page(args, poolManager, url, data_session, search):
 
     helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
 
-    max_attempts = 3
     search_results = []
 
-    for attempt in range(max_attempts):
-        helper.logger.info(f'Attempt number {attempt + 1}')
+    response = https_request(poolManager, 'POST', url=url, fields=payload)
 
-        if attempt > 0:
-            delay()
+    try:
+        data = json.loads(response.data).get('aaData')
+    except JSONDecodeError:
+        clear()
+        print('Failed to parse response')
+        DataClient().delete_data()
+        print('Please try again')
+        helper.logger.error('Failed to parse response, delete data session')
+        exit(0)
 
-        response = https_request(poolManager, 'POST', url=url, fields=payload)
-        try:
-            data = json.loads(response.data).get('aaData')
-        except JSONDecodeError:
-            clear()
-            print('Failed to parse response')
-            DataClient().delete_data()
-            print('Please try again')
-            helper.logger.error('Failed to parse response, delete data session')
-            exit(0)
+    for result in data:
+        subtitle = {
+            'id_subtitle': result['id'],
+            'title': filter_text(result['titulo']),
+            'description': filter_text(result['descripcion']),
+            'downloads': result['descargas'],
+            'uploader': result['nick'],
+            'upload_date': parse_date(result['fecha_subida']) if result['fecha_subida'] else '-'
+        }
+        search_results.append(subtitle)
 
-        for result in data:
-            subtitle = {
-                'id_subtitle': result['id'],
-                'title': filter_text(result['titulo']),
-                'description': filter_text(result['descripcion']),
-                'downloads': result['descargas'],
-                'uploader': result['nick'],
-                'upload_date': parse_date(result['fecha_subida']) if result['fecha_subida'] else '-'
-            }
-            search_results.append(subtitle)
+    if not search_results:
+        if not args.verbose:
+            print('No subtitles found')
+        helper.logger.info(f'No subtitles found for query: {query}')
+        exit(0)
 
-        if not search_results and attempt < (max_attempts - 1):
-            continue
-        elif search_results:
-            helper.logger.info(f'Subtitles found for: {query}')
-            break
-        elif not search_results and attempt == max_attempts - 1:
-            helper.logger.info(f'Subtitles not found for: {query}')
-            if not args.verbose:
-                print('Subtitles not found')
-            exit(0)
-
+    helper.logger.info(f'Found subtitles for query: {query}')
     return search_results
 
 def sort_data(args, data):
