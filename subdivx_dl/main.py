@@ -47,7 +47,6 @@ else:
 	args = Args(args)
 
 def main():
-
 	# Get all data from search
 	search_data = get_data_page(args, https, SUBDIVX_URL, data_session, FIND_SUBTITLE)
 

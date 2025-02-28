@@ -710,7 +710,6 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         print('Done!')
 
 def normalize_key_values(key_values):
-
     source = key_values.get('source')
     if source:
         key_values['source'] = source.replace('Blu-ray', 'BluRay')
