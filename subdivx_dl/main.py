@@ -11,7 +11,7 @@ SUBDIVX_URL = 'https://www.subdivx.com/'
 args = helper.parser.parse_args()
 FIND_SUBTITLE = args.SEARCH
 
-rev = '135.0'
+rev = '136.0'
 
 headers = {
 	'user-agent': f'Mozilla/5.0 (X11; Linux x86_64; rv:{rev}) Gecko/20100101 Firefox/{rev}'
