@@ -5,6 +5,7 @@ import os
 import re
 import json
 import time
+import random
 import shutil
 import tempfile
 import textwrap
@@ -930,6 +931,19 @@ def get_web_version(poolManager, url):
 def delay(factor=2):
     delay = 2 ** factor
     time.sleep(delay)
+
+def get_random_rev():
+    _REV = (
+        '136.0',
+        '135.0',
+        '134.0',
+        '133.0',
+        '132.0',
+        '131.0',
+        '130.0',
+    )
+
+    return random.choice(_REV)
 
 def https_request(https, method, url, **kwargs):
     try:
