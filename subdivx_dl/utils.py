@@ -1133,51 +1133,51 @@ class Args():
     def verbose(self):
         return self.verbose
 
-# -- Configuration functions -- #
-CONFIG_FILE_NAME = 'config.json'
+# -- Class Config -- #
+class Config():
+    _CONFIG_FILE_NAME = 'config.json'
 
-def create_config_directory():
-    platform_name = platform.system()
+    def __init__(self):
+        self.config_directory = self._create_config_directory()
+        self.config_path = os.path.join(self.config_directory, self._CONFIG_FILE_NAME)
 
-    local_appdata = os.getenv('LOCALAPPDATA')
+    def _create_config_directory(self):
+        platform_name = platform.system()
 
-    directory_paths = {
-        'Linux': '~/.config/subdivx-dl/',
-        'Darwin': '~/Library/Application Support/subdivx-dl/',
-        'Windows': f'{local_appdata}\\subdivx-dl\\'
-    }
+        local_appdata = os.getenv('LOCALAPPDATA')
 
-    config_directory = os.path.expanduser(directory_paths[platform_name])
-    os.makedirs(config_directory, exist_ok=True)
+        directory_paths = {
+            'Linux': '~/.config/subdivx-dl/',
+            'Darwin': '~/Library/Application Support/subdivx-dl/',
+            'Windows': f'{local_appdata}\\subdivx-dl\\'
+        }
 
-    return config_directory
+        config_directory = os.path.expanduser(directory_paths[platform_name])
+        os.makedirs(config_directory, exist_ok=True)
 
-def save_config(args):
-    config_directory = create_config_directory()
-    config_path = os.path.join(config_directory, CONFIG_FILE_NAME)
+        return config_directory
 
-    args_copy = args.__dict__.copy()
+    def save_config(self, args):
+        args_copy = args.__dict__.copy()
 
-    args_to_delete = ['SEARCH', 'load_config', 'save_config']
+        args_to_delete = ['SEARCH', 'load_config', 'save_config']
 
-    for arg in args_to_delete:
-        args_copy.pop(arg, None)
+        for arg in args_to_delete:
+            args_copy.pop(arg, None)
 
-    with open(config_path, 'w') as file:
-        json.dump(args_copy, file, indent=4, sort_keys=True)
+        with open(self.config_path, 'w') as file:
+            json.dump(args_copy, file, indent=4, sort_keys=True)
 
-    helper.logger.info(f'Save configuration file {config_path}')
+        helper.logger.info(f'Save configuration file {self.config_path}')
 
-def load_config():
-    config_path = os.path.join(create_config_directory(), CONFIG_FILE_NAME)
+    def load_config(self):
+        if not os.path.exists(self.config_path):
+            helper.logger.info('Not found configuration file, usage default values')
+            return {}
 
-    if not os.path.exists(config_path):
-        helper.logger.info('Not found configuration file, usage default values')
-        return {}
-
-    with open(config_path, 'r') as file:
-        helper.logger.info(f'Load configuration file {config_path}')
-        return json.load(file)
+        with open(self.config_path, 'r') as file:
+            helper.logger.info(f'Load configuration file {self.config_path}')
+            return json.load(file)
 
 # -- Class TTLCache -- #
 # Get from https://medium.com/@denis.volokh/caching-methods-implementations-and-comparisons-in-python-7d29a2b0cd80

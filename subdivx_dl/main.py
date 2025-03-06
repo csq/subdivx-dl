@@ -39,9 +39,9 @@ else:
 
 # Save or load configuration
 if args.save_config:
-	save_config(args)
+	Config().save_config(args)
 elif args.load_config:
-	config = load_config()
+	config = Config().load_config()
 	args = Args(args, config)
 else:
 	args = Args(args)
