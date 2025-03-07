@@ -382,6 +382,7 @@ def rename_and_move_subtitle(args, file_path, destination):
         tv_show_subtitles(args, file_path, destination)
 
 def get_data_page(args, poolManager, url, data_session, search):
+    clear()
     print('Searching...', end='\r')
 
     query = parse_search_query(search)
@@ -1016,6 +1017,7 @@ class DataClient():
         self.url = url
 
     def generate_data(self):
+        print('Generating data session...', end='\r')
         helper.logger.info('Generate data session')
         self.web_version = get_web_version(self.poolManager, self.url)
         self.sdx_cookie = Cookie(self.poolManager, self.url).get_cookie()
