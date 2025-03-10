@@ -9,7 +9,7 @@ from .utils import *
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
 args = helper.parser.parse_args()
-FIND_SUBTITLE = args.SEARCH
+FIND_SUBTITLE = parse_user_input(args.SEARCH)
 
 rev = get_random_rev()
 
