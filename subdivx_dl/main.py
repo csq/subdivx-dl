@@ -30,12 +30,11 @@ https = urllib3.PoolManager(
 data_client = DataClient(https, headers, SUBDIVX_URL)
 
 # Load or generate data session
-if data_client.does_data_exist() and not data_client.does_data_session_expire():
-	data_session = data_client.get_data_session()
-else:
+if not data_client.does_data_exist() or data_client.does_data_session_expire():
 	data_client.generate_data()
 	data_client.save_data()
-	data_session = data_client.get_data_session()
+
+data_session = data_client.get_data_session()
 
 # Save or load configuration
 if args.save_config:
