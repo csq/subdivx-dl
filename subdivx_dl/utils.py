@@ -620,7 +620,7 @@ def filter_text(text):
     text = text.replace('&amp;', '&')
 
     # Replace &quot; with "
-    text = text.replace('\\&quot;', '"')
+    text = text.replace('&quot;', '"')
 
     return text
 
