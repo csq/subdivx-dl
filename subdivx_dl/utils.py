@@ -907,9 +907,9 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
 
     menu_options = {
         'subtitle': main_menu,
-        'pagination': main_menu + paginate_menu,
+        'pagination': main_menu + '\n' + paginate_menu,
         'download': secondary_menu,
-        'comments': secondary_menu + paginate_menu
+        'comments': secondary_menu + '\n' + paginate_menu
     }[menu_name]
 
     if not args.disable_help:
