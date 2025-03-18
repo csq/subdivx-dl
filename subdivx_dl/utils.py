@@ -453,12 +453,12 @@ def parse_date(date):
         return None
 
 def parse_user_input(input):
-    if len(input) < 1:
+    search = input.strip()
+    if search == '':
         print('Invalid search, try again')
         helper.logger.error('Invalid search')
         exit(0)
-
-    return input.strip()
+    return search
 
 def parse_search_query(search):
     try:
