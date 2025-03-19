@@ -941,18 +941,9 @@ def delay(factor=2):
     delay = 2 ** factor
     time.sleep(delay)
 
-def get_random_rev():
-    _REV = (
-        '136.0',
-        '135.0',
-        '134.0',
-        '133.0',
-        '132.0',
-        '131.0',
-        '130.0',
-    )
-
-    return random.choice(_REV)
+def get_random_revision():
+    revision = f'13{random.randrange(7)}.0' # 130.0 - 136.0
+    return revision
 
 def https_request(https, method, url, **kwargs):
     try:
