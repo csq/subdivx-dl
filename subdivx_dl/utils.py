@@ -922,21 +922,6 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
 
     return user_input
 
-def get_web_version(poolManager, url):
-    response = https_request(poolManager, 'GET', url)
-    response_data = response.data.decode('utf-8')
-
-    label = 'id="vs">'
-
-    version_start_index = response_data.find(label) + len(label)
-    version_end_index = response_data.find('</div>', version_start_index)
-
-    version_text = response_data[version_start_index:version_end_index]
-
-    version = version_text.replace('v', '').replace('.', '')
-
-    return version
-
 def delay(factor=2):
     delay = 2 ** factor
     time.sleep(delay)
@@ -1015,10 +1000,25 @@ class DataClient():
         self.header = header
         self.url = url
 
+    def _get_web_version(self, poolManager, url):
+        response = https_request(poolManager, 'GET', url)
+        response_data = response.data.decode('utf-8')
+
+        label = 'id="vs">'
+
+        version_start_index = response_data.find(label) + len(label)
+        version_end_index = response_data.find('</div>', version_start_index)
+
+        version_text = response_data[version_start_index:version_end_index]
+
+        version = version_text.replace('v', '').replace('.', '')
+
+        return version
+
     def generate_data(self):
         print('Generating data session...', end='\r')
         helper.logger.info('Generate data session')
-        self.web_version = get_web_version(self.poolManager, self.url)
+        self.web_version = self._get_web_version(self.poolManager, self.url)
         self.sdx_cookie = Cookie(self.poolManager, self.url).get_cookie()
         self.token_data = Token(self.poolManager, self.url, self.sdx_cookie).get_token_data()
 
