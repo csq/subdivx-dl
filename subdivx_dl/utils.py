@@ -171,26 +171,18 @@ def select_best_subtitle_from_list(args, data):
 
 def print_menu_content_dir(args, directory):
     header = [['N°', 'File name']]
-    files = os.listdir(directory)
 
-    data = []
+    file_names = [fname for fname in os.listdir(directory) if fname.endswith(SUBTITLE_EXTENSIONS)]
+    file_count = len(file_names)
 
-    index = 1
-    x = 0
-    while x < len(files):
-        if files[x].endswith(SUBTITLE_EXTENSIONS):
-            data.append(index)
-            data.append(os.path.basename(files[x]))
-            header.append(data[:])
-            data.clear()
-            index += 1
-        x += 1
+    for index, file_name in enumerate(file_names, start=1):
+        header.append([index, file_name])
 
-    if args.fast and index > 2:
+    if args.fast and file_count > 1:
         file_name = select_best_subtitle_from_list(args, header)
         return file_name
 
-    if index > 2:
+    if file_count > 1:
         while True:
             # Clear screen
             clear()
@@ -232,10 +224,8 @@ def print_menu_content_dir(args, directory):
             clear()
             return file_name
     else:
-        # Return the file_name of the subtitle, excluding .zip or .rar extensions
-        for x in range(2):
-            if files[x].endswith(SUBTITLE_EXTENSIONS):
-                return os.path.basename(files[x])
+        # Return the file_name of the subtitle
+        return file_names[0]
 
 def movie_subtitle(args, file_path, destination):
     helper.logger.info(f'Move subtitle to {destination}')
