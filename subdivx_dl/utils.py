@@ -36,16 +36,16 @@ def get_file_extension(file_path):
     with open(file_path, 'rb') as file:
         header = file.read(4)
 
-        file_signatures = {
-            b'\x50\x4B\x03\x04': '.zip',
-            b'\x52\x61\x72\x21': '.rar'
-        }
+    file_signatures = {
+        b'\x50\x4B\x03\x04': '.zip',
+        b'\x52\x61\x72\x21': '.rar'
+    }
 
-        for signature, extension in file_signatures.items():
-            if header.startswith(signature):
-                return extension
+    for signature, extension in file_signatures.items():
+        if header.startswith(signature):
+            return extension
 
-        return '.bin'
+    return '.bin' # For unknown file
 
 def download_file(poolManager, url, id_subtitle, location):
     helper.logger.info(f'Downloading archive from: {url}{id_subtitle} in {location}')
