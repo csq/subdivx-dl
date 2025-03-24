@@ -89,10 +89,9 @@ def unzip(zip_file_path, destination):
                 if file.endswith(SUBTITLE_EXTENSIONS):
                     helper.logger.info(f'Unzip [{os.path.basename(file)}]')
                     z.extract(file, destination)
-            z.close()
-    except:
-        helper.logger.error('File corrupt')
-        print('Invalid file')
+    except Exception as e:
+        helper.logger.error('Failed to unzip file')
+        print(f'Failed to unzip file: error {e}')
         exit(1)
     else:
         move_all_to_parent_folder(destination)
