@@ -21,7 +21,7 @@ from rarfile import RarFile
 from guessit import guessit
 from subdivx_dl import helper
 
-SUBTITLE_EXTENSIONS = ('.srt', '.SRT', '.sub', '.ass', '.ssa', 'idx')
+SUBTITLE_EXTENSIONS = ('.srt', '.SRT', '.sub', '.ass', '.ssa', '.idx')
 
 DEFAULT_STYLE = 'pretty'
 
