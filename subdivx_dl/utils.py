@@ -64,12 +64,12 @@ def download_file(poolManager, url, id_subtitle, location):
 
             file_extension = get_file_extension(temp_file.name)
 
-            if file_extension in ('.zip', '.rar'):
+            if file_extension != '.bin':
                 helper.logger.info('Download complete')
-
-                new_file_path = temp_file.name + file_extension
                 temp_file.close()
-                os.rename(temp_file.name, new_file_path)
+
+                temp_file_new_name = f'{temp_file.name}{file_extension}'
+                os.rename(temp_file.name, temp_file_new_name)
 
                 success = True
                 break
