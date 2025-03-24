@@ -432,7 +432,7 @@ def sort_data(args, data):
                 datetime.strptime(item['upload_date'], '%d/%m/%Y'
                 if item['upload_date'] != '-' else '-')
             ),
-            reverse = True
+            reverse=True
         )
         return sorted_data
 
@@ -756,7 +756,13 @@ def get_best_match(args, search_data):
         title_values = guessit(subtitle['title'])
 
         if key_values['type'] == 'episode':
-            episode_number = f'E{title_values.get("episode"):02d}' if title_values.get('episode') is not None else ''
+            try:
+                episode_number = f'E{title_values.get("episode"):02d}' if title_values.get('episode') is not None else ''
+            except TypeError:
+                episode_number_input = key_values.get('episode')
+                episode_number_subtitle = title_values.get('episode')
+                if episode_number_input is not None and episode_number_input in episode_number_subtitle:
+                    episode_number = f'E{episode_number_input:02d}'
             title_filtered = f'{title_values.get("title")} S{title_values.get("season"):02d}{episode_number}'.replace(':', '').replace('.', '').strip()
             alt_title_filtered = f'{title_values.get("episode_title")}' if title_values.get('episode_title') else title_filtered
         else:
