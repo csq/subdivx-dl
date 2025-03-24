@@ -671,28 +671,25 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     else:
         parent_folder = LOCATION_DESTINATION
 
-    # In case the server does not return a file, exit
-    list_directory = os.listdir(fpath)
-
-    if not list_directory:
-        helper.logger.info('Remote server not found file')
-
-        helper.logger.info(f'Delete temporal directory {fpath}')
+    # Get name of compressed file downloaded
+    try:
+        compressed_file_name = os.listdir(fpath)[0]
+    except IndexError:
+        helper.logger.error('No file returned from server')
         temp_dir.cleanup()
 
         if not args.verbose:
             clear()
-            print('Subtitle not found because server missing file')
+            print('Subtitle not found because server is missing the file')
         exit(0)
 
     # Extract zip/rar file
-    for file in list_directory:
-        file_path = os.path.join(fpath, file)
+    compressed_file_path = os.path.join(fpath, compressed_file_name)
 
-        if file.endswith('.zip'):
-            unzip(file_path, fpath)
-        elif file.endswith('.rar'):
-            unrar(file_path, fpath)
+    if compressed_file_name.endswith('.zip'):
+        unzip(compressed_file_path, fpath)
+    elif compressed_file_name.endswith('.rar'):
+        unrar(compressed_file_path, fpath)
 
     # Rename and/or move subtitles
     rename_and_move_subtitle(args, fpath, parent_folder)
