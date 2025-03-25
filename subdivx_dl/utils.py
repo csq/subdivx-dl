@@ -361,6 +361,18 @@ def tv_show_subtitles(args, file_path, destination):
                 exit(0)
         index += 1
 
+def rename_file_extension(directory):
+    for filename in os.listdir(directory):
+        # Split filename into name and extension
+        name, ext = os.path.splitext(filename)
+
+        # Check if the file has a subtitle extension
+        if ext.lower() in SUBTITLE_EXTENSIONS:
+            # If the extension is upper-case, rename the file to lower-case
+            if ext.isupper():
+                new_filename = f'{name}{ext.lower()}'
+                os.rename(os.path.join(directory, filename), os.path.join(directory, new_filename))
+
 def rename_and_move_subtitle(args, file_path, destination):
     # Check flag --season
     if not args.season:
@@ -690,6 +702,9 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         unzip(compressed_file_path, fpath)
     elif compressed_file_name.endswith('.rar'):
         unrar(compressed_file_path, fpath)
+
+    # Rename file extension if necessary
+    rename_file_extension(fpath)
 
     # Rename and/or move subtitles
     rename_and_move_subtitle(args, fpath, parent_folder)
