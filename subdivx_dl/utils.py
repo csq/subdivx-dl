@@ -21,7 +21,7 @@ from rarfile import RarFile
 from guessit import guessit
 from subdivx_dl import helper
 
-SUBTITLE_EXTENSIONS = ('.srt', '.SRT', '.sub', '.ass', '.ssa', '.idx')
+SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
 DEFAULT_STYLE = 'pretty'
 
@@ -86,7 +86,7 @@ def unzip(zip_file_path, destination):
         with ZipFile(zip_file_path, 'r') as z:
             helper.logger.info(f'Unpacking zip [{os.path.basename(z.filename)}]')
             for file in z.namelist():
-                if file.endswith(SUBTITLE_EXTENSIONS):
+                if file.lower().endswith(SUBTITLE_EXTENSIONS):
                     helper.logger.info(f'Unzip [{os.path.basename(file)}]')
                     z.extract(file, destination)
     except Exception as e:
@@ -112,7 +112,7 @@ def unrar(rar_file_path, destination):
     rf = RarFile(rar_file_path)
 
     for file in rf.namelist():
-        if file.endswith(SUBTITLE_EXTENSIONS):
+        if file.lower().endswith(SUBTITLE_EXTENSIONS):
             helper.logger.info(f'Unrar [{os.path.basename(file)}]')
             rf.extract(file, destination)
     rf.close()
