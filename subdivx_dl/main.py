@@ -60,8 +60,7 @@ def main():
     if args.lines:
         result_limit = args.lines
     else:
-        base_limit = 2 if args.compact else 3 if args.alternative else 5 if args.style and args.style.endswith('grid') else 10
-        result_limit = base_limit + (1 if args.disable_help else 0)
+        result_limit = max_results_by_height(args)
 
     search_data = search_data[:result_limit]
 

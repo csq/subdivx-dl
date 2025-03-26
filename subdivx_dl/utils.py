@@ -32,6 +32,13 @@ def get_terminal_width():
     except OSError:
         return 80
 
+def get_terminal_height():
+    try:
+        terminal_size = shutil.get_terminal_size()
+        return terminal_size.lines
+    except OSError:
+        return 25
+
 def get_file_extension(file_path):
     with open(file_path, 'rb') as file:
         header = file.read(4)
@@ -561,6 +568,32 @@ def print_search_results(args, search_data):
             table_data, headers='firstrow', tablefmt=args.style or DEFAULT_STYLE, colalign=align, maxcolwidths=maxcolwidths
         )
     )
+
+def max_results_by_height(args):
+    terminal_height = get_terminal_height()
+
+    # Lines excluded (empty line, header and help messages)
+    min_lines_excluded = 8
+    max_lines_excluded = 10
+
+    # Default values
+    lines_to_exclude = min_lines_excluded if args.disable_help else max_lines_excluded
+    max_results = (terminal_height - lines_to_exclude)
+
+    if args.style:
+        if args.style in ['presto', 'simple', 'pipe', 'orgtbl']:
+            lines_to_exclude = 6 if args.disable_help else 9
+            max_results = (terminal_height - lines_to_exclude)
+        elif args.style.endswith('grid'):
+            single_line_height = 2
+            max_results = (terminal_height - lines_to_exclude) // single_line_height
+
+    if args.alternative:
+        max_results = 4 if args.disable_help else 3
+    elif args.compact:
+        max_results = 3 if args.disable_help else 2
+
+    return max_results
 
 def print_search_results_compact(args, search_data):
     terminal_width = get_terminal_width()
