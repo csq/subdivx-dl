@@ -233,140 +233,72 @@ def print_menu_content_dir(args, directory):
         # Return the file_name of the subtitle
         return file_names[0]
 
-def movie_subtitle(args, file_path, destination):
-    helper.logger.info(f'Move subtitle to {destination}')
+def rename_subtitle_file(source_file_path, dest_file_path):
+    try:
+        # Create destination directory if not exists
+        os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
 
-    file_name_select = print_menu_content_dir(args, file_path)
-    file_path_select = os.path.join(file_path, file_name_select)
+        # Move the file
+        shutil.move(source_file_path, dest_file_path)
+    except (PermissionError, FileExistsError) as error:
+        helper.logger.warning(f'Permissions issues on destination directory: {error}')
+        print(f'An error has occurred: {error}')
+        exit(0)
 
-    # Rename file
-    search_name, file_extension = os.path.splitext(args.SEARCH)
-    new_name = search_name.strip()
+def rename_and_move_subtitle(args, source_dir, dest_dir):
+    subtitle_files = [
+        file for file in os.listdir(source_dir)
+        if file.endswith(SUBTITLE_EXTENSIONS)
+    ]
 
-    # Get file extension of subtitle downloaded
-    subtitle_file_extension = os.path.splitext(file_path_select)[1]
+    for source_file in subtitle_files:
+        extension = os.path.splitext(source_file)[1]
+        num_subtitles = len(subtitle_files)
 
-    origin_name = os.path.basename(file_path_select)
+        if args.no_rename and not args.season:
+            if num_subtitles > 1:
+                selected_subtitle = print_menu_content_dir(args, source_dir)
+                source_file_path = os.path.join(source_dir, selected_subtitle)
+                dest_file_path = os.path.join(dest_dir, selected_subtitle)
 
-    if not args.no_rename:
-        new_name = os.path.join(destination, f'{new_name}{subtitle_file_extension}')
-
-        destination_name = os.path.basename(new_name)
-        helper.logger.info(f'Rename and move subtitle [{origin_name}] to [{destination_name}]')
-
-        destination_path = os.path.dirname(new_name)
-        os.makedirs(destination_path, exist_ok=True)
-
-        try:
-            shutil.copy(file_path_select, new_name)
-        except PermissionError:
-            if not args.verbose:
-                clear()
-                print(f'You do not have permissions to write to {destination_path}')
-            helper.logger.warning('Permissions issues on destination directory')
-            exit(0)
-
-    else:
-        new_name = os.path.join(destination, origin_name)
-        helper.logger.info(f'Just move subtitle [{origin_name}] to [{destination}]')
-
-        destination_path = os.path.dirname(new_name)
-        os.makedirs(destination_path, exist_ok=True)
-
-        try:
-            shutil.copy(file_path_select, new_name)
-        except PermissionError:
-            if not args.verbose:
-                clear()
-                print(f'You do not have permissions to write to {destination_path}')
-            helper.logger.warning('Permissions issues on destination directory')
-            exit(0)
-
-def tv_show_subtitles(args, file_path, destination):
-    helper.logger.info(f'Moves subtitles to {destination}')
-    files = os.listdir(file_path)
-
-    # TV series season and episode names
-    patternSeriesTv = r'(.*?)[.\ssS](\d{1,2})[eExX](\d{1,3}).*'
-
-    index = 0
-
-    while index < len(files):
-        file_origin = os.path.join(file_path, files[index])
-        subtitle_file_extension = os.path.splitext(files[index])[1]
-
-        if files[index].endswith(SUBTITLE_EXTENSIONS) and not args.no_rename:
-            result = re.search(patternSeriesTv, files[index])
-
-            try:
-                get_tv_show = result.group(1)
-                get_season = result.group(2)
-                get_episode = result.group(3)
-
-                series = get_tv_show
-                season = f'S{get_season}'
-                episode = f'E{get_episode}'
-
-                exclude = ['.', '-']
-                for i in exclude:
-                    series = series.replace(i, ' ')
-
-                # Remove double spaces and end space in name tv show
-                series = series.replace('  ', '').rstrip()
-
-                # Format name example:
-                # Series - S05E01.srt | S05E01.srt
-                if series != '':
-                    new_name = f'{series} - {season}{episode}{subtitle_file_extension}'
-                else:
-                    new_name = f'{season}{episode}{subtitle_file_extension}'
-
-            except Exception as e:
-                helper.logger.error(e)
-                file_destination = os.path.join(destination, files[index])
-                helper.logger.info(f'No match Regex: Just move subtitle [{files[index]}]')
-
-                os.makedirs(os.path.dirname(file_destination), exist_ok=True)
-
+                helper.logger.info(f'Move [{selected_subtitle}] to {dest_dir} as [{selected_subtitle}]')
+                rename_subtitle_file(source_file_path, dest_file_path)
+                break
+            elif num_subtitles == 1:
+                dest_file = source_file
+        elif args.no_rename and args.season:
+            dest_file = source_file
+        elif args.season:
+            subtitle_data = guessit(source_file)
+            if subtitle_data['type'] == 'episode':
+                series = subtitle_data.get('title', '')
+                season = f'S{subtitle_data["season"]:02d}'
                 try:
-                    shutil.copy(file_origin, file_destination)
-                except PermissionError:
-                    if not args.verbose:
-                        clear()
-                        print(f'Permission denied for writing to {os.path.dirname(file_destination)}')
-                    helper.logger.warning('Permissions issues on destination directory')
-                    exit(0)
+                    episode = f'E{subtitle_data["episode"]:02d}'
+                except (KeyError, ValueError):
+                    episode = f'E{subtitle_data["episode"][0]:02d}-E{subtitle_data["episode"][1]:02d}'
+                dest_file = f'{series} - {season}{episode}{extension}' if series else f'{season}{episode}{extension}'
             else:
-                file_destination = os.path.join(destination, new_name)
-                helper.logger.info(f'Move subtitle [{files[index]}] as [{new_name}]')
+                movie_name = subtitle_data['title']
+                year = subtitle_data['year']
+                dest_file = f'{movie_name} ({year}){extension}' if year else f'{movie_name}{extension}'
+        else:
+            dest_file = str(args.SEARCH).strip() + extension
 
-                os.makedirs(os.path.dirname(file_destination), exist_ok=True)
+            if num_subtitles > 1:
+                selected_subtitle = print_menu_content_dir(args, source_dir)
+                source_file_path = os.path.join(source_dir, selected_subtitle)
+                dest_file_path = os.path.join(dest_dir, dest_file)
 
-                try:
-                    shutil.copy(file_origin, file_destination)
-                except PermissionError:
-                    if not args.verbose:
-                        clear()
-                        print(f'You do not have permissions to write here {os.path.dirname(file_destination)}')
-                    helper.logger.warning('Permissions issues on destination directory')
-                    exit(0)
+                helper.logger.info(f'Move [{selected_subtitle}] to {dest_dir} as [{dest_file}]')
+                rename_subtitle_file(source_file_path, dest_file_path)
+                break
 
-        # Move (rename same name for override) files without rename if flag --no-rename is True
-        elif files[index].endswith(SUBTITLE_EXTENSIONS):
-            file_destination = os.path.join(destination, files[index])
-            helper.logger.info(f'Move subtitle [{files[index]}] to [{destination}]')
+        source_file_path = os.path.join(source_dir, source_file)
+        dest_file_path = os.path.join(dest_dir, dest_file)
 
-            os.makedirs(os.path.dirname(file_destination), exist_ok=True)
-
-            try:
-                shutil.copy(file_origin, file_destination)
-            except PermissionError:
-                if not args.verbose:
-                    clear()
-                    print(f'You do not have permissions to write here {os.path.dirname(file_destination)}')
-                helper.logger.warning('Permissions issues on destination directory')
-                exit(0)
-        index += 1
+        helper.logger.info(f'Move [{source_file}] to {dest_dir} as [{dest_file}]')
+        rename_subtitle_file(source_file_path, dest_file_path)
 
 def rename_file_extension(directory):
     for filename in os.listdir(directory):
@@ -379,15 +311,6 @@ def rename_file_extension(directory):
             if ext.isupper():
                 new_filename = f'{name}{ext.lower()}'
                 os.rename(os.path.join(directory, filename), os.path.join(directory, new_filename))
-
-def rename_and_move_subtitle(args, file_path, destination):
-    # Check flag --season
-    if not args.season:
-        # Rename single srt
-        movie_subtitle(args, file_path, destination)
-    else:
-        # Move and rename bulk srt
-        tv_show_subtitles(args, file_path, destination)
 
 def get_data_page(args, poolManager, url, data_session, search):
     clear()
