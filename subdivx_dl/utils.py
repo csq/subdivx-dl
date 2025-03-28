@@ -100,19 +100,19 @@ def unzip(zip_file_path, destination):
         helper.logger.error('Failed to unzip file')
         print(f'Failed to unzip file: error {e}')
         exit(1)
-    else:
-        move_all_to_parent_folder(destination)
 
 def move_all_to_parent_folder(directory):
-    for (root, dirs, files) in os.walk(directory, topdown=True):
-        for d in dirs:
-            if d != '__MACOSX':
-                subfolder = os.path.join(directory, dirs[0])
-                for (root, dirs, files) in os.walk(subfolder, topdown=True):
-                    for name in files:
-                        source_path = os.path.join(root, name)
-                        destination_path = os.path.join(directory, name)
-                        shutil.copy(source_path, destination_path)
+    for root, dirs, files in os.walk(directory, topdown=True):
+        for dir_ in dirs:
+            if dir_ != '__MACOSX':
+                subfolder = os.path.join(root, dir_)
+                for _, _, filenames in os.walk(subfolder, topdown=True):
+                    for filename in filenames:
+                        file_path = os.path.join(subfolder, filename)
+                        ext = os.path.splitext(filename)[1].lower()
+                        if ext in SUBTITLE_EXTENSIONS:
+                            dest_path = os.path.join(directory, filename)
+                            os.rename(file_path, dest_path)
 
 def unrar(rar_file_path, destination):
     helper.logger.info(f'Unpacking rar [{os.path.basename(rar_file_path)}] in {destination}')
@@ -658,6 +658,9 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         unzip(compressed_file_path, fpath)
     elif compressed_file_name.endswith('.rar'):
         unrar(compressed_file_path, fpath)
+
+    # Move all files from any subdirectories to the parent folder
+    move_all_to_parent_folder(fpath)
 
     # Rename file extension if necessary
     rename_file_extension(fpath)
