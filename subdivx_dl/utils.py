@@ -88,14 +88,14 @@ def download_file(poolManager, url, id_subtitle, location):
             helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
             exit(1)
 
-def unzip(zip_file_path, destination):
+def unzip(zip_file_path, dest_dir):
     try:
         with ZipFile(zip_file_path, 'r') as z:
             helper.logger.info(f'Unpacking zip [{os.path.basename(z.filename)}]')
             for file in z.namelist():
                 if file.lower().endswith(SUBTITLE_EXTENSIONS):
                     helper.logger.info(f'Unzip [{os.path.basename(file)}]')
-                    z.extract(file, destination)
+                    z.extract(file, dest_dir)
     except Exception as e:
         helper.logger.error('Failed to unzip file')
         print(f'Failed to unzip file: error {e}')
@@ -114,14 +114,14 @@ def move_all_to_parent_folder(directory):
                             dest_path = os.path.join(directory, filename)
                             os.rename(file_path, dest_path)
 
-def unrar(rar_file_path, destination):
-    helper.logger.info(f'Unpacking rar [{os.path.basename(rar_file_path)}] in {destination}')
+def unrar(rar_file_path, dest_dir):
+    helper.logger.info(f'Unpacking rar [{os.path.basename(rar_file_path)}] in {dest_dir}')
     rf = RarFile(rar_file_path)
 
     for file in rf.namelist():
         if file.lower().endswith(SUBTITLE_EXTENSIONS):
             helper.logger.info(f'Unrar [{os.path.basename(file)}]')
-            rf.extract(file, destination)
+            rf.extract(file, dest_dir)
     rf.close()
 
 def get_attribute_weights():
