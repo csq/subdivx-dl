@@ -49,9 +49,8 @@ def main():
     # Get all data from search
     search_data = get_data_page(args, https, SUBDIVX_URL, data_session, FIND_SUBTITLE)
 
-    # Sorting data if flag is set
-    if args.order_by_downloads or args.order_by_dates:
-        search_data = sort_data(args, search_data)
+    # Sorting data if needed
+    search_data = sort_data(args, search_data)
 
     # Save a copy of the original data
     search_data_complete = search_data

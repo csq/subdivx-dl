@@ -366,7 +366,7 @@ def sort_data(args, data):
     if args.order_by_downloads:
         return sorted(data, key=lambda item: item['downloads'], reverse=True)
     elif args.order_by_dates:
-        sorted_data = sorted(
+        return sorted(
             data,
             key=lambda item: (
                 datetime.strptime(item['upload_date'], '%d/%m/%Y'
@@ -374,7 +374,8 @@ def sort_data(args, data):
             ),
             reverse=True
         )
-        return sorted_data
+    else:
+        return data
 
 def parse_date(date):
     try:
