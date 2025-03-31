@@ -90,27 +90,27 @@ config_group.add_argument('-lc', '--load-config', help='load configuration', act
 # Create and configure logger
 logger = logging.getLogger(__name__)
 
+def configure_logger(level: str, format_str: str, save_to_file: bool) -> None:
+    log_name = 'subdivx-dl.log'
+
+    kwargs = {
+        "level": getattr(logging, level.upper()),
+        "format": format_str,
+        "datefmt": "%d/%m/%y %H:%M:%S",
+    }
+    if save_to_file:
+        kwargs["filename"] = os.path.join(tempfile.gettempdir(), log_name)
+        kwargs["filemode"] = "w"
+        kwargs["encoding"] = "utf-8"
+    logging.basicConfig(**kwargs)
+
+# Format string
 fullfmt = '[%(asctime)s] |%(levelname)s| %(message)s'
 compactfmt = '|%(levelname)s| %(message)s'
-
-datefmt = '%d/%m/%y %H:%M:%S'
-
-# Get the temporary directory
-temp_dir = tempfile.gettempdir()
-
-# Choose appropriate file path based on the platform
-log_file = os.path.join(temp_dir, 'subdivx-dl.log')
 
 args = parser.parse_args()
 
 if args.verbose:
-    logging.basicConfig(level=logging.INFO, format=compactfmt)
+    configure_logger(level='info', format_str=compactfmt, save_to_file=False)
 else:
-    logging.basicConfig(
-        filename=log_file,
-        filemode='w',
-        encoding='utf-8',
-        level=logging.INFO,
-        format=fullfmt,
-        datefmt=datefmt
-    )
+    configure_logger(level='info', format_str=fullfmt, save_to_file=True)
