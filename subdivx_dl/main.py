@@ -56,10 +56,7 @@ def main():
     search_data_complete = search_data
 
     # Limit the number of results displayed based on the user's preference
-    if args.lines:
-        result_limit = args.lines
-    else:
-        result_limit = max_results_by_height(args)
+    result_limit = max_results_by_height(args) if args.lines is None else args.lines
 
     search_data = search_data[:result_limit]
 
