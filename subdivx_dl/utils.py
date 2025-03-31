@@ -101,14 +101,14 @@ def unzip(zip_file_path, dest_dir):
         print(f'Failed to unzip file: error {e}')
         exit(1)
 
-def move_all_to_parent_folder(directory):
+def move_all_to_parent_directory(directory):
     for root, dirs, files in os.walk(directory, topdown=True):
         for dir_ in dirs:
             if dir_ != '__MACOSX':
-                subfolder = os.path.join(root, dir_)
-                for _, _, filenames in os.walk(subfolder, topdown=True):
+                subdirectory = os.path.join(root, dir_)
+                for _, _, filenames in os.walk(subdirectory, topdown=True):
                     for filename in filenames:
-                        file_path = os.path.join(subfolder, filename)
+                        file_path = os.path.join(subdirectory, filename)
                         ext = os.path.splitext(filename)[1].lower()
                         if ext in SUBTITLE_EXTENSIONS:
                             dest_path = os.path.join(directory, filename)
@@ -217,7 +217,7 @@ def print_menu_content_dir(args, directory):
                 delay(0)
                 continue
             elif selection == -1:
-                # Remove temp folder
+                # Remove temp directory
                 try:
                     shutil.rmtree(directory)
                     helper.logger.info(f'Delete temporal directory {directory}')
@@ -635,9 +635,9 @@ def get_subtitle(args, poolManager, url, id_subtitle):
 
     # Determinate final path for subtitle
     if LOCATION_DESTINATION is None:
-        parent_folder = os.getcwd()
+        parent_directory = os.getcwd()
     else:
-        parent_folder = LOCATION_DESTINATION
+        parent_directory = LOCATION_DESTINATION
 
     # Get name of compressed file downloaded
     try:
@@ -659,16 +659,16 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     elif compressed_file_name.endswith('.rar'):
         unrar(compressed_file_path, fpath)
 
-    # Move all files from any subdirectories to the parent folder
-    move_all_to_parent_folder(fpath)
+    # Move all files from any subdirectories to the parent directory
+    move_all_to_parent_directory(fpath)
 
     # Rename file extension if necessary
     rename_file_extension(fpath)
 
     # Rename and/or move subtitles
-    rename_and_move_subtitle(args, fpath, parent_folder)
+    rename_and_move_subtitle(args, fpath, parent_directory)
 
-    # Remove temp folder
+    # Remove temp directory
     try:
         temp_dir.cleanup()
         helper.logger.info(f'Delete temporal directory {fpath}')
