@@ -337,9 +337,8 @@ def get_data_page(args, poolManager, url, data_session, search):
         data = json.loads(response.data).get('aaData')
     except JSONDecodeError:
         clear()
-        print('Failed to parse response')
+        print('Failed to parse response\nPlease try again')
         DataClient().delete_data()
-        print('Please try again')
         helper.logger.error('Failed to parse response, delete data session')
         exit(0)
 
