@@ -96,7 +96,8 @@ def main():
             # Show the pagination
             page_info = get_pagination_info(search_data_complete_size, block_size, current_index)
             page_info_format = f'[{page_info["current_page"]}/{page_info["total_pages"]}]'
-            print(page_info_format.center(get_terminal_width()))
+            terminal_width, _ = get_terminal_size()
+            print(page_info_format.center(terminal_width))
 
             user_input = prompt_user_selection(args, 'pagination')
         else:

@@ -25,19 +25,12 @@ SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
 DEFAULT_STYLE = 'pretty'
 
-def get_terminal_width():
+def get_terminal_size():
     try:
         terminal_size = shutil.get_terminal_size()
-        return terminal_size.columns
+        return terminal_size.columns, terminal_size.lines
     except OSError:
-        return 80
-
-def get_terminal_height():
-    try:
-        terminal_size = shutil.get_terminal_size()
-        return terminal_size.lines
-    except OSError:
-        return 25
+        return 80, 25
 
 def get_file_extension(file_path):
     with open(file_path, 'rb') as file:
@@ -439,7 +432,7 @@ def get_style_column_name(args):
         return 'Downloads'.ljust(11)
 
 def print_search_results(args, search_data):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
 
     maxcolwidths = []
 
@@ -491,7 +484,7 @@ def print_search_results(args, search_data):
     )
 
 def max_results_by_height(args):
-    terminal_height = get_terminal_height()
+    _, terminal_height = get_terminal_size()
 
     # Lines excluded (empty line, header and help messages)
     min_lines_excluded = 8
@@ -517,7 +510,7 @@ def max_results_by_height(args):
     return max_results
 
 def print_search_results_compact(args, search_data):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
 
     table_data = []
 
@@ -542,7 +535,7 @@ def print_search_results_compact(args, search_data):
         table_data.clear()
 
 def print_centered(args, text, end=None):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
 
     if args.style in ['simple', 'presto']:
         first_line_length = len(text.splitlines()[1])
@@ -565,8 +558,7 @@ def shorten_text(text, width):
     return textwrap.shorten(text, width=width, placeholder=placeholder)
 
 def print_center_text(text):
-    terminal_width = get_terminal_width()
-    terminal_height = get_terminal_height()
+    terminal_width, terminal_height = get_terminal_size()
 
     padding = '\n' * ((terminal_height // 2) - 5)
 
@@ -590,7 +582,7 @@ def filter_text(text):
     return text
 
 def print_description(args, selection, search_data):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
     description = search_data[selection]['description'].strip()
 
     description_table = [['Description'.center(terminal_width - 8)], [description]]
@@ -607,7 +599,7 @@ def print_description(args, selection, search_data):
     )
 
 def print_summary(args, selection, search_data):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
 
     summary = []
 
@@ -795,7 +787,7 @@ def get_best_match(args, search_data):
         return id_subtitle
 
 def print_comments(args, comments):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
 
     table = [['N°', 'Comment'.center(terminal_width - 15)]]
     for index, comment_text in enumerate(comments, start=1):
@@ -844,7 +836,8 @@ def paginate_comments(args, comments_list, block_size=10, selection=None, descri
 
         print_comments(args, page_comments)
         page_info_format = f'[{current_page}/{total_pages}]'
-        print(page_info_format.center(get_terminal_width()))
+        terminal_width, _ = get_terminal_size()
+        print(page_info_format.center(terminal_width))
 
         if total_pages > 1:
             user_input = prompt_user_selection(args, 'comments')
@@ -872,7 +865,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'download', 'pagination']):
-    terminal_width = get_terminal_width()
+    terminal_width, _ = get_terminal_size()
     padding = ' ' * ((terminal_width // 2) - 6)
 
     main_menu = '[1-9] Select [ 0 ] Exit'.center(terminal_width)
