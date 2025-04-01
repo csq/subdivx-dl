@@ -208,13 +208,11 @@ def print_menu_content_dir(args, directory):
                 selection = int(user_input) - 1
                 file_name = header[selection + 1][1]
             except (ValueError, IndexError):
-                print('\nInput valid numbers')
-                delay(0)
+                print_center_text('Input valid numbers')
                 continue
 
             if selection < -1:
-                print('\nInput only positive numbers')
-                delay(0)
+                print_center_text('Input only positive numbers')
                 continue
             elif selection == -1:
                 # Remove temp directory
@@ -566,6 +564,16 @@ def shorten_text(text, width):
 
     return textwrap.shorten(text, width=width, placeholder=placeholder)
 
+def print_center_text(text):
+    terminal_width = get_terminal_width()
+    terminal_height = get_terminal_height()
+
+    padding = '\n' * ((terminal_height // 2) - 5)
+
+    clear()
+    print(padding + text.center(terminal_width))
+    time.sleep(0.5)
+
 def filter_text(text):
     # Remove HTML tags from the text
     text = re.sub(r'<[^>]+>', '', text)
@@ -887,10 +895,6 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
         exit(1)
 
     return user_input
-
-def delay(factor=2):
-    delay = 2 ** factor
-    time.sleep(delay)
 
 def get_random_revision():
     return f'13{random.randrange(8)}.0' # 130.0 - 137.0

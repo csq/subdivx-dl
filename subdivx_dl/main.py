@@ -116,15 +116,13 @@ def main():
                 if current_index < 0:
                     current_index = 0
             else:
-                print('\nInput only numbers')
-                delay(0)
+                print_center_text('Input only numbers')
                 continue
             clear()
             continue
 
         if selection < -1:
-            print('\nInput only positive numbers')
-            delay(0)
+            print_center_text('Input only positive numbers')
             continue
         elif selection == -1:
             clear()
@@ -159,13 +157,11 @@ def main():
         try:
             select_action = int(user_input)
         except ValueError:
-            print('\nInput only numbers')
-            delay(0)
+            print_center_text('Input only numbers')
             continue
 
         if select_action > 1 or select_action <= -1:
-            print('\nInput valid numbers')
-            delay(0)
+            print_center_text('Input valid numbers')
             continue
         elif select_action == 1:
             clear()
