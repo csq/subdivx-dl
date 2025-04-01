@@ -893,8 +893,7 @@ def delay(factor=2):
     time.sleep(delay)
 
 def get_random_revision():
-    revision = f'13{random.randrange(7)}.0' # 130.0 - 136.0
-    return revision
+    return f'13{random.randrange(8)}.0' # 130.0 - 137.0
 
 def https_request(https, method, url, **kwargs):
     try:
