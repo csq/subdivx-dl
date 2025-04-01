@@ -26,11 +26,11 @@ class VersionChecker():
     def check_version(self):
         latest_version = self.get_latest_version()
         if latest_version > self.version:
-            return f'New version available: {latest_version}'
+            print(f'New version available: {latest_version}')
         else:
-            return 'Using the latest version'
+            print('Using the latest version')
 
 def run_check_version():
     checker = VersionChecker()
-    print('Installed version:', checker.version)
-    print(checker.check_version())
+    print(f'Installed version: {checker.version}')
+    checker.check_version()
