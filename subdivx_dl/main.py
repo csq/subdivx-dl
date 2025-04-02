@@ -52,37 +52,35 @@ def main():
     # Sorting data if needed
     search_data = sort_data(args, search_data)
 
-    # Save a copy of the original data
-    search_data_complete = search_data
-
     # Limit the number of results displayed based on the user's preference
     result_limit = max_results_by_height(args) if args.lines is None else args.lines
 
-    search_data = search_data[:result_limit]
-
     # Checking flag for switch to fast download mode
     if args.fast:
-        id_subtitle = get_best_match(args, search_data_complete)
+        id_subtitle = get_best_match(args, search_data)
         get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
         exit(0)
 
+    # Size of the data
+    search_data_size = len(search_data)
+
     # Initialize cache for comments
     if args.comments:
-        cache_comments = TTLCache(capacity=len(search_data), ttl=120)
+        cache_comments = TTLCache(capacity=search_data_size, ttl=120)
 
     # Pagination
     current_index = 0
-    block_size = (result_limit if args.lines is None else args.lines)
+    block_size = result_limit if args.lines is None else args.lines
 
-    # Get the size of the complete data
-    search_data_complete_size = len(search_data_complete)
+    # Copy data
+    search_data_copy = search_data[:]
 
     while True:
         # Clear screen
         clear()
 
         # Slice data
-        search_data = search_data_complete[current_index:current_index + block_size]
+        search_data = search_data_copy[current_index:current_index + block_size]
 
         # Show Search Results
         if args.compact:
@@ -91,10 +89,10 @@ def main():
             print_search_results(args, search_data)
 
         # Get the user selection
-        if search_data_complete_size > block_size:
+        if search_data_size > block_size:
 
             # Show the pagination
-            page_info = get_pagination_info(search_data_complete_size, block_size, current_index)
+            page_info = get_pagination_info(search_data_size, block_size, current_index)
             page_info_format = f'[{page_info["current_page"]}/{page_info["total_pages"]}]'
             terminal_width, _ = get_terminal_size()
             print(page_info_format.center(terminal_width))
@@ -108,9 +106,9 @@ def main():
             id_subtitle = str(search_data[selection]['id_subtitle'])
         except (ValueError, IndexError):
             if user_input.lower() == 'n':
-                if current_index >= search_data_complete_size:
-                    current_index = search_data_complete_size - block_size
-                elif current_index + block_size < search_data_complete_size:
+                if current_index >= search_data_size:
+                    current_index = search_data_size - block_size
+                elif current_index + block_size < search_data_size:
                     current_index += block_size
             elif user_input.lower() == 'p':
                 current_index -= block_size
