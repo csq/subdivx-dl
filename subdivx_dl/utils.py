@@ -77,7 +77,7 @@ def download_file(poolManager, url, id_subtitle, location):
                 success = False
 
         if not success:
-            print(f'No subtitles were downloaded because the link is broken')
+            print('No subtitles were downloaded because the link is broken')
             helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
             exit(1)
 
@@ -622,58 +622,37 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
         print('Working...', end='\r')
 
-    # Check flag --location
-    LOCATION_DESTINATION = args.location
-
     # Create temporal directory
-    temp_dir = tempfile.TemporaryDirectory()
-    fpath = temp_dir.name
-    helper.logger.info(f'Create temporal directory {fpath}')
+    with tempfile.TemporaryDirectory() as temp_dir:
+        helper.logger.info(f'Create temporal directory {temp_dir}')
 
-    # Download zip/rar in temporal directory
-    download_file(poolManager, url, id_subtitle, fpath)
+        # Download zip/rar in temporal directory
+        download_file(poolManager, url, id_subtitle, temp_dir)
 
-    # Determinate final path for subtitle
-    if LOCATION_DESTINATION is None:
-        parent_directory = os.getcwd()
-    else:
-        parent_directory = LOCATION_DESTINATION
+        # Get file name and path
+        file_name = os.listdir(temp_dir)[0]
+        file_path = os.path.join(temp_dir, file_name)
 
-    # Get name of compressed file downloaded
-    try:
-        compressed_file_name = os.listdir(fpath)[0]
-    except IndexError:
-        helper.logger.error('No file returned from server')
-        temp_dir.cleanup()
+        # Extract zip/rar
+        if file_path.endswith('.zip'):
+            unzip(file_path, temp_dir)
+        elif file_path.endswith('.rar'):
+            unrar(file_path, temp_dir)
 
-        if not args.verbose:
-            clear()
-            print('Subtitle not found because server is missing the file')
-        exit(0)
+        # Move all files from any subdirectories to the parent directory
+        move_all_to_parent_directory(temp_dir)
 
-    # Extract zip/rar file
-    compressed_file_path = os.path.join(fpath, compressed_file_name)
+        # Rename file extension if necessary
+        rename_file_extension(temp_dir)
 
-    if compressed_file_name.endswith('.zip'):
-        unzip(compressed_file_path, fpath)
-    elif compressed_file_name.endswith('.rar'):
-        unrar(compressed_file_path, fpath)
+        # Get destination directory
+        dest_dir = args.location or os.getcwd()
 
-    # Move all files from any subdirectories to the parent directory
-    move_all_to_parent_directory(fpath)
+        # Rename and/or move subtitles
+        rename_and_move_subtitle(args, temp_dir, dest_dir)
 
-    # Rename file extension if necessary
-    rename_file_extension(fpath)
-
-    # Rename and/or move subtitles
-    rename_and_move_subtitle(args, fpath, parent_directory)
-
-    # Remove temp directory
-    try:
-        temp_dir.cleanup()
-        helper.logger.info(f'Delete temporal directory {fpath}')
-    except OSError as error:
-        helper.logger.error(error)
+    # Message for user
+    helper.logger.info(f'Delete temporal directory {temp_dir}')
 
     if not args.verbose:
         clear()
