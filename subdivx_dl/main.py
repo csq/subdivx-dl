@@ -9,7 +9,7 @@ from .utils import *
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
 args = helper.parser.parse_args()
-FIND_SUBTITLE = parse_user_input(args.SEARCH)
+SEARCH_TERM = parse_user_input(args.SEARCH)
 
 rev = get_random_revision()
 
@@ -47,7 +47,7 @@ else:
 
 def main():
     # Get all data from search
-    search_data = get_data_page(args, https, SUBDIVX_URL, data_session, FIND_SUBTITLE)
+    search_data = get_data_page(args, https, SUBDIVX_URL, data_session, SEARCH_TERM)
 
     # Sorting data if needed
     search_data = sort_data(args, search_data)
