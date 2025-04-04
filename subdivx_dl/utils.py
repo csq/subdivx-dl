@@ -73,13 +73,11 @@ def download_file(poolManager, url, id_subtitle, location):
 
                 success = True
                 break
-            else:
-                success = False
 
-        if not success:
-            print('No subtitles were downloaded because the link is broken')
-            helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
-            exit(1)
+    if not success:
+        print('No subtitles were downloaded because the link is broken')
+        helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
+        exit(1)
 
 def unzip(zip_file_path, dest_dir):
     try:
