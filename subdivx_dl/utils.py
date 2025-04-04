@@ -307,8 +307,6 @@ def get_data_page(args, poolManager, url, data_session, search):
 
     query = parse_search_query(search)
 
-    url = f'{url}inc/ajax.php'
-
     payload = {
         'tabla': 'resultados',
         'filtros': '',
@@ -317,19 +315,11 @@ def get_data_page(args, poolManager, url, data_session, search):
     }
 
     helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
+    response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
+
+    data = json.loads(response.data).get('aaData')
 
     search_results = []
-
-    response = https_request(poolManager, 'POST', url=url, fields=payload)
-
-    try:
-        data = json.loads(response.data).get('aaData')
-    except JSONDecodeError:
-        clear()
-        print('Failed to parse response\nPlease try again')
-        DataClient().delete_data()
-        helper.logger.error('Failed to parse response, delete data session')
-        exit(0)
 
     for result in data:
         subtitle = {
@@ -885,6 +875,7 @@ def https_request(https, method, url, **kwargs):
     except Exception as e:
         print(f'An Error occurred: {e}')
         helper.logger.error(f'{e}')
+        DataClient().delete_data()
         exit(1)
 
     return response
@@ -986,6 +977,7 @@ class DataClient():
             return self._data
 
     def delete_data(self):
+        helper.logger.info('Delete data session')
         if self.does_data_exist():
             os.remove(self._PATH_DATA)
 
