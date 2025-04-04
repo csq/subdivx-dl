@@ -85,7 +85,7 @@ def unzip(zip_file_path, dest_dir):
             helper.logger.info(f'Unpacking zip [{os.path.basename(z.filename)}]')
             for file in z.namelist():
                 if file.lower().endswith(SUBTITLE_EXTENSIONS):
-                    helper.logger.info(f'Unzip [{os.path.basename(file)}]')
+                    helper.logger.info(f'Unzip [{file}]')
                     z.extract(file, dest_dir)
     except Exception as e:
         helper.logger.error('Failed to unzip file')
@@ -111,7 +111,7 @@ def unrar(rar_file_path, dest_dir):
 
     for file in rf.namelist():
         if file.lower().endswith(SUBTITLE_EXTENSIONS):
-            helper.logger.info(f'Unrar [{os.path.basename(file)}]')
+            helper.logger.info(f'Unrar [{file}]')
             rf.extract(file, dest_dir)
     rf.close()
 
