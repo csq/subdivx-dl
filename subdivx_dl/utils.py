@@ -11,8 +11,7 @@ import tempfile
 import textwrap
 import platform
 
-from json import JSONDecodeError
-from urllib3.exceptions import ProtocolError, MaxRetryError, TimeoutError
+from urllib3.exceptions import MaxRetryError, TimeoutError
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
@@ -397,16 +396,10 @@ def get_comments(poolManager, url, subtitle_id):
         'getComentarios': subtitle_id
     }
 
-    url = f'{url}inc/ajax.php'
+    response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
+    comments_data = json.loads(response.data).get('aaData', [])
 
-    try:
-        response = poolManager.request('POST', url=url, fields=payload)
-        comments_data = json.loads(response.data).get('aaData', [])
-        helper.logger.info('Downloaded comments')
-    except (ProtocolError, JSONDecodeError):
-        helper.logger.error('Failed to parse response')
-        return []
-
+    helper.logger.info(f'Comments downloaded: {len(comments_data)}')
     comments = [filter_text(comment['comentario']) for comment in comments_data]
 
     return comments
