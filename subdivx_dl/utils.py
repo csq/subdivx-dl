@@ -49,8 +49,6 @@ def get_file_extension(file_path):
 def download_file(poolManager, url, id_subtitle, location):
     helper.logger.info(f'Downloading archive from: {url}{id_subtitle} in {location}')
 
-    success = False
-
     with NamedTemporaryFile(dir=location, delete=False) as temp_file:
         for i in range(9, 0, -1):
             server_address = f'{url}sub{i}/{id_subtitle}'
@@ -69,14 +67,11 @@ def download_file(poolManager, url, id_subtitle, location):
 
                 temp_file_new_name = f'{temp_file.name}{file_extension}'
                 os.rename(temp_file.name, temp_file_new_name)
-
-                success = True
                 break
-
-    if not success:
-        print('No subtitles were downloaded because the link is broken')
-        helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
-        exit(1)
+            elif i == 1:
+                print('No subtitles were downloaded because the link is broken')
+                helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
+                exit(1)
 
 def unzip(zip_file_path, dest_dir):
     try:
