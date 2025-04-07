@@ -124,7 +124,7 @@ def get_attribute_weights():
 def select_best_subtitle_from_list(args, data):
     helper.logger.info('Selecting the best subtitle from the list')
 
-    key_values = guessit(args.SEARCH)
+    key_values = GuessitInfo(args.SEARCH).get_info()
     normalized_key_values = normalize_key_values(key_values)
 
     weights = get_attribute_weights()
@@ -366,7 +366,7 @@ def parse_user_input(input):
 
 def parse_search_query(search):
     try:
-        result = guessit(search)
+        result = GuessitInfo(search).get_info()
         file_type = result['type']
         title = result['title']
         year = result.get('year', '')
@@ -659,7 +659,7 @@ def get_best_match(args, search_data):
     id_subtitle = search_data[0]['id_subtitle']
     id_secondary_subtitle = ''
 
-    key_values = guessit(args.SEARCH)
+    key_values =  GuessitInfo(args.SEARCH).get_info()
     normalized_key_values = normalize_key_values(key_values)
 
     weights = get_attribute_weights()
@@ -1149,3 +1149,20 @@ class TTLCache:
             oldest = min(self.timestamps, key=self.timestamps.get)
             del self.cache[oldest]
             del self.timestamps[oldest]
+
+# -- Class GuessitInfo -- #
+class GuessitInfo:
+    _instance = None
+    _SHARED_INFO = None
+
+    def __new__(cls, search_term):
+        if not cls._instance:
+            cls._instance = super(GuessitInfo, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, search_term):
+        if self._SHARED_INFO is None:
+            self._SHARED_INFO = guessit(search_term)
+
+    def get_info(self):
+        return self._SHARED_INFO
