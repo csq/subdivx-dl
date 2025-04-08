@@ -129,13 +129,10 @@ def select_best_subtitle_from_list(args, data):
 
     weights = get_attribute_weights()
 
+    file_name = data[1][1]
+
     max_score = 0
-
-    file_name = ''
-    first_file = data[1][1]
-
     for i in range(1, len(data)):
-        # Search match text with name of subtitle
         score = 0
         for key in weights.keys():
             try:
@@ -153,12 +150,8 @@ def select_best_subtitle_from_list(args, data):
             file_name = data[i][1]
             helper.logger.info(f'New best match with score {max_score:.2f} in subtitle [{i}]')
 
-    if max_score > 0:
-        helper.logger.info(f'The best matching subtitle has been selected with a score {max_score:.2f}')
-        return file_name
-    else:
-        helper.logger.info('The first available subtitle has been selected')
-        return first_file
+    helper.logger.info(f'The best matching subtitle has been selected with a score {max_score:.2f}')
+    return file_name
 
 def print_menu_content_dir(args, directory):
     header = [['N°', 'File name']]
