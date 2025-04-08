@@ -677,8 +677,14 @@ def get_best_match(args, search_data):
         alternative_title = key_values.get('alternative_title', '').replace('aka', '').strip()
         alt_title = (f'{alternative_title} ({key_values.get("year")})' if alternative_title else key_values.get('title')).strip()
 
+    title_values = None
+    previous_title = None
+
     for subtitle in search_data:
-        title_values = guessit(subtitle['title'])
+        subtitle_title = subtitle['title'].lower()
+        if subtitle_title != previous_title:
+            previous_title = subtitle_title
+            title_values = guessit(subtitle_title)
 
         if key_values['type'] == 'episode':
             try:
