@@ -259,7 +259,7 @@ def rename_and_move_subtitle(args, source_dir, dest_dir):
                 year = subtitle_data['year']
                 dest_file = f'{movie_name} ({year}){extension}' if year else f'{movie_name}{extension}'
         else:
-            dest_file = str(args.SEARCH).strip() + extension
+            dest_file = os.path.splitext(args.SEARCH)[0].strip() + extension
 
             if num_subtitles > 1:
                 selected_subtitle = print_menu_content_dir(args, source_dir)
