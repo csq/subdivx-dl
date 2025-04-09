@@ -115,7 +115,7 @@ def main():
                 if current_index < 0:
                     current_index = 0
             else:
-                print_center_text('Input only numbers')
+                print_center_text('Input only valid numbers')
                 continue
             clear()
             continue
