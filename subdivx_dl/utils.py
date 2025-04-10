@@ -111,8 +111,9 @@ def unrar(rar_file_path, dest_dir):
 
 def get_attribute_weights():
     attribute_weights = {
-        'source': 0.5,         # 50% importance
-        'release_group': 0.25, # 25% importance
+        'edition': 0.4,        # 40% importance
+        'source': 0.2,         # 20% importance
+        'release_group': 0.15, # 15% importance
         'screen_size': 0.1,    # 10% importance
         'video_codec': 0.05,   #  5% importance
         'size': 0.05,          #  5% importance
@@ -645,21 +646,17 @@ def normalize_key_values(key_values):
     if other:
         key_values['other'] = ' '.join(other)
 
+    edition = key_values.get('edition')
+    if edition:
+        key_values['edition'] = edition.replace('Director\'s', 'Directors')
+
     return key_values
 
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
-    id_subtitle = search_data[0]['id_subtitle']
-    id_secondary_subtitle = ''
-
     key_values =  GuessitInfo(args.SEARCH).get_info()
     normalized_key_values = normalize_key_values(key_values)
-
-    weights = get_attribute_weights()
-
-    max_score = 0
-    max_similarity_percentage = 0.8
 
     # Format the title based on the user input
     if key_values['type'] == 'episode':
@@ -670,6 +667,11 @@ def get_best_match(args, search_data):
         title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
         alternative_title = key_values.get('alternative_title', '').replace('aka', '').strip()
         alt_title = (f'{alternative_title} ({key_values.get("year")})' if alternative_title else key_values.get('title')).strip()
+
+    id_subtitle = search_data[0]['id_subtitle']
+    weights = get_attribute_weights()
+
+    max_score = 0
 
     title_values = None
     previous_title = None
@@ -695,26 +697,19 @@ def get_best_match(args, search_data):
             alternative_title = title_values.get('alternative_title', '').replace('aka', '').strip()
             alt_title_filtered = (f'{alternative_title} ({title_values.get("year")})' if alternative_title else title_values.get('title')).strip()
 
-        main_title_lower = title_filtered.lower()
-        alt_title_lower = alt_title_filtered.lower()
-
-        if (title.lower() == main_title_lower or
-            title.lower() == alt_title_lower or
-            alt_title.lower() == main_title_lower or
-            alt_title.lower() == alt_title_lower):
-            id_secondary_subtitle = subtitle['id_subtitle']
-
-            score = 0
+        if (title.lower() == title_filtered.lower() or
+            title.lower() == alt_title_filtered.lower() or
+            alt_title.lower() == title_filtered.lower() or
+            alt_title.lower() == alt_title_filtered.lower()):
+            id_subtitle = subtitle['id_subtitle'] if max_score == 0 else id_subtitle
 
             # Search for match in description
+            subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
+            subtitle_description = subtitle_description.replace('director\'s', 'directors')
+
+            score = 0
             for key in weights.keys():
                 try:
-                    subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
-
-                    # If the edition is found in the subtitle description, consider it as the best match
-                    if key_values.get('edition') and key_values['edition'].lower() in subtitle_description:
-                        id_subtitle = subtitle['id_subtitle']
-
                     attribute = normalized_key_values[key].lower()
 
                     if attribute in subtitle_description:
@@ -726,20 +721,10 @@ def get_best_match(args, search_data):
             if max_score < score:
                 max_score = score
                 id_subtitle = subtitle['id_subtitle']
-                helper.logger.info(f'New best match with score {max_score:.2f} is subtitle [{id_subtitle}]')
+                helper.logger.info(f'New best match with score {max_score:.2f} in subtitle [{id_subtitle}]')
 
-        if max_score >= max_similarity_percentage:
-            break
-
-    if max_score > 0:
-        helper.logger.info(f'Returning the best match for {args.SEARCH} is subtitle [{id_subtitle}] with score {max_score:.2f}')
-        return id_subtitle
-    elif id_secondary_subtitle:
-        helper.logger.info('Returning the first subtitle found with matching with title')
-        return id_secondary_subtitle
-    else:
-        helper.logger.info('Returning the first subtitle found')
-        return id_subtitle
+    helper.logger.info(f'Returning the best match for {args.SEARCH} is subtitle [{id_subtitle}] with score {max_score:.2f}')
+    return id_subtitle
 
 def print_comments(args, comments):
     terminal_width, _ = get_terminal_size()
