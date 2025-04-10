@@ -133,10 +133,11 @@ def select_best_subtitle_from_list(args, data):
 
     max_score = 0
     for i in range(1, len(data)):
+        subtitle_name = data[i][1].strip().lower()
+
         score = 0
         for key in weights.keys():
             try:
-                subtitle_name = data[i][1].strip().lower()
                 attribute = normalized_key_values[key].lower()
 
                 if attribute in subtitle_name:
