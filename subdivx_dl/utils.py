@@ -550,6 +550,9 @@ def filter_text(text):
     # Replace &quot; with "
     text = text.replace('&quot;', '"')
 
+    # Replace \" with "
+    text = text.replace('\\"', '"')
+
     return text
 
 def print_description(args, selection, search_data):
