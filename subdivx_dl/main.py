@@ -72,15 +72,15 @@ def main():
     current_index = 0
     block_size = result_limit if args.lines is None else args.lines
 
-    # Copy data
-    search_data_copy = search_data[:]
+    # Reference to the original search data
+    search_data_reference = search_data
 
     while True:
         # Clear screen
         clear()
 
         # Slice data
-        search_data = search_data_copy[current_index:current_index + block_size]
+        search_data = search_data_reference[current_index:current_index + block_size]
 
         # Show Search Results
         if args.compact:
