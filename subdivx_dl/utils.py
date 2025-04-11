@@ -272,6 +272,13 @@ def rename_and_move_subtitle(args, source_dir, dest_dir):
                 rename_subtitle_file(source_file_path, dest_file_path)
                 break
 
+        # Find IMDb code in search term
+        pattern = r'\btt\d{7,8}\b'
+        imdb_code = re.search(pattern, args.SEARCH)
+
+        if imdb_code:
+            dest_file = source_file
+
         source_file_path = os.path.join(source_dir, source_file)
         dest_file_path = os.path.join(dest_dir, dest_file)
 
