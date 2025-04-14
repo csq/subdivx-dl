@@ -29,6 +29,10 @@ https = urllib3.PoolManager(
 # Create a DataClient instance
 data_client = DataClient(https, headers, SUBDIVX_URL)
 
+# Delete data session if flag is set
+if args.new_session:
+	data_client.delete_data()
+
 # Load or generate data session
 if not data_client.does_data_exist() or data_client.does_data_session_expire():
     data_client.generate_data()

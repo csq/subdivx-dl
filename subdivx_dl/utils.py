@@ -960,8 +960,8 @@ class DataClient():
             return self._data
 
     def delete_data(self):
-        helper.logger.info('Delete data session')
         if self.does_data_exist():
+            helper.logger.info('Delete data session')
             os.remove(self._PATH_DATA)
 
     def does_data_exist(self):
