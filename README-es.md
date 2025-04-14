@@ -43,6 +43,7 @@ Python 3.6+ son compatibles. Otras versiones e implementaciones pueden funcionar
     Descargar:
         -s, --season                        Descargar subtítulos para toda la temporada
         -l, --location UBICACIÓN            Especificar el directorio de destino
+        -ns, --new-session                  Crea una nueva session
         -nr, --no-rename                    Deshabilitar el renombrado de archivos
         -ne, --no-exit                      Desabilitar salida automática
         -f, --fast                          Descargar directamente el mejor subtítulo coincidente

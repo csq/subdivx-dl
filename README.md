@@ -43,6 +43,7 @@ Python versions 3.6+ are supported. Other versions and implementations may or ma
     Download:
         -s, --season                        Download subtitles for the entire season
         -l, --location LOCATION             Specify the destination directory
+        -ns, --new-session                  Create a new session
         -nr, --no-rename                    Disable file renaming
         -ne, --no-exit                      Disable automatic exit
         -f, --fast                          Directly download the best matching subtitle
