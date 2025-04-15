@@ -40,16 +40,15 @@ if not data_client.does_data_exist() or data_client.does_data_session_expire():
 
 data_session = data_client.get_data_session()
 
-# Save or load configuration
+# Load configuration
+config = Config().load_config() if args.load_config else {}
+args = Args(args, config)
+
+# Save configuration
 if args.save_config:
     Config().save_config(args)
-elif args.load_config:
-    config = Config().load_config()
-    args = Args(args, config)
-else:
-    args = Args(args)
 
-helper.logger.info(f'Arguments used: {args.get_args}')
+helper.logger.info(f'Arguments used: {args.get_args()}')
 
 def main():
     # Get all data from search
