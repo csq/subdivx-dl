@@ -994,60 +994,6 @@ class Args():
                 setattr(self, key, value)
             self.SEARCH = args.SEARCH
 
-    def SEARCH(self):
-        return self.SEARCH
-
-    def comment(self):
-        return self.comment
-
-    def first(self):
-        return self.first
-
-    def lines(self):
-        return self.lines
-
-    def location(self):
-        return self.location
-
-    def minimal(self):
-        return self.minimal
-
-    def alternative(self):
-        return self.alternative
-
-    def compact(self):
-        return self.compact
-
-    def no_rename(self):
-        return self.no_rename
-
-    def no_exit(self):
-        return self.no_exit
-
-    def order_by_downloads(self):
-        return self.order_by_downloads
-
-    def order_by_dates(self):
-        return self.order_by_dates
-
-    def save_config(self):
-        return self.save_config
-
-    def season(self):
-        return self.season
-
-    def style(self):
-        return self.style
-
-    def load_config(self):
-        return self.load_config
-
-    def disable_help(self):
-        return self.disable_help
-
-    def verbose(self):
-        return self.verbose
-
     def get_args(self):
         arguments = []
 

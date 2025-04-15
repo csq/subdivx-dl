@@ -49,7 +49,7 @@ elif args.load_config:
 else:
     args = Args(args)
 
-helper.logger.info(f'Arguments used: {args.get_args()}')
+helper.logger.info(f'Arguments used: {args.get_args}')
 
 def main():
     # Get all data from search
