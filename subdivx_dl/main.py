@@ -49,6 +49,8 @@ elif args.load_config:
 else:
     args = Args(args)
 
+helper.logger.info(f'Arguments used: {args.get_args()}')
+
 def main():
     # Get all data from search
     search_data = get_data_page(args, https, SUBDIVX_URL, data_session, SEARCH_TERM)

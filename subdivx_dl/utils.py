@@ -1048,6 +1048,15 @@ class Args():
     def verbose(self):
         return self.verbose
 
+    def get_args(self):
+        arguments = []
+
+        for attribute, value in self.__dict__.items():
+            if attribute != 'SEARCH' and value is not False and value is not None:
+                arguments.append(f'{attribute}={value}')
+
+        return arguments
+
 # -- Class Config -- #
 class Config():
     _CONFIG_FILE_NAME = 'config.json'
