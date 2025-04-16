@@ -481,9 +481,11 @@ def max_results_by_height(args):
             max_results = (terminal_height - lines_to_exclude) // single_line_height
 
     if args.alternative:
-        max_results = 4 if args.disable_help else 3
+        single_line_height = 3
+        max_results = (terminal_height - lines_to_exclude) // single_line_height
     elif args.compact:
-        max_results = 3 if args.disable_help else 2
+        single_line_height = 5
+        max_results = (terminal_height - lines_to_exclude) // single_line_height
 
     return max_results
 
