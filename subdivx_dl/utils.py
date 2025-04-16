@@ -1030,7 +1030,7 @@ class Config():
     def save_config(self, args):
         args_copy = args.__dict__.copy()
 
-        args_to_delete = ['SEARCH', 'load_config', 'save_config']
+        args_to_delete = ['SEARCH', 'load_config', 'save_config', 'check_update']
 
         for arg in args_to_delete:
             args_copy.pop(arg, None)
