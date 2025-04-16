@@ -57,9 +57,6 @@ def main():
     # Sorting data if needed
     search_data = sort_data(args, search_data)
 
-    # Limit the number of results displayed based on the user's preference
-    result_limit = max_results_by_height(args) if args.lines is None else args.lines
-
     # Checking flag for switch to fast download mode
     if args.fast:
         id_subtitle = get_best_match(args, search_data)
@@ -73,16 +70,38 @@ def main():
     if args.comments:
         cache_comments = TTLCache(capacity=search_data_size, ttl=120)
 
-    # Pagination
-    current_index = 0
-    block_size = result_limit if args.lines is None else args.lines
-
     # Reference to the original search data
     search_data_reference = search_data
 
+    # Pagination current position
+    current_index = 0
+
+    # Save the initial maximum number of results
+    initial_max_results = max_results_by_height(args)
+
+    # Check if it has changed the screen
+    resized = False
+
     while True:
+        # Reset the current index if it has changed number of results to display
+        current_max_results = max_results_by_height(args)
+        if current_max_results != initial_max_results:
+            if resized is False:
+                current_index = 0
+                resized = True
+        elif current_max_results == initial_max_results:
+            if resized is True:
+                current_index = 0
+                resized = False
+
         # Clear screen
         clear()
+
+        # Limit the number of results displayed based on the user's preference
+        result_limit = args.lines if args.lines else max_results_by_height(args)
+
+        # Pagination
+        block_size = args.lines if args.lines else result_limit
 
         # Slice data
         search_data = search_data_reference[current_index:current_index + block_size]
