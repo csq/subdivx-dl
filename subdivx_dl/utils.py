@@ -559,8 +559,8 @@ def filter_text(text):
     # Replace &quot; with "
     text = text.replace('&quot;', '"')
 
-    # Replace \" with "
-    text = text.replace('\\"', '"')
+    # Replace \" or \\\" with "
+    text = re.sub(r'\\{1,3}"', '"', text)
 
     return text
 
