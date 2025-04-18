@@ -787,9 +787,11 @@ def paginate_comments(args, comments_list, block_size=10, selection=None, descri
             print_description(args, selection, description_list)
 
         print_comments(args, page_comments)
-        page_info_format = f'[{current_page}/{total_pages}]'
-        terminal_width, _ = get_terminal_size()
-        print(page_info_format.center(terminal_width))
+
+        if total_pages > 1:
+            page_info_format = f'[{current_page}/{total_pages}]'
+            terminal_width, _ = get_terminal_size()
+            print(page_info_format.center(terminal_width))
 
         if total_pages > 1:
             user_input = prompt_user_selection(args, 'comments')
