@@ -793,10 +793,7 @@ def paginate_comments(args, comments_list, block_size=10, selection=None, descri
             terminal_width, _ = get_terminal_size()
             print(page_info_format.center(terminal_width))
 
-        if total_pages > 1:
-            user_input = prompt_user_selection(args, 'comments')
-        else:
-            user_input = prompt_user_selection(args, 'download')
+        user_input = prompt_user_selection(args, 'comments' if total_pages > 1 else 'download')
 
         # Menu pagination
         if total_pages >= 1:
