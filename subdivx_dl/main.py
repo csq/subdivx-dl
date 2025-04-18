@@ -121,9 +121,7 @@ def main():
             terminal_width, _ = get_terminal_size()
             print(page_info_format.center(terminal_width))
 
-            user_input = prompt_user_selection(args, 'pagination')
-        else:
-            user_input = prompt_user_selection(args, 'subtitle')
+        user_input = prompt_user_selection(args, 'pagination' if search_data_size > block_size else 'subtitle')
 
         try:
             selection = int(user_input) - 1
