@@ -761,7 +761,8 @@ def get_pagination_info(list_size, block_size, current_index):
     current_page = (current_index // block_size) + 1
     page_info = {
         'current_page': current_page,
-        'total_pages': total_pages}
+        'total_pages': total_pages
+    }
     return page_info
 
 def paginate_comments(args, comments_list, block_size=10, selection=None, description_list=None):
