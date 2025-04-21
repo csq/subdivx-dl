@@ -163,7 +163,6 @@ def main():
             comment_from_cache = cache_comments.get(id_subtitle)
 
             if comment_from_cache and comment_from_cache != -1:
-                helper.logger.info('Getting comments from cache')
                 comments_selection = paginate_comments(args, comment_from_cache, block_size, selection, search_data)
             else:
                 comment_list = get_comments(https, SUBDIVX_URL, id_subtitle)

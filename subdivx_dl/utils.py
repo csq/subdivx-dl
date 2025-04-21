@@ -396,7 +396,6 @@ def get_comments(poolManager, url, subtitle_id):
     response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
     comments_data = json.loads(response.data).get('aaData', [])
 
-    helper.logger.info(f'Comments downloaded: {len(comments_data)}')
     comments = [filter_text(comment['comentario']) for comment in comments_data]
 
     return comments
