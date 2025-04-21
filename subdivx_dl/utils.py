@@ -968,7 +968,7 @@ class DataClient():
     def has_data(self):
         return os.path.exists(self._PATH_DATA)
 
-    def does_data_session_expire(self):
+    def is_data_expired(self):
         if self.has_data():
             self._read_data()
 

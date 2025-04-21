@@ -34,7 +34,7 @@ if args.new_session:
 	data_client.delete_data()
 
 # Load or generate data session
-if not data_client.has_data() or data_client.does_data_session_expire():
+if not data_client.has_data() or data_client.is_data_expired():
     data_client.generate_data()
     data_client.save_data()
 
