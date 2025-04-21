@@ -954,22 +954,22 @@ class DataClient():
             file.close()
 
     def get_data_session(self):
-        if self.does_data_exist():
+        if self.has_data():
             helper.logger.info('Load data session')
             self._read_data()
             self.header['cookie'] = self._data['sdx_cookie'] # Set cookie in header
             return self._data
 
     def delete_data(self):
-        if self.does_data_exist():
+        if self.has_data():
             helper.logger.info('Delete data session')
             os.remove(self._PATH_DATA)
 
-    def does_data_exist(self):
+    def has_data(self):
         return os.path.exists(self._PATH_DATA)
 
     def does_data_session_expire(self):
-        if self.does_data_exist():
+        if self.has_data():
             self._read_data()
 
             expiration_date = datetime.fromisoformat(self._data['expiration_date'])
