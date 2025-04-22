@@ -11,7 +11,8 @@ SUBDIVX_URL = 'https://www.subdivx.com/'
 args = helper.parser.parse_args()
 SEARCH_TERM = parse_user_input(args.SEARCH)
 
-rev = get_random_revision()
+# Firefox ESR version
+rev = 128.0
 
 headers = {
     'user-agent': f'Mozilla/5.0 (X11; Linux x86_64; rv:{rev}) Gecko/20100101 Firefox/{rev}'

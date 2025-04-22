@@ -5,7 +5,6 @@ import os
 import re
 import json
 import time
-import random
 import shutil
 import tempfile
 import textwrap
@@ -836,9 +835,6 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
         exit(1)
 
     return user_input
-
-def get_random_revision():
-    return f'13{random.randrange(8)}.0' # 130.0 - 137.0
 
 def https_request(https, method, url, **kwargs):
     try:
