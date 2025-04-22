@@ -733,8 +733,15 @@ def get_best_match(args, search_data):
 def print_comments(args, comments):
     terminal_width, _ = get_terminal_size()
 
+    base_padding = 5
+    if args.style:
+        if args.style.endswith('grid') or args.style in ['presto', 'pipe', 'orgtbl', 'psql']:
+            base_padding = 7
+        elif args.style in ['rst', 'simple']:
+            base_padding = 8
+
     label_width = 6 if args.style in ['simple', 'rst'] else 8
-    comment_label = 'Comments'.center(terminal_width - 7)[label_width:]
+    comment_label = 'Comments'.center(terminal_width - base_padding)[label_width:]
 
     table = [['N°', comment_label]]
     for index, comment_text in enumerate(comments, start=1):
