@@ -740,7 +740,10 @@ def get_best_match(args, search_data):
 def print_comments(args, comments):
     terminal_width, _ = get_terminal_size()
 
-    table = [['N°', 'Comment'.center(terminal_width - 15)]]
+    label_width = 6 if args.style in ['simple', 'rst'] else 8
+    comment_label = 'Comments'.center(terminal_width - 7)[label_width:]
+
+    table = [['N°', comment_label]]
     for index, comment_text in enumerate(comments, start=1):
         table.append([index, comment_text.strip()])
 
