@@ -554,6 +554,9 @@ def filter_text(text):
     # Replace \" or \\\" with "
     text = re.sub(r'\\{1,3}"', '"', text)
 
+    # Remove \´
+    text = text.replace('\´', '')
+
     return text
 
 def print_description(args, selection, search_data):
