@@ -23,6 +23,7 @@ Python 3.6+ son compatibles. Otras versiones e implementaciones pueden funcionar
 * **Certifi**: Colección de certificados raíz para la validación de SSL/TLS.
 * **Urllib3**: Cliente HTTP para realizar solicitudes y manejar respuestas.
 * **Tabulate**: Formatea y muestra datos en tablas para una mejor legibilidad.
+* **Patool**: Gestor de archivos comprimidos que admite varios formatos de archivo.
 * **Rarfile**: Lee y extrae archivos de archivos RAR.
 
 ## USO Y OPCIONES
@@ -148,6 +149,9 @@ El módulo ``rarfile`` especifica:
 >Los archivos comprimidos se extraen ejecutando una herramienta externa: unrar (preferido), unar, 7zip o bsdtar.
 
 Por lo tanto, debes tener una de estas herramientas instaladas.
+
+**Uncompress 7z files**
+Instale 7zip.
 
 **ID IMDb válido sin resultados**
 
