@@ -9,13 +9,12 @@ import shutil
 import tempfile
 import textwrap
 import platform
+import patoolib
 
 from urllib3.exceptions import MaxRetryError, TimeoutError
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
-from zipfile import ZipFile
-from rarfile import RarFile
 from guessit import guessit
 from subdivx_dl import helper
 
@@ -72,17 +71,18 @@ def download_file(poolManager, url, id_subtitle, location):
                 helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
                 exit(1)
 
-def unzip(zip_file_path, dest_dir):
+def uncompress(compressed_path, dest_dir):
     try:
-        with ZipFile(zip_file_path, 'r') as z:
-            helper.logger.info(f'Unpacking zip [{os.path.basename(z.filename)}]')
-            for file in z.namelist():
-                if file.lower().endswith(SUBTITLE_EXTENSIONS):
-                    helper.logger.info(f'Unzip [{file}]')
-                    z.extract(file, dest_dir)
-    except Exception as e:
-        helper.logger.error('Failed to unzip file')
-        print(f'Failed to unzip file: error {e}')
+        helper.logger.info(f'Unpacking [{os.path.basename(compressed_path)}]')
+        patoolib.extract_archive(
+            archive=compressed_path,
+            outdir=dest_dir,
+            interactive=False,
+            verbosity=-1
+        )
+    except patoolib.util.PatoolError as e:
+        helper.logger.error('Failed to unpack file')
+        print(f'Failed to unpack file: error {e}')
         exit(1)
 
 def move_all_to_parent_directory(directory):
@@ -97,16 +97,6 @@ def move_all_to_parent_directory(directory):
                         if ext in SUBTITLE_EXTENSIONS:
                             dest_path = os.path.join(directory, filename)
                             os.rename(file_path, dest_path)
-
-def unrar(rar_file_path, dest_dir):
-    helper.logger.info(f'Unpacking rar [{os.path.basename(rar_file_path)}] in {dest_dir}')
-    rf = RarFile(rar_file_path)
-
-    for file in rf.namelist():
-        if file.lower().endswith(SUBTITLE_EXTENSIONS):
-            helper.logger.info(f'Unrar [{file}]')
-            rf.extract(file, dest_dir)
-    rf.close()
 
 def get_attribute_weights():
     attribute_weights = {
@@ -604,18 +594,15 @@ def get_subtitle(args, poolManager, url, id_subtitle):
     with tempfile.TemporaryDirectory() as temp_dir:
         helper.logger.info(f'Create temporal directory {temp_dir}')
 
-        # Download zip/rar in temporal directory
+        # Download file compressed in temporal directory
         download_file(poolManager, url, id_subtitle, temp_dir)
 
         # Get file name and path
         file_name = os.listdir(temp_dir)[0]
         file_path = os.path.join(temp_dir, file_name)
 
-        # Extract zip/rar
-        if file_path.endswith('.zip'):
-            unzip(file_path, temp_dir)
-        elif file_path.endswith('.rar'):
-            unrar(file_path, temp_dir)
+        # Uncompress file
+        uncompress(file_path, temp_dir)
 
         # Move all files from any subdirectories to the parent directory
         move_all_to_parent_directory(temp_dir)
