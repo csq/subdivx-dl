@@ -20,6 +20,8 @@ from subdivx_dl import helper
 
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
+COMPRESSED_EXTENSIONS = ('.zip', '.rar')
+
 DEFAULT_STYLE = 'pretty'
 
 def get_terminal_size():
@@ -597,12 +599,20 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         # Download file compressed in temporal directory
         download_file(poolManager, url, id_subtitle, temp_dir)
 
-        # Get file name and path
-        file_name = os.listdir(temp_dir)[0]
-        file_path = os.path.join(temp_dir, file_name)
+        # Extract files, including nested archives, up to depth 2
+        excluded_file_names = set()
 
-        # Uncompress file
-        uncompress(file_path, temp_dir)
+        max_extraction_depth = 2
+
+        while max_extraction_depth > 0:
+            for file_name in os.listdir(temp_dir):
+                file_path = os.path.join(temp_dir, file_name)
+
+                if file_name.endswith(COMPRESSED_EXTENSIONS) and file_name not in excluded_file_names:
+                    uncompress(file_path, temp_dir)
+                    excluded_file_names.add(file_name)
+
+            max_extraction_depth -= 1
 
         # Move all files from any subdirectories to the parent directory
         move_all_to_parent_directory(temp_dir)
