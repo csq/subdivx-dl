@@ -20,7 +20,7 @@ from subdivx_dl import helper
 
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
-COMPRESSED_EXTENSIONS = ('.zip', '.rar')
+COMPRESSED_EXTENSIONS = ('.zip', '.rar', '.7z')
 
 DEFAULT_STYLE = 'pretty'
 
@@ -37,7 +37,8 @@ def get_file_extension(file_path):
 
     file_signatures = {
         b'\x50\x4B\x03\x04': '.zip',
-        b'\x52\x61\x72\x21': '.rar'
+        b'\x52\x61\x72\x21': '.rar',
+        b'\x37\x7A\xBC\xAF': '.7z'
     }
 
     for signature, extension in file_signatures.items():
