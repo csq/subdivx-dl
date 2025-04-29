@@ -9,6 +9,9 @@ import tempfile
 from .version import __version__
 from .verchk import run_check_version
 
+# Set logging level for patool library
+logging.getLogger('patool').setLevel(logging.ERROR)
+
 # Check for updates
 class CheckUpdateAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
