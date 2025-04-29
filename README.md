@@ -17,14 +17,13 @@ You can install subdivx-dl by following these steps:
     ```
 
 ## DEPENDENCIES
-Python versions 3.6+ are supported. Other versions and implementations may or may not work correctly.
+Python versions 3.10+ are supported. Other versions and implementations may or may not work correctly.
 
 * **Guessit**: Extracts metadata from media filenames.
 * **Certifi**: Collection of root certificates for SSL/TLS validation.
 * **Urllib3**: HTTP client for making requests and handling responses.
 * **Tabulate**: Formats and displays data in tables for better readability.
 * **Patool**: Archive file manager that supports various archive formats.
-* **Rarfile**: Reads and extracts files from RAR archives.
 
 ## USAGE AND OPTIONS
 ```bash
@@ -143,17 +142,21 @@ To save frequently used options for the ``subdivx-dl`` command, the following op
     * Linux: ``~/.config/subdivx-dl/``
 
 ## Troubleshooting
-**Uncompress rar files**
 
-The module ``rarfile`` specifies:
->Compressed files are extracted by executing external tool: unrar (preferred), unar, 7zip or bsdtar.
+### Uncompressing Files
 
-Therefore, you must have one of these tools installed.
+To extract compressed files using the ``Patool`` library, ensure you have the following tools installed:
 
-**Uncompress 7z files**
-Install 7zip.
+- **RAR Files**: Install one of the following:
+  - **unrar**
+  - **unar**
+  - **7zip**
 
-**Valid IMDb ID returns no results**
+- **7z Files**: Install **7zip**.
+
+Having these tools will allow for the extraction of the corresponding file formats.
+
+### Valid IMDb ID returns no results
 
 A valid IMDb ID may not return results due to an external issue with subdivx.com. The solution is to search by file name or keywords.
 
