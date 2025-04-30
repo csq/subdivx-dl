@@ -23,8 +23,8 @@ https = urllib3.PoolManager(
     headers=headers,
     cert_reqs='CERT_REQUIRED',
     ca_certs=certifi.where(),
-    timeout=5,
-    retries=3
+    timeout=10,
+    retries=5
 )
 
 # Create a DataClient instance
