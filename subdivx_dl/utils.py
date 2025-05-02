@@ -1052,7 +1052,7 @@ class Config():
             return json.load(file)
 
 # -- Class TTLCache -- #
-# Get from https://medium.com/@denis.volokh/caching-methods-implementations-and-comparisons-in-python-7d29a2b0cd80
+# See: https://medium.com/@denis.volokh/caching-methods-implementations-and-comparisons-in-python-7d29a2b0cd80
 
 class TTLCache:
     def __init__(self, capacity, ttl):
