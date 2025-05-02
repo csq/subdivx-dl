@@ -1,7 +1,22 @@
-# Subdivx-dl
-CLI tool for searching and downloading subtitles from www.subdivx.com
+<h1 align="center">
+  <b>SUBDIVX-DL</b>
+</h1>
 
-### Other language
+<p align="center">
+  <strong>CLI Tool for Searching and Downloading Subtitles from subdivx.com</strong><br>
+</p>
+
+## OVERVIEW
+SUBDIVX-DL is a fast command-line interface (CLI) tool for searching and downloading subtitles, optimized to retrieve the best results with minimal external library usage.
+
+## FEATURES
+- **Fast Search**: Quickly find subtitles for your favorite movies and shows.
+- **Efficient Downloads**: Download subtitles with ease and speed.
+- **Automatic File Renaming**: Seamlessly rename subtitle files to ensure compatibility with various media players.
+- **Customizable Display**: Adjust the layout and style of search results to suit your preferences.
+- **Minimal Dependencies**: Built with a focus on reducing bloat by limiting external library usage.
+
+## AVAILABLE LANGUAGES
 - [Español](README-es.md)
 
 ## INSTALLATION
@@ -141,7 +156,7 @@ To save frequently used options for the ``subdivx-dl`` command, the following op
     * Windows: ``C:\Users\user_name\AppData\Local\subdivx-dl\``
     * Linux: ``~/.config/subdivx-dl/``
 
-## Troubleshooting
+## TROUBLESHOOTING
 
 ### Uncompressing Files
 

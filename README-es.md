@@ -1,7 +1,22 @@
-# Subdivx-dl
-Herramienta de línea de comandos para buscar y descargar subtítulos de www.subdivx.com
+<h1 align="center">
+  <b>SUBDIVX-DL</b>
+</h1>
 
-### Otro idioma
+<p align="center">
+  <strong>Herramienta CLI para Buscar y Descargar Subtítulos de subdivx.com</strong><br>
+</p>
+
+## DESCRIPCIÓN GENERAL
+SUBDIVX-DL es una herramienta de interfaz de línea de comandos (CLI) rápida para buscar y descargar subtítulos, optimizada para obtener los mejores resultados con un uso mínimo de bibliotecas externas.
+
+## CARACTERÍSTICAS
+- **Búsqueda Rápida**: Encuentra rápidamente subtítulos para tus películas y programas favoritos.
+- **Descargas Eficientes**: Descarga subtítulos con facilidad y rapidez.
+- **Renombrado Automático de Archivos**: Renombra sin problemas los archivos de subtítulos para garantizar la compatibilidad con varios reproductores multimedia.
+- **Visualización Personalizable**: Ajusta el diseño y estilo de los resultados de búsqueda según tus preferencias.
+- **Dependencias Mínimas**: Diseñado para ser ligero, limitando el uso de bibliotecas externas.
+
+## IDIOMAS DISPONIBLES
 - [English](README.md)
 
 ## INSTALACIÓN
@@ -141,7 +156,7 @@ Los datos se guardan en:
     * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\subdivx-dl\``
     * Linux: ``~/.config/subdivx-dl/``
 
-## Solución de problemas
+## SOLUCIÓN DE PROBLEMAS
 
 ### Descompresión de Archivos
 
