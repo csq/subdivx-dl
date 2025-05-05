@@ -4,7 +4,7 @@
 import re
 import urllib3
 
-from .version import __version__
+from subdivx_dl import __version__
 
 class VersionChecker():
     def __init__(self):

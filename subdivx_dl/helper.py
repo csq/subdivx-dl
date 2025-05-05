@@ -6,7 +6,7 @@ import logging
 import argparse
 import tempfile
 
-from .version import __version__
+from subdivx_dl import __version__
 from .verchk import run_check_version
 
 # Set logging level for patool library

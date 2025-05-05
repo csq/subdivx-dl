@@ -39,7 +39,7 @@ Tracker = "https://github.com/csq/subdivx-dl/issues"
 subdivx-dl = "subdivx_dl.main:main"
 
 [tool.setuptools.dynamic]
-version = { attr = "subdivx_dl.version.__version__" }
+version = { attr = "subdivx_dl.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
