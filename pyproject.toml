@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "subdivx-dl"
+dynamic = ["version"]
+authors = [{ name = "Carlos Quiroz" }]
+description = "Subtitle downloader from subdivx.com"
+readme = "README.md"
+license = "GPL-3.0"
+keywords = [
+    "subdivx-dl",
+    "subtitles",
+    "subdivx",
+    "cli"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "tabulate == 0.9.0",
+    "urllib3 == 2.4.0",
+    "certifi >= 2025.4.26",
+    "guessit == 3.8.0",
+    "patool == 4.0.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/csq/subdivx-dl"
+Documentation = "https://github.com/csq/subdivx-dl#readme"
+Repository = "https://github.com/csq/subdivx-dl"
+Tracker = "https://github.com/csq/subdivx-dl/issues"
+
+[project.scripts]
+subdivx-dl = "subdivx_dl.main:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "subdivx_dl.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["subdivx_dl"]
