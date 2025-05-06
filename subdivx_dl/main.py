@@ -5,7 +5,7 @@ import sys
 import urllib3
 import certifi
 
-from .utils import *
+from subdivx_dl.utils import *
 
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
