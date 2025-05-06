@@ -6,8 +6,7 @@ import logging
 import argparse
 import tempfile
 
-from subdivx_dl import __version__
-from .verchk import run_check_version
+from subdivx_dl import __version__, run_check_version
 
 # Set logging level for patool library
 logging.getLogger('patool').setLevel(logging.ERROR)
