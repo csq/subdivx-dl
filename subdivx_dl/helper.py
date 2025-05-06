@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import os
+import sys
 import logging
 import argparse
 import tempfile
@@ -15,7 +16,7 @@ logging.getLogger('patool').setLevel(logging.ERROR)
 class CheckUpdateAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         run_check_version()
-        exit(0)
+        sys.exit(0)
 
 # Check positive number
 def positive_number(value):

@@ -5,6 +5,7 @@
 __version__ = '2025.04.30'
 
 import re
+import sys
 import urllib3
 
 class VersionChecker():
@@ -17,7 +18,7 @@ class VersionChecker():
             response = urllib3.request('GET', url)
         except Exception:
             print('\nFailed to check for updates\nPlease check your internet connection')
-            exit(1)
+            sys.exit(1)
         if response.status == 200:
             content = response.data.decode('utf-8')
             version_pattern = r"__version__ = '(\d+\.\d+\.\d+)'"

@@ -1,6 +1,7 @@
 # Copyright: (c) 2022, subdivx-dl
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+import sys
 import urllib3
 import certifi
 
@@ -62,7 +63,7 @@ def main():
     if args.fast:
         id_subtitle = get_best_match(args, search_data)
         get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
-        exit(0)
+        sys.exit(0)
 
     # Size of the data
     search_data_size = len(search_data)
@@ -148,7 +149,7 @@ def main():
             continue
         elif selection == -1:
             clear()
-            exit(0)
+            sys.exit(0)
 
         clear()
 
@@ -189,10 +190,10 @@ def main():
             get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
             if args.no_exit:
                 continue
-            exit(0)
+            sys.exit(0)
         elif select_action == 0:
             clear()
-            exit(0)
+            sys.exit(0)
 
 if __name__ == '__main__':
     main()

@@ -3,6 +3,7 @@
 
 import os
 import re
+import sys
 import json
 import time
 import shutil
@@ -72,7 +73,7 @@ def download_file(poolManager, url, id_subtitle, location):
             elif i == 1:
                 print('No subtitles were downloaded because the link is broken')
                 helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
-                exit(1)
+                sys.exit(1)
 
 def uncompress(compressed_path, dest_dir):
     try:
@@ -86,7 +87,7 @@ def uncompress(compressed_path, dest_dir):
     except patoolib.util.PatoolError as e:
         helper.logger.error('Failed to unpack file')
         print(f'Failed to unpack file: error {e}')
-        exit(1)
+        sys.exit(1)
 
 def move_all_to_parent_directory(directory):
     for root, dirs, files in os.walk(directory, topdown=True):
@@ -194,7 +195,7 @@ def print_menu_content_dir(args, directory):
                 except OSError as error:
                     helper.logger.error(error)
                 clear()
-                exit(0)
+                sys.exit(0)
 
             # Return the file_name of the selected subtitle file
             clear()
@@ -213,7 +214,7 @@ def rename_subtitle_file(source_file_path, dest_file_path):
     except (PermissionError, FileExistsError) as error:
         helper.logger.warning(f'Permissions issues on destination directory: {error}')
         print(f'An error has occurred: {error}')
-        exit(0)
+        sys.exit(0)
 
 def rename_and_move_subtitle(args, source_dir, dest_dir):
     subtitle_files = [
@@ -324,7 +325,7 @@ def get_data_page(args, poolManager, url, data_session, search):
         if not args.verbose:
             print('No subtitles found')
         helper.logger.info(f'No subtitles found for query: {query}')
-        exit(0)
+        sys.exit(0)
 
     helper.logger.info(f'Found subtitles for query: {query}')
     return search_results
@@ -355,7 +356,7 @@ def parse_user_input(input):
     if search == '':
         print('Invalid search, try again')
         helper.logger.error('Invalid search')
-        exit(0)
+        sys.exit(0)
     return search
 
 def parse_search_query(search):
@@ -840,7 +841,7 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
     try:
         user_input = input('\n' + padding + 'Selection: ')
     except (KeyboardInterrupt, EOFError):
-        exit(1)
+        sys.exit(1)
 
     return user_input
 
@@ -852,16 +853,16 @@ def https_request(https, method, url, **kwargs):
     except TimeoutError:
         print('Timeout error, check your internet connection')
         helper.logger.error('Timeout error')
-        exit(1)
+        sys.exit(1)
     except MaxRetryError:
         print('Connection error, check your internet connection')
         helper.logger.error('Connection error')
-        exit(1)
+        sys.exit(1)
     except Exception as e:
         print(f'An Error occurred: {e}')
         helper.logger.error(f'{e}')
         DataClient().delete_data()
-        exit(1)
+        sys.exit(1)
 
     return response
 
