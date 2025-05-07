@@ -15,7 +15,7 @@ class VersionChecker():
     def get_latest_version(self):
         url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/version.py'
         try:
-            response = urllib3.request('GET', url)
+            response = urllib3.request('GET', url, retries=5, timeout=10)
         except Exception:
             print('\nFailed to check for updates\nPlease check your internet connection')
             sys.exit(1)
