@@ -13,7 +13,7 @@ class VersionChecker():
         self.version = __version__
 
     def get_latest_version(self):
-        url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/version.py'
+        url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/__init__.py'
         try:
             response = urllib3.request('GET', url, retries=5, timeout=10)
         except Exception:
