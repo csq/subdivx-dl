@@ -16,14 +16,15 @@ class VersionChecker():
         url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/__init__.py'
         try:
             response = urllib3.request('GET', url, retries=5, timeout=10)
-        except Exception:
-            print('\nFailed to check for updates\nPlease check your internet connection')
-            sys.exit(1)
-        if response.status == 200:
+            if response is None or response.status != 200:
+                raise Exception
             content = response.data.decode('utf-8')
             version_pattern = r"__version__ = '(\d+\.\d+\.\d+)'"
             match = re.search(version_pattern, content)
             return match.group(1)
+        except Exception:
+            print('\nFailed to check for updates\nPlease check your internet connection')
+            sys.exit(1)
 
     def check_version(self):
         latest_version = self.get_latest_version()
