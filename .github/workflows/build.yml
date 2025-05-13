@@ -1,4 +1,4 @@
-name: Create wheel and executable
+name: Create wheel and executables
 
 on:
   push:
@@ -72,3 +72,86 @@ jobs:
       with:
         name: build-bin-${{ github.job }}
         path: dist/subdivx-dl_linux
+
+  windows_standalone:
+    needs: create-wheel
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+
+    - name: Download Wheel
+      uses: actions/download-artifact@v4
+      with:
+        name: subdivx-dl_wheel
+        path: dist
+
+    - name: Install wheel
+      run: python -m pip install dist/subdivx_dl-*.whl
+
+    - name: Create standalone executable
+      run: |
+        python -m pip install pyinstaller
+        pyinstaller subdivx-dl.spec
+
+    - name: Rename executable
+      run: mv dist/subdivx-dl.exe dist/subdivx-dl.exe
+
+    - name: Upload Executable as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-bin-${{ github.job }}
+        path: dist/subdivx-dl.exe
+
+  windows_standalone_x86:
+    needs: create-wheel
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x86'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+
+    - name: Download Wheel
+      uses: actions/download-artifact@v4
+      with:
+        name: subdivx-dl_wheel
+        path: dist
+
+    - name: Install wheel
+      run: python -m pip install dist/subdivx_dl-*.whl
+
+    - name: Create standalone executable
+      run: |
+        python -m pip install pyinstaller
+        pyinstaller subdivx-dl.spec
+
+    - name: Rename executable
+      run: mv dist/subdivx-dl.exe dist/subdivx-dl_x86.exe
+
+    - name: Upload Executable as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-bin-${{ github.job }}
+        path: dist/subdivx-dl_x86.exe
