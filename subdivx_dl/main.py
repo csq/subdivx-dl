@@ -9,14 +9,24 @@ from subdivx_dl.utils import *
 
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
+# Parse command-line arguments
 args = helper.parser.parse_args()
-SEARCH_TERM = parse_user_input(args.SEARCH)
 
-# Firefox ESR version
-rev = 128.0
+# Load configuration
+config = Config().load_config() if args.load_config else {}
+args = Args(args, config)
+
+# Save configuration
+if args.save_config:
+    Config().save_config(args)
+
+helper.logger.info(f'Arguments used: {args.get_args()}')
+
+# Default User-Agent: Firefox ESR latest version
+default_ua = 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'
 
 headers = {
-    'user-agent': f'Mozilla/5.0 (X11; Linux x86_64; rv:{rev}) Gecko/20100101 Firefox/{rev}'
+    'user-agent': default_ua if args.user_agent is None else args.user_agent
 }
 
 # Create a PoolManager instance for HTTPS requests
@@ -42,15 +52,8 @@ if not data_client.has_data() or data_client.is_data_expired():
 
 data_session = data_client.get_data_session()
 
-# Load configuration
-config = Config().load_config() if args.load_config else {}
-args = Args(args, config)
-
-# Save configuration
-if args.save_config:
-    Config().save_config(args)
-
-helper.logger.info(f'Arguments used: {args.get_args()}')
+# Parse user input
+SEARCH_TERM = parse_user_input(args.SEARCH)
 
 def main():
     # Get all data from search
