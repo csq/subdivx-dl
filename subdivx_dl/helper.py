@@ -18,6 +18,29 @@ class CheckUpdateAction(argparse.Action):
         run_check_version()
         sys.exit(0)
 
+# Dump configuration
+class DumpConfigAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        import platform
+        platform_name = platform.system()
+
+        local_appdata = os.getenv('LOCALAPPDATA')
+        config_filename = 'config.json'
+
+        directory_paths = {
+            'Linux': f'~/.config/subdivx-dl/{config_filename}',
+            'Darwin': f'~/Library/Application Support/subdivx-dl/{config_filename}',
+            'Windows': f'{local_appdata}\\subdivx-dl\\{config_filename}'
+        }
+
+        path = os.path.expanduser(directory_paths[platform_name])
+        try:
+            with open(path, 'r') as config_file:
+                print(f'Configuration file: {path} \n\n' + config_file.read())
+        except FileNotFoundError:
+            print('Not found configuration file, usage default values')
+        sys.exit(0)
+
 # Check positive number
 def positive_number(value):
     try:
@@ -90,6 +113,7 @@ style_group.add_argument(
 config_group = parser.add_argument_group('Configuration').add_mutually_exclusive_group()
 config_group.add_argument('-sc', '--save-config', help='save configuration', action='store_true')
 config_group.add_argument('-lc', '--load-config', help='load configuration', action='store_true')
+config_group.add_argument('-dc', '--dump-config', help='dump configuration', action=DumpConfigAction, nargs=0)
 
 # Create and configure logger
 logger = logging.getLogger(__name__)
