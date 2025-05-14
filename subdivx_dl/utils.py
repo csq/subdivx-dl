@@ -1033,10 +1033,15 @@ class Config():
     def save_config(self, args):
         args_copy = args.__dict__.copy()
 
-        args_to_delete = ['SEARCH', 'load_config', 'save_config', 'check_update']
+        # Remove keys that are not needed in the config file
+        keys_to_remove = {'SEARCH', 'load_config', 'save_config', 'check_update'}
 
-        for arg in args_to_delete:
-            args_copy.pop(arg, None)
+        # Remove keys that have empty values
+        keys_to_remove.update(key for key, value in args_copy.items() if not value)
+
+        # Remove the identified keys
+        for key in keys_to_remove:
+            args_copy.pop(key, None)
 
         with open(self.config_path, 'w') as file:
             json.dump(args_copy, file, indent=4, sort_keys=True)
