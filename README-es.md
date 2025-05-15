@@ -59,6 +59,7 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
         -s, --season                        Descargar subtítulos para toda la temporada
         -l, --location UBICACIÓN            Especificar el directorio de destino
         -ns, --new-session                  Crea una nueva session
+        -ua', --user-agent                  Definir un agente de usuario personalizado
         -nr, --no-rename                    Deshabilitar el renombrado de archivos
         -ne, --no-exit                      Desabilitar salida automática
         -f, --fast                          Descargar directamente el mejor subtítulo coincidente
@@ -82,6 +83,7 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
     Configuración:
         -sc, --save-config                  Guardar configuración
         -lc, --load-config                  Cargar configuración
+        -dc, --dump-config                  Visualizar configuración
 ```
 
 ## EJEMPLOS DE USO

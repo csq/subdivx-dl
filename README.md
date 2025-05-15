@@ -59,6 +59,7 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
         -s, --season                        Download subtitles for the entire season
         -l, --location LOCATION             Specify the destination directory
         -ns, --new-session                  Create a new session
+        -ua', --user-agent                  Specify a custom user agent
         -nr, --no-rename                    Disable file renaming
         -ne, --no-exit                      Disable automatic exit
         -f, --fast                          Directly download the best matching subtitle
@@ -82,6 +83,7 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
     Configuration:
         -sc, --save-config                  Save configuration
         -lc, --load-config                  Load configuration
+        -dc, --dump-config                  Dump configuration
 ```
 
 ## USAGE EXAMPLES
