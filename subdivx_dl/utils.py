@@ -9,7 +9,6 @@ import time
 import shutil
 import tempfile
 import textwrap
-import platform
 import patoolib
 
 from urllib3.exceptions import MaxRetryError, TimeoutError
@@ -1015,6 +1014,7 @@ class Config():
         self.config_path = os.path.join(self.config_directory, self._CONFIG_FILE_NAME)
 
     def _create_config_directory(self):
+        import platform
         platform_name = platform.system()
 
         local_appdata = os.getenv('LOCALAPPDATA')

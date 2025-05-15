@@ -4,15 +4,13 @@
 # Format: yyyy-mm-dd
 __version__ = '2025.05.12'
 
-import re
-import sys
-import urllib3
-
 class VersionChecker():
     def __init__(self):
         self.version = __version__
 
     def get_latest_version(self):
+        import sys, re, urllib3
+
         url = 'https://raw.githubusercontent.com/csq/subdivx-dl/refs/heads/master/subdivx_dl/__init__.py'
         try:
             response = urllib3.request('GET', url, retries=5, timeout=10)
