@@ -3,7 +3,7 @@ name: Create wheel and executables
 on:
   push:
     tags:
-      - '[0-9]{4}\.[0-9]{2}\.[0-9]{2}'
+      - '*'
 
 jobs:
   create-wheel:
