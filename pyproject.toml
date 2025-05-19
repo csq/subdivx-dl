@@ -44,4 +44,7 @@ version = { attr = 'subdivx_dl.__version__' }
 
 [tool.setuptools.packages.find]
 where = ['.']
-include = ['subdivx_dl']
+include = ['subdivx_dl', 'subdivx_dl.translations']
+
+[tool.setuptools.package-data]
+'subdivx_dl' = ['translations/translations.json']

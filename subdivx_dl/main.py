@@ -6,6 +6,7 @@ import urllib3
 import certifi
 
 from subdivx_dl.utils import *
+from subdivx_dl.translations.load_translations import get_translation, set_language
 
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
@@ -15,6 +16,10 @@ args = helper.parser.parse_args()
 # Load configuration
 config = Config().load_config() if args.load_config else {}
 args = Args(args, config)
+
+# Set the language code if provided
+if args.language_code:
+    set_language(args.language_code)
 
 # Save configuration
 if args.save_config:
@@ -142,13 +147,13 @@ def main():
                 if current_index < 0:
                     current_index = 0
             else:
-                print_center_text('Input only valid numbers')
+                print_center_text(get_translation('input_only_valid_numbers'))
                 continue
             clear()
             continue
 
         if selection < -1:
-            print_center_text('Input only positive numbers')
+            print_center_text(get_translation('input_only_positive_numbers'))
             continue
         elif selection == -1:
             clear()
@@ -182,11 +187,11 @@ def main():
         try:
             select_action = int(user_input)
         except ValueError:
-            print_center_text('Input only numbers')
+            print_center_text(get_translation('input_only_numbers'))
             continue
 
         if select_action > 1 or select_action <= -1:
-            print_center_text('Input valid numbers')
+            print_center_text(get_translation('input_valid_numbers'))
             continue
         elif select_action == 1:
             clear()

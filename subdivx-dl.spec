@@ -8,9 +8,10 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-	    (guessit.__path__[0] + '/config/', 'guessit/config'),
+        (guessit.__path__[0] + '/config/', 'guessit/config'),
         (guessit.__path__[0] + '/data/', 'guessit/data'),
-        (babelfish.__path__[0] + '/data', 'babelfish/data')
+        (babelfish.__path__[0] + '/data', 'babelfish/data'),
+        ('subdivx_dl/translations', 'subdivx_dl/translations')
     ],
     hiddenimports=[
         'babelfish.converters.alpha2',
@@ -47,4 +48,3 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
-

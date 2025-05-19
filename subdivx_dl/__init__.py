@@ -4,6 +4,8 @@
 # Format: yyyy-mm-dd
 __version__ = '2025.05.15'
 
+from subdivx_dl.translations.load_translations import get_translation
+
 class VersionChecker():
     def __init__(self):
         self.version = __version__
@@ -21,17 +23,17 @@ class VersionChecker():
             match = re.search(version_pattern, content)
             return match.group(1)
         except Exception:
-            print('\nFailed to check for updates\nPlease check your internet connection')
+            print(f'\n{get_translation("failed_to_check_for_updates")}\n{get_translation("check_internet_connection")}')
             sys.exit(1)
 
     def check_version(self):
         latest_version = self.get_latest_version()
         if latest_version > self.version:
-            print(f'New version available: {latest_version}')
+            print(f'{get_translation("new_version_available")} {latest_version}')
         else:
-            print('Using the latest version')
+            print(get_translation('using_latest_version'))
 
 def run_check_version():
     checker = VersionChecker()
-    print(f'Installed version: {checker.version}')
+    print(f'{get_translation("installed_version")} {checker.version}')
     checker.check_version()

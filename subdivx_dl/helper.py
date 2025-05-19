@@ -8,6 +8,7 @@ import argparse
 import tempfile
 
 from subdivx_dl import __version__, run_check_version
+from subdivx_dl.translations.load_translations import get_translation
 
 # Set logging level for patool library
 logging.getLogger('patool').setLevel(logging.ERROR)
@@ -36,9 +37,9 @@ class DumpConfigAction(argparse.Action):
         path = os.path.expanduser(directory_paths[platform_name])
         try:
             with open(path, 'r') as config_file:
-                print(f'Configuration file: {path} \n\n' + config_file.read())
+                print(f'{get_translation("config_file")} {path} \n\n' + config_file.read())
         except FileNotFoundError:
-            print('Not found configuration file, usage default values')
+            print(get_translation('config_file_not_found_using_defaults'))
         sys.exit(0)
 
 # Check positive number
@@ -69,6 +70,13 @@ startup_group.add_argument('-V', '--version', action='version', version=__versio
 startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
 startup_group.add_argument('-cu', '--check-update', help='check availability of updates', action=CheckUpdateAction, nargs=0)
 startup_group.add_argument('-dh', '--disable-help', help='disable help messages', action='store_true')
+startup_group.add_argument(
+        '-lcode', '--language-code',
+        help='specify a custom language code',
+        choices=['es', 'en'],
+        nargs='?',
+        const='en'
+)
 
 # Create a group for download-related arguments
 download_group = parser.add_argument_group('Download')

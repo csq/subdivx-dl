@@ -17,6 +17,7 @@ from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
 from guessit import guessit
 from subdivx_dl import helper
+from subdivx_dl.translations.load_translations import get_translation
 
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
@@ -70,7 +71,7 @@ def download_file(poolManager, url, id_subtitle, location):
                 os.rename(temp_file.name, temp_file_new_name)
                 break
             elif i == 1:
-                print('No subtitles were downloaded because the link is broken')
+                print(get_traslation('no_subtitles_downloaded_broken_link'))
                 helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
                 sys.exit(1)
 
@@ -85,7 +86,7 @@ def uncompress(compressed_path, dest_dir):
         )
     except patoolib.util.PatoolError as e:
         helper.logger.error('Failed to unpack file')
-        print(f'Failed to unpack file: error {e}')
+        print(f'{get_translation("failed_to_unpack_file")} {e}')
         sys.exit(1)
 
 def move_all_to_parent_directory(directory):
@@ -148,7 +149,7 @@ def select_best_subtitle_from_list(args, data):
     return file_name
 
 def print_menu_content_dir(args, directory):
-    header = [['N°', 'File name']]
+    header = [['N°', get_translation('file_name')]]
 
     file_names = [fname for fname in os.listdir(directory) if fname.endswith(SUBTITLE_EXTENSIONS)]
     file_count = len(file_names)
@@ -180,11 +181,11 @@ def print_menu_content_dir(args, directory):
                 selection = int(user_input) - 1
                 file_name = header[selection + 1][1]
             except (ValueError, IndexError):
-                print_center_text('Input valid numbers')
+                print_center_text(get_translation('input_valid_numbers'))
                 continue
 
             if selection < -1:
-                print_center_text('Input only positive numbers')
+                print_center_text(get_translation('input_only_positive_numbers'))
                 continue
             elif selection == -1:
                 # Remove temp directory
@@ -212,7 +213,7 @@ def rename_subtitle_file(source_file_path, dest_file_path):
         shutil.move(source_file_path, dest_file_path)
     except (PermissionError, FileExistsError) as error:
         helper.logger.warning(f'Permissions issues on destination directory: {error}')
-        print(f'An error has occurred: {error}')
+        print(f'{get_translation("error_occurred")} {error}')
         sys.exit(0)
 
 def rename_and_move_subtitle(args, source_dir, dest_dir):
@@ -291,7 +292,7 @@ def rename_file_extension(directory):
 
 def get_data_page(args, poolManager, url, data_session, search):
     clear()
-    print('Searching...', end='\r')
+    print(get_translation('searching'), end='\r')
 
     query = parse_search_query(search)
 
@@ -322,7 +323,7 @@ def get_data_page(args, poolManager, url, data_session, search):
 
     if not search_results:
         if not args.verbose:
-            print('No subtitles found')
+            print(get_translation('no_subtitles_found'))
         helper.logger.info(f'No subtitles found for query: {query}')
         sys.exit(0)
 
@@ -353,7 +354,7 @@ def parse_date(date):
 def parse_user_input(input):
     search = input.strip()
     if search == '':
-        print('Invalid search, try again')
+        print(get_translation('invalid_search_try_again'))
         helper.logger.error('Invalid search')
         sys.exit(0)
     return search
@@ -397,25 +398,38 @@ def print_search_results(args, search_data):
 
     maxcolwidths = []
 
-    download_label = 'Downloads'.ljust(11) if args.style else 'Downloads'
-
     # Check flag --minimal
     if args.minimal:
-        columns = ['N°', 'Title', download_label, 'Date']
+        columns = ['N°', 'title', 'downloads', 'date']
         align = ['center', 'center', 'decimal', 'center']
         min_width = 40
 
     elif args.alternative:
-        columns = ['N°', 'Title', 'Description'.center(terminal_width // 2)]
+        columns = ['N°', 'title', 'description']
         align = ['center', 'center', 'left']
         maxcolwidths = [None, terminal_width // 3,  terminal_width // 2]
 
     else:
-        columns = ['N°', 'Title', download_label, 'Date', 'User']
+        columns = ['N°', 'title', 'downloads', 'date', 'user']
         align = ['center', 'center', 'decimal', 'center', 'center']
         min_width = 55
 
-    table_data = [columns]
+    # Translate columns
+    translated_columns = []
+
+    for column_name in columns:
+        translated_column = get_translation(column_name)
+
+        if column_name == 'N°':
+            translated_column = column_name
+        elif column_name == 'downloads':
+            translated_column = translated_column.ljust(11) if args.style else translated_column
+        elif column_name == 'description':
+            translated_column = translated_column.center(terminal_width // 2)
+
+        translated_columns.append(translated_column)
+
+    table_data = [translated_columns]
 
     for index, item in enumerate(search_data, start=1):
 
@@ -556,7 +570,8 @@ def print_description(args, selection, search_data):
     terminal_width, _ = get_terminal_size()
     description = search_data[selection]['description'].strip()
 
-    description_table = [['Description'.center(terminal_width - 8)], [description]]
+    description_text = get_translation('description').center(terminal_width - 8)
+    description_table = [[description_text], [description]]
 
     print_centered(
         args,
@@ -576,7 +591,8 @@ def print_summary(args, selection, search_data):
 
     attributes = ['title', 'downloads', 'upload_date', 'uploader']
     for attribute in attributes:
-        summary.append([attribute.capitalize().replace('_', ' '), search_data[selection][attribute]])
+        attribute_text = get_translation(attribute)
+        summary.append([attribute_text.capitalize(), search_data[selection][attribute]])
 
     print_centered(
         args,
@@ -591,7 +607,7 @@ def print_summary(args, selection, search_data):
 
 def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
-        print('Working...', end='\r')
+        print(get_translation('working'), end='\r')
 
     # Create temporal directory
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -632,7 +648,7 @@ def get_subtitle(args, poolManager, url, id_subtitle):
 
     if not args.verbose:
         clear()
-        print('Done!')
+        print(get_translation('done'))
 
 def normalize_key_values(key_values):
     source = key_values.get('source')
@@ -742,7 +758,8 @@ def print_comments(args, comments):
             base_padding = 8
 
     label_width = 6 if args.style in ['simple', 'rst'] else 8
-    comment_label = 'Comments'.center(terminal_width - base_padding)[label_width:]
+    comment_text = get_translation('comment')
+    comment_label = comment_text.center(terminal_width - base_padding)[label_width:]
 
     table = [['N°', comment_label]]
     for index, comment_text in enumerate(comments, start=1):
@@ -823,9 +840,15 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
     terminal_width, _ = get_terminal_size()
     padding = ' ' * ((terminal_width // 2) - 6)
 
-    main_menu = '[1-9] Select [ 0 ] Exit'.center(terminal_width)
-    secondary_menu = '[ 1 ] Download [ 0 ] Exit'.center(terminal_width)
-    paginate_menu = '[ n ] Next page [ p ] Previous page'.center(terminal_width)
+    exit_text = get_translation('exit')
+    selec_text = get_translation('select')
+    download_text = get_translation('download')
+    next_page_text = get_translation('next_page')
+    previous_page_text = get_translation('previous_page')
+
+    main_menu = f'[1-9] {selec_text} [ 0 ] {exit_text}'.center(terminal_width)
+    secondary_menu = f'[ 1 ] {download_text} [ 0 ] {exit_text}'.center(terminal_width)
+    paginate_menu = f'[ n ] {next_page_text} [ p ] {previous_page_text}'.center(terminal_width)
 
     menu_options = {
         'subtitle': main_menu,
@@ -838,7 +861,7 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
         print('\n' + menu_options.center(terminal_width))
 
     try:
-        user_input = input('\n' + padding + 'Selection: ')
+        user_input = input('\n' + padding + get_translation('selection'))
     except (KeyboardInterrupt, EOFError):
         sys.exit(1)
 
@@ -850,15 +873,15 @@ def https_request(https, method, url, **kwargs):
         if 400 <= response.status < 600 and 'www.subdivx.com/sub' not in url:
             raise Exception(f'HTTP Error: {response.status}')
     except TimeoutError:
-        print('Timeout error, check your internet connection')
+        print(get_translation('timeout_error_check_connection'))
         helper.logger.error('Timeout error')
         sys.exit(1)
     except MaxRetryError:
-        print('Connection error, check your internet connection')
+        print(get_translation('connection_error_check_connection'))
         helper.logger.error('Connection error')
         sys.exit(1)
     except Exception as e:
-        print(f'An Error occurred: {e}')
+        print(f'{get_translation("error_occurred")} {e}')
         helper.logger.error(f'{e}')
         DataClient().delete_data()
         sys.exit(1)
@@ -931,7 +954,7 @@ class DataClient():
         return version
 
     def generate_data(self):
-        print('Generating data session...', end='\r')
+        print(get_translation('generating_data_session'), end='\r')
         helper.logger.info('Generate data session')
         self.web_version = self._get_web_version(self.poolManager, self.url)
         self.sdx_cookie = Cookie(self.poolManager, self.url).get_cookie()
