@@ -12,7 +12,7 @@ SUBDIVX-DL is a fast command-line interface (CLI) tool for searching and downloa
 ## FEATURES
 - **Fast Search**: Quickly find subtitles for your favorite movies and shows.
 - **Efficient Downloads**: Download subtitles with ease and speed.
-- **Automatic File Renaming**: Seamlessly rename subtitle files to ensure compatibility with various media players.
+- **Automatic File Renaming**: Automatically rename your downloaded subtitles.
 - **Customizable Display**: Adjust the layout and style of search results to suit your preferences.
 - **Minimal Dependencies**: Built with a focus on reducing bloat by limiting external library usage.
 
@@ -54,6 +54,7 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
         -v, --verbose                       Enable verbose output
         -cu, --check-update                 Check availability of updates
         -dh, --disable-help                 Disable help messages
+        -lcode, --language-code CODE        Specify a custom language code
 
     Download:
         -s, --season                        Download subtitles for the entire season
