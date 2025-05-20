@@ -18,12 +18,10 @@ config = Config().load_config() if args.load_config else {}
 args = Args(args, config)
 
 # Set the language code if provided
-if args.language_code:
-    set_language(args.language_code)
+set_language(args.language_code) if args.language_code else None
 
 # Save configuration
-if args.save_config:
-    Config().save_config(args)
+Config().save_config(args) if args.save_config else None
 
 helper.logger.info(f'Arguments used: {args.get_args()}')
 
