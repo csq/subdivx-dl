@@ -108,9 +108,6 @@ jobs:
         python -m pip install pyinstaller
         pyinstaller subdivx-dl.spec
 
-    - name: Rename executable
-      run: mv dist/subdivx-dl.exe dist/subdivx-dl.exe
-
     - name: Upload Executable as Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -161,3 +158,38 @@ jobs:
       with:
         name: build-bin-${{ github.job }}
         path: dist/subdivx-dl_x86.exe
+
+  checksum:
+    needs:
+      - create-wheel
+      - linux_standalone
+      - windows_standalone
+      - windows_standalone_x86
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifact
+        merge-multiple: true
+
+    - name: Make checksums
+      run: |
+        cd artifact
+        find . -type f -exec sha512sum {} \; > SHA512SUM
+
+    - name: Prepare checksums
+      run: |
+        mkdir dist
+        mv artifact/SHA512SUM dist
+
+    - name: Upload Executable as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: dist/SHA512SUM
