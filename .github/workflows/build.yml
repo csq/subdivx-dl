@@ -97,8 +97,11 @@ jobs:
         name: subdivx-dl_wheel
         path: dist
 
-    - name: Install wheel
-      run: python -m pip install dist/subdivx_dl-*.whl
+    - name: Install Wheel
+      run: |
+        $whlFile = Get-ChildItem dist\*.whl | Select-Object -First 1
+        pip install $whlFile.FullName
+      shell: pwsh
 
     - name: Create standalone executable
       run: |
@@ -139,8 +142,11 @@ jobs:
         name: subdivx-dl_wheel
         path: dist
 
-    - name: Install wheel
-      run: python -m pip install dist/subdivx_dl-*.whl
+    - name: Install Wheel
+      run: |
+        $whlFile = Get-ChildItem dist\*.whl | Select-Object -First 1
+        pip install $whlFile.FullName
+      shell: pwsh
 
     - name: Create standalone executable
       run: |
