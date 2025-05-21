@@ -149,15 +149,19 @@ It is possible to apply different styles to the tables that display the results 
   <img src="img/minimal_layout.png" alt="preview minimal layout" />
 </p>
 
+## LANGUAGE
+### Change Display Language
+The application automatically detects the language based on your operating system's locale settings. Currently, it supports only English and Spanish, with the default language set to 'en' if the locale language cannot be recognized.
+
+You can also change the language manually using the following command:
+* `-lcode CODE` or `--language-code CODE`: This option allows you to specify the language, where CODE can be either 'en' for English or 'es' for Spanish.
+
 ## CONFIGURATION
 ### Configuration Management
 To save frequently used options for the ``subdivx-dl`` command, the following options are implemented:
 * ``-sc`` or ``--save-config``: allows you to save the entered arguments.
 * ``-lc`` or ``--load-config``: allows you to perform searches with previously saved arguments.
-
-* The data is stored in:
-    * Windows: ``C:\Users\user_name\AppData\Local\subdivx-dl\``
-    * Linux: ``~/.config/subdivx-dl/``
+* ``-dc`` or ``--dump-config``: prints the location of the configuration  and its current settings.
 
 ## TROUBLESHOOTING
 

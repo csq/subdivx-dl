@@ -149,15 +149,19 @@ Es posible aplicar diferentes estilos a las tablas que muestan los resultados ut
   <img src="img/minimal_layout.png" alt="vista previa diseño minimal" />
 </p>
 
+## IDIOMA
+### Cambiar el idioma de visualización
+La aplicación detecta automáticamente el idioma según la configuración regional de su sistema operativo. Actualmente, solo se admiten el inglés y el español, con el idioma predeterminado configurado en 'en' si no se puede reconocer el idioma de la configuración regional.
+
+También puede cambiar el idioma manualmente utilizando el siguiente comando:
+* `-lcode CÓDIGO` o `--language-code CÓDIGO`: Esta opción le permite especificar el idioma, donde CÓDIGO puede ser 'en' para inglés o 'es' para español.
+
 ## CONFIGURACIÓN
 ### Gestión de la configuración
 Para guardar las opciones frecuentemente utilizadas con el comando ``subdivx-dl``, se implementan siguientes opciones:
 * ``-sc`` o ``--save-config``: permite guardar los argumentos ingresados.
 * ``-lc`` o ``--load-config``: permite realizar búsquedas con argumentos previamente guardados.
-
-Los datos se guardan en:
-    * Windows: ``C:\Users\nombre_de_usuario\AppData\Local\subdivx-dl\``
-    * Linux: ``~/.config/subdivx-dl/``
+* ``-dc`` o ``--dump-config``: imprime la ubicación del archivo de configuración y los ajustes seteados.
 
 ## SOLUCIÓN DE PROBLEMAS
 
