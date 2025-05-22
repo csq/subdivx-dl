@@ -543,7 +543,7 @@ def print_center_text(text):
 
     clear()
     print(padding + text.center(terminal_width))
-    time.sleep(0.7)
+    time.sleep(0.8)
 
 def filter_text(text):
     # Remove HTML tags from the text
