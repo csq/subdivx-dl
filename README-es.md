@@ -53,21 +53,16 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
         -V, --version                       Imprimir la versión del programa y salir
         -v, --verbose                       Habilitar salida detallada
         -cu, --check-update                 Comprobar disponibilidad de actualizaciones
-        -dh, --disable-help                 Desabilitar los mensajes de ayuda
-        -lcode, --language-code CODIGO      Especificar lenguaje predeterminado
 
     Descargar:
         -s, --season                        Descargar subtítulos para toda la temporada
         -l, --location UBICACIÓN            Especificar el directorio de destino
-        -ns, --new-session                  Crea una nueva session
-        -ua', --user-agent                  Definir un agente de usuario personalizado
         -nr, --no-rename                    Deshabilitar el renombrado de archivos
-        -ne, --no-exit                      Desabilitar salida automática
         -f, --fast                          Descargar directamente el mejor subtítulo coincidente
 
     Ordenar por:
-        -odownloads, --order-by-downloads   Ordenar por número de descargas
         -odates, --order-by-dates           Ordenar resultados por fechas
+        -odownloads, --order-by-downloads   Ordenar por número de descargas
 
     Resultados:
         -n, --lines LÍNEAS                  Limitar el número de resultados
@@ -80,6 +75,13 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
 
     Estilo:
         -st, --style ESTILO                 Mostrar resultados en el estilo seleccionado
+
+    Misceláneos:
+        -dh, --disable-help                 Desactivar los mensajes de ayuda
+        -ne, --no-exit                      Desactivar salida automática
+        -ns, --new-session                  Crea una nueva session
+        -ua', --user-agent                  Definir un agente de usuario personalizado
+        -lcode, --language-code CODIGO      Especificar lenguaje predeterminado
 
     Configuración:
         -sc, --save-config                  Guardar configuración

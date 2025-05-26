@@ -53,16 +53,11 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
         -V, --version                       Print program version and exit
         -v, --verbose                       Enable verbose output
         -cu, --check-update                 Check availability of updates
-        -dh, --disable-help                 Disable help messages
-        -lcode, --language-code CODE        Specify a custom language code
 
     Download:
         -s, --season                        Download subtitles for the entire season
         -l, --location LOCATION             Specify the destination directory
-        -ns, --new-session                  Create a new session
-        -ua', --user-agent                  Specify a custom user agent
         -nr, --no-rename                    Disable file renaming
-        -ne, --no-exit                      Disable automatic exit
         -f, --fast                          Directly download the best matching subtitle
 
     Order-by:
@@ -80,6 +75,13 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
 
     Style:
         -st, --style STYLE                  Show results in the selected style
+
+    Miscellaneous:
+        -dh, --disable-help                 Disable help messages
+        -ne, --no-exit                      Disable automatic exit
+        -ns, --new-session                  Create a new session
+        -ua', --user-agent                  Specify a custom user agent
+        -lcode, --language-code CODE        Specify a custom language code
 
     Configuration:
         -sc, --save-config                  Save configuration
