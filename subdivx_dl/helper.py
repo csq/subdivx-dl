@@ -69,23 +69,12 @@ startup_group = parser.add_argument_group('Startup').add_mutually_exclusive_grou
 startup_group.add_argument('-V', '--version', action='version', version=__version__)
 startup_group.add_argument('-v', '--verbose', help='enable verbose output', action='store_true')
 startup_group.add_argument('-cu', '--check-update', help='check availability of updates', action=CheckUpdateAction, nargs=0)
-startup_group.add_argument('-dh', '--disable-help', help='disable help messages', action='store_true')
-startup_group.add_argument(
-        '-lcode', '--language-code',
-        help='specify a custom language code',
-        choices=['es', 'en'],
-        nargs='?',
-        const='en'
-)
 
 # Create a group for download-related arguments
 download_group = parser.add_argument_group('Download')
 download_group.add_argument('-s', '--season', help='download subtitles for the entire season', action='store_true')
 download_group.add_argument('-l', '--location', help='specify the destination directory')
-download_group.add_argument('-ns', '--new-session', help='create a new session', action='store_true')
-download_group.add_argument('-ua', '--user-agent', help='specify a custom user agent', type=str)
 download_group.add_argument('-nr', '--no-rename', help='disable file renaming', action='store_true')
-download_group.add_argument('-ne', '--no-exit', help='disable automatic exit', action='store_true')
 download_group.add_argument('-f', '--fast', help='directly download the best matching subtitle', action='store_true')
 
 # Create a group for ordering-related arguments
@@ -116,6 +105,20 @@ style_group.add_argument(
     ],
     nargs='?',
     const='rounded_grid'
+)
+
+# Create a group for miscellaneous-related arguments
+misc_group = parser.add_argument_group('Miscellaneous')
+misc_group.add_argument('-dh', '--disable-help', help='disable help messages', action='store_true')
+misc_group.add_argument('-ne', '--no-exit', help='disable automatic exit', action='store_true')
+misc_group.add_argument('-ns', '--new-session', help='create a new session', action='store_true')
+misc_group.add_argument('-ua', '--user-agent', help='specify a custom user agent', type=str)
+misc_group.add_argument(
+        '-lcode', '--language-code',
+        help='specify a custom language code',
+        choices=['es', 'en'],
+        nargs='?',
+        const='en'
 )
 
 # Create a group for configuration-related arguments
