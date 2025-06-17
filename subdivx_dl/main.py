@@ -37,7 +37,7 @@ https = urllib3.PoolManager(
     headers=headers,
     cert_reqs='CERT_REQUIRED',
     ca_certs=certifi.where(),
-    timeout=10,
+    timeout=30,
     retries=5
 )
 
