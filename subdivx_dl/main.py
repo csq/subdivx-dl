@@ -26,7 +26,7 @@ Config().save_config(args) if args.save_config else None
 helper.logger.info(f'Arguments used: {args.get_args()}')
 
 # Default User-Agent: Firefox ESR latest version
-default_ua = 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0'
+default_ua = 'Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0'
 
 headers = {
     'user-agent': default_ua if args.user_agent is None else args.user_agent
