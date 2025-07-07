@@ -363,7 +363,7 @@ def parse_search_query(search):
     try:
         result = GuessitInfo(search).get_info()
         file_type = result['type']
-        title = result['title']
+        title = result['title'].replace(':', '')
         year = result.get('year', '')
         season = result.get('season', '')
         episode = result.get('episode', '')
