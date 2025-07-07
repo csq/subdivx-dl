@@ -259,7 +259,10 @@ def rename_and_move_subtitle(args, source_dir, dest_dir):
             if num_subtitles > 1:
                 selected_subtitle = print_menu_content_dir(args, source_dir)
                 source_file_path = os.path.join(source_dir, selected_subtitle)
-                dest_file_path = os.path.join(dest_dir, dest_file)
+
+                # Get subtitle extension from selected subtitle
+                subtitle_extension = os.path.splitext(selected_subtitle)[1]
+                dest_file_path = os.path.join(dest_dir, dest_file.replace(extension, subtitle_extension))
 
                 helper.logger.info(f'Move [{selected_subtitle}] to {dest_dir} as [{dest_file}]')
                 rename_subtitle_file(source_file_path, dest_file_path)
