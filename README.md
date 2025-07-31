@@ -199,5 +199,5 @@ subdivx-dl was created by [Carlos Quiroz](https://github.com/csq/)
 subdivx.com is not involved in this development.
 
 ### License
-GNU General Public License v3.0 or later
+GNU General Public License v3.0
 See [COPYING](COPYING) to see the full text.
