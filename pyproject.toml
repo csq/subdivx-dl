@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = 'subdivx-dl'
 dynamic = ['version']
 authors = [{ name = 'Carlos Quiroz' }]
-description = 'Subtitle downloader from subdivx.com'
+description = 'A CLI tool designed for downloading subtitles from subdivx.com'
 readme = 'README.md'
 license = 'GPL-3.0'
 keywords = [
