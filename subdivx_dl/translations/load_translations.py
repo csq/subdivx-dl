@@ -4,15 +4,12 @@
 import os
 import json
 import locale
+import importlib.resources
 
-from pkg_resources import resource_filename
-
-# Get the path to translations file
-translations_path = resource_filename(__name__, 'translations.json')
-
-# Load translations from file
-with open(translations_path, 'r', encoding='utf-8') as translation_file:
-    translations = json.load(translation_file)
+# Load translations
+with importlib.resources.path(__package__, 'translations.json') as path:
+    with open(path, 'r', encoding='utf-8') as file:
+        translations = json.load(file)
 
 # Get the current language code
 try:
