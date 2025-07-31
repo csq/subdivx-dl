@@ -2,7 +2,7 @@
 # GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 # Format: yyyy-mm-dd
-__version__ = '2025.07.07'
+__version__ = '2025.07.31'
 
 from subdivx_dl.translations.load_translations import get_translation
 
