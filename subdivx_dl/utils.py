@@ -309,7 +309,13 @@ def get_data_page(args, poolManager, url, data_session, search):
     helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
     response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
 
-    data = json.loads(response.data).get('aaData')
+    try:
+        data = json.loads(response.data).get('aaData')
+    except json.JSONDecodeError:
+        helper.logger.error('Failed to decode JSON due to an expired data session')
+        print(get_translation('expired_data_session_try_again'))
+        DataClient().delete_data()
+        sys.exit(1)
 
     search_results = []
 
