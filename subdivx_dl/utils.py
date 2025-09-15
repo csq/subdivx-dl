@@ -680,6 +680,23 @@ def normalize_key_values(key_values):
     if edition:
         key_values['edition'] = edition.replace('Director\'s', 'Directors')
 
+    alternative_title = key_values.get('alternative_title')
+    if alternative_title:
+        list_title = []
+
+        aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
+        try:
+            new_title = re.sub(aka_pattern, '', alternative_title, flags=re.IGNORECASE)
+        except(TypeError):
+            for title in alternative_title:
+                new_title = re.sub(aka_pattern, '', title, flags=re.IGNORECASE)
+                list_title.append(new_title)
+
+        if list_title:
+            key_values['alternative_title'] = list_title
+        else:
+            key_values['alternative_title'] = new_title.strip()
+
     return key_values
 
 def get_best_match(args, search_data):
@@ -695,7 +712,7 @@ def get_best_match(args, search_data):
         alt_title = f'{key_values.get("episode_title")}' if key_values.get('episode_title') else title
     else:
         title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
-        alternative_title = key_values.get('alternative_title', '').replace('aka', '').strip()
+        alternative_title = key_values.get('alternative_title', '')
         alt_title = (f'{alternative_title} ({key_values.get("year")})' if alternative_title else key_values.get('title')).strip()
 
     id_subtitle = search_data[0]['id_subtitle']
@@ -710,7 +727,7 @@ def get_best_match(args, search_data):
         subtitle_title = subtitle['title'].lower()
         if subtitle_title != previous_title:
             previous_title = subtitle_title
-            title_values = guessit(subtitle_title)
+            title_values = normalize_key_values(guessit(subtitle_title))
 
         if key_values['type'] == 'episode':
             try:
@@ -724,7 +741,7 @@ def get_best_match(args, search_data):
             alt_title_filtered = f'{title_values.get("episode_title")}' if title_values.get('episode_title') else title_filtered
         else:
             title_filtered = f'{title_values.get("title")} ({title_values.get("year")})' if title_values.get('year') else title_values['title']
-            alternative_title = title_values.get('alternative_title', '').replace('aka', '').strip()
+            alternative_title = title_values.get('alternative_title', '')
             alt_title_filtered = (f'{alternative_title} ({title_values.get("year")})' if alternative_title else title_values.get('title')).strip()
 
         if (title.lower() == title_filtered.lower() or
