@@ -671,10 +671,6 @@ def normalize_key_values(key_values):
     if size:
         key_values['size'] = str(size)
 
-    other = key_values.get('other')
-    if other:
-        key_values['other'] = ' '.join(other)
-
     edition = key_values.get('edition')
     if edition:
         key_values['edition'] = edition.replace('Director\'s', 'Directors')
