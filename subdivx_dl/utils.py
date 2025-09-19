@@ -105,12 +105,11 @@ def move_all_to_parent_directory(directory):
 def get_attribute_weights():
     attribute_weights = {
         'edition': 0.4,        # 40% importance
+        'release_group': 0.25, # 25% importance
         'source': 0.2,         # 20% importance
-        'release_group': 0.15, # 15% importance
-        'screen_size': 0.1,    # 10% importance
+        'screen_size': 0.05,   #  5% importance
         'video_codec': 0.05,   #  5% importance
-        'size': 0.05,          #  5% importance
-        'other': 0.05          #  5% importance
+        'size': 0.05           #  5% importance
     }
 
     return attribute_weights
