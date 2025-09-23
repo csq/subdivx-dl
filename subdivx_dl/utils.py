@@ -372,6 +372,15 @@ def parse_search_query(search):
         result = GuessitInfo(search).get_info()
         file_type = result['type']
         title = remove_punctuation(result['title'])
+
+        # Extract title and alternative title if 'aka' is present
+        aka_index = title.lower().find('aka')
+        if aka_index != -1:
+            title_end_index = aka_index
+            alternative_title_start_index = aka_index + 4
+            result['title'] = title[:title_end_index]
+            result['alternative_title'] = title[alternative_title_start_index:]
+
         year = result.get('year', '')
         season = result.get('season', '')
         episode = result.get('episode', '')
