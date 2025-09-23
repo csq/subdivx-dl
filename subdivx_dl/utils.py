@@ -371,7 +371,7 @@ def parse_search_query(search):
     try:
         result = GuessitInfo(search).get_info()
         file_type = result['type']
-        title = result['title'].replace(':', '')
+        title = remove_punctuation(result['title'])
         year = result.get('year', '')
         season = result.get('season', '')
         episode = result.get('episode', '')
@@ -388,6 +388,10 @@ def parse_search_query(search):
         query = f'{title} {year}'
 
     return query
+
+def remove_punctuation(text):
+    text_no_punctuation = re.sub(r'[^\w\s]', '', text)
+    return text_no_punctuation
 
 def get_comments(poolManager, url, subtitle_id):
     payload = {
@@ -659,6 +663,10 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         print(get_translation('done'))
 
 def normalize_key_values(key_values):
+    title = key_values.get('title')
+    if title:
+        key_values['title'] = remove_punctuation(title)
+
     source = key_values.get('source')
     if source:
         key_values['source'] = source.replace('Blu-ray', 'BluRay')
@@ -732,7 +740,7 @@ def get_best_match(args, search_data):
                 episode_number_subtitle = title_values.get('episode')
                 if episode_number_input is not None and episode_number_input in episode_number_subtitle:
                     episode_number = f'E{episode_number_input:02d}'
-            title_filtered = f'{title_values.get("title")} S{title_values.get("season"):02d}{episode_number}'.replace(':', '').replace('.', '').strip()
+            title_filtered = f'{title_values.get("title")} S{title_values.get("season"):02d}{episode_number}'
             alt_title_filtered = f'{title_values.get("episode_title")}' if title_values.get('episode_title') else title_filtered
         else:
             title_filtered = f'{title_values.get("title")} ({title_values.get("year")})' if title_values.get('year') else title_values['title']
