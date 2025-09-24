@@ -711,21 +711,31 @@ def normalize_key_values(key_values):
 
     return key_values
 
+def extract_media_info(guessit_info):
+    media_info = {}
+
+    if guessit_info['type'] == 'episode':
+        try:
+            episode_number = f'E{guessit_info.get("episode"):02d}' if guessit_info.get('episode') is not None else ''
+        except TypeError:
+            pass
+        media_info['title'] = f'{guessit_info.get("title")} S{guessit_info.get("season"):02d}{episode_number}'
+        media_info['alternative_title'] = f'{guessit_info.get("episode_title")}' if guessit_info.get('episode_title') else media_info['title']
+    else:
+        media_info['title'] = f'{guessit_info.get("title")} ({guessit_info.get("year")})' if guessit_info.get('year') else guessit_info['title']
+        alternative_title = guessit_info.get('alternative_title', '')
+        media_info['alternative_title'] = (f'{alternative_title} ({guessit_info.get("year")})' if alternative_title else guessit_info.get('title'))
+
+    return media_info
+
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
     key_values =  GuessitInfo(args.SEARCH).get_info()
     normalized_key_values = normalize_key_values(key_values)
 
-    # Format the title based on the user input
-    if key_values['type'] == 'episode':
-        episode_number = f'E{key_values.get("episode"):02d}' if key_values.get('episode') is not None else ''
-        title = f'{key_values.get("title")} S{key_values.get("season"):02d}{episode_number}'
-        alt_title = f'{key_values.get("episode_title")}' if key_values.get('episode_title') else title
-    else:
-        title = f'{key_values.get("title")} ({key_values.get("year")})' if key_values.get('year') else key_values['title']
-        alternative_title = key_values.get('alternative_title', '')
-        alt_title = (f'{alternative_title} ({key_values.get("year")})' if alternative_title else key_values.get('title')).strip()
+    # Extract media info from user input
+    media_info = extract_media_info(key_values)
 
     id_subtitle = search_data[0]['id_subtitle']
     weights = get_attribute_weights()
@@ -741,28 +751,16 @@ def get_best_match(args, search_data):
             previous_title = subtitle_title
             title_values = normalize_key_values(guessit(subtitle_title))
 
-        if key_values['type'] == 'episode':
-            try:
-                episode_number = f'E{title_values.get("episode"):02d}' if title_values.get('episode') is not None else ''
-            except TypeError:
-                episode_number_input = key_values.get('episode')
-                episode_number_subtitle = title_values.get('episode')
-                if episode_number_input is not None and episode_number_input in episode_number_subtitle:
-                    episode_number = f'E{episode_number_input:02d}'
-            title_filtered = f'{title_values.get("title")} S{title_values.get("season"):02d}{episode_number}'
-            alt_title_filtered = f'{title_values.get("episode_title")}' if title_values.get('episode_title') else title_filtered
-        else:
-            title_filtered = f'{title_values.get("title")} ({title_values.get("year")})' if title_values.get('year') else title_values['title']
-            alternative_title = title_values.get('alternative_title', '')
-            alt_title_filtered = (f'{alternative_title} ({title_values.get("year")})' if alternative_title else title_values.get('title')).strip()
+        # Extract media info from subtitle
+        subtitle_media_info = extract_media_info(title_values)
 
-        if (title.lower() == title_filtered.lower() or
-            title.lower() == alt_title_filtered.lower() or
-            alt_title.lower() == title_filtered.lower() or
-            alt_title.lower() == alt_title_filtered.lower()):
+        if (media_info['title'].lower() == subtitle_media_info['title'].lower() or
+            media_info['title'].lower() == subtitle_media_info['alternative_title'].lower() or
+            media_info['alternative_title'].lower() == subtitle_media_info['title'].lower() or
+            media_info['alternative_title'].lower() == subtitle_media_info['alternative_title'].lower()):
             id_subtitle = subtitle['id_subtitle'] if max_score == 0 else id_subtitle
 
-            # Search for match in description
+            # Search for ma tch in description
             subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
             subtitle_description = subtitle_description.replace('director\'s', 'directors')
 
