@@ -71,7 +71,7 @@ def download_file(poolManager, url, id_subtitle, location):
                 os.rename(temp_file.name, temp_file_new_name)
                 break
             elif i == 1:
-                print(get_traslation('no_subtitles_downloaded_broken_link'))
+                print(get_translation('no_subtitles_downloaded_broken_link'))
                 helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
                 sys.exit(1)
 
