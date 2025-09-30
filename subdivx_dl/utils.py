@@ -402,6 +402,9 @@ def remove_punctuation(text):
     text_no_punctuation = re.sub(r'[^\w\s]', '', text)
     return text_no_punctuation
 
+def normalize_text(text):
+    return text.lower().strip() if text else ''
+
 def get_comments(poolManager, url, subtitle_id):
     payload = {
         'getComentarios': subtitle_id
@@ -728,6 +731,21 @@ def extract_media_info(guessit_info):
 
     return media_info
 
+def are_titles_equal(media_info, subtitle_media_info):
+    # Extract normalized titles
+    titles1 = {
+        normalize_text(media_info.get('title')),
+        normalize_text(media_info.get('alternative_title'))
+    }
+
+    titles2 = {
+        normalize_text(subtitle_media_info.get('title')),
+        normalize_text(subtitle_media_info.get('alternative_title'))
+    }
+
+    # Check for any intersection between title sets
+    return bool(titles1 & titles2)
+
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
@@ -737,30 +755,31 @@ def get_best_match(args, search_data):
     # Extract media info from user input
     media_info = extract_media_info(key_values)
 
-    id_subtitle = search_data[0]['id_subtitle']
     weights = get_attribute_weights()
+
+    id_subtitle = search_data[0]['id_subtitle']
+    previous_subtitle_title = None
 
     max_score = 0
 
-    title_values = None
-    previous_title = None
-
+    # Iterate over all subtitles to find the best match
     for subtitle in search_data:
-        subtitle_title = subtitle['title'].lower()
-        if subtitle_title != previous_title:
-            previous_title = subtitle_title
-            title_values = normalize_key_values(guessit(subtitle_title))
+        subtitle_title = subtitle['title'].strip().lower()
 
-        # Extract media info from subtitle
-        subtitle_media_info = extract_media_info(title_values)
+        # Extract title info only once
+        if subtitle_title != previous_subtitle_title:
+            previous_subtitle_title = subtitle_title
 
-        if (media_info['title'].lower() == subtitle_media_info['title'].lower() or
-            media_info['title'].lower() == subtitle_media_info['alternative_title'].lower() or
-            media_info['alternative_title'].lower() == subtitle_media_info['title'].lower() or
-            media_info['alternative_title'].lower() == subtitle_media_info['alternative_title'].lower()):
-            id_subtitle = subtitle['id_subtitle'] if max_score == 0 else id_subtitle
+            guessit_info = guessit(subtitle_title)
+            title_values = normalize_key_values(guessit_info)
+            subtitle_guessit_info = extract_media_info(title_values)
 
-            # Search for ma tch in description
+        # Identify matches in the title field
+        if are_titles_equal(media_info, subtitle_guessit_info):
+            if max_score == 0:
+                id_subtitle = subtitle['id_subtitle']
+
+            # Identify matches in the description field
             subtitle_description = subtitle['description'].replace('Blu-Ray', 'BluRay').lower()
             subtitle_description = subtitle_description.replace('director\'s', 'directors')
 
@@ -775,7 +794,7 @@ def get_best_match(args, search_data):
                 except KeyError:
                     pass
 
-            if max_score < score:
+            if score > max_score:
                 max_score = score
                 id_subtitle = subtitle['id_subtitle']
                 helper.logger.info(f'New best match with score {max_score:.2f} in subtitle [{id_subtitle}]')
