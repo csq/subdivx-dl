@@ -639,16 +639,16 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         clear()
         print(get_translation('done'))
 
-def are_titles_equal(media_info, subtitle_media_info):
+def are_titles_equal(media_info_a, media_info_b):
     # Extract normalized titles
     titles1 = {
-        media_info.get('title').strip().lower(),
-        media_info.get('alternative_title').strip().lower()
+        media_info_a.get('title').strip().lower(),
+        media_info_a.get('alternative_title').strip().lower()
     }
 
     titles2 = {
-        subtitle_media_info.get('title').strip().lower(),
-        subtitle_media_info.get('alternative_title').strip().lower()
+        media_info_b.get('title').strip().lower(),
+        media_info_b.get('alternative_title').strip().lower()
     }
 
     # Check for any intersection between title sets
