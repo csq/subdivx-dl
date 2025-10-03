@@ -117,8 +117,7 @@ def get_attribute_weights():
 def select_best_subtitle_from_list(args, data):
     helper.logger.info('Selecting the best subtitle from the list')
 
-    key_values = GuessitInfo(args.SEARCH).get_info()
-    normalized_key_values = normalize_key_values(key_values)
+    guessit_info = DictCache().get()
 
     weights = get_attribute_weights()
 
@@ -131,7 +130,7 @@ def select_best_subtitle_from_list(args, data):
         score = 0
         for key in weights.keys():
             try:
-                attribute = normalized_key_values[key].lower()
+                attribute = guessit_info[key].lower()
 
                 if attribute in subtitle_name:
                     score += weights[key]
@@ -139,7 +138,7 @@ def select_best_subtitle_from_list(args, data):
             except KeyError:
                 pass
 
-        if max_score < score:
+        if score > max_score:
             max_score = score
             file_name = data[i][1]
             helper.logger.info(f'New best match with score {max_score:.2f} in subtitle [{i}]')
@@ -296,7 +295,11 @@ def get_data_page(args, poolManager, url, data_session, search):
     clear()
     print(get_translation('searching'), end='\r')
 
-    query = parse_search_query(search)
+    # Save guessit info to cache
+    guessit_info = GuessitInfo(search).get_info()
+    DictCache().store(guessit_info)
+
+    query = guessit_info['title']
 
     payload = {
         'tabla': 'resultados',
@@ -366,44 +369,6 @@ def parse_user_input(input):
         helper.logger.error('Invalid search')
         sys.exit(0)
     return search
-
-def parse_search_query(search):
-    try:
-        result = GuessitInfo(search).get_info()
-        file_type = result['type']
-        title = remove_punctuation(result['title'])
-
-        # Extract title and alternative title if 'aka' is present
-        aka_index = title.lower().find('aka')
-        if aka_index != -1:
-            title_end_index = aka_index
-            alternative_title_start_index = aka_index + 4
-            result['title'] = title[:title_end_index]
-            result['alternative_title'] = title[alternative_title_start_index:]
-
-        year = result.get('year', '')
-        season = result.get('season', '')
-        episode = result.get('episode', '')
-    except KeyError:
-        return search
-
-    if file_type == 'episode':
-        try:
-            episode_number = f'E{episode:02d}' if episode else ''
-            query = f'{title} S{season:02d}{episode_number}'
-        except ValueError:
-            return search
-    else:
-        query = f'{title} {year}'
-
-    return query
-
-def remove_punctuation(text):
-    text_no_punctuation = re.sub(r'[^\w\s]', '', text)
-    return text_no_punctuation
-
-def normalize_text(text):
-    return text.lower().strip() if text else ''
 
 def get_comments(poolManager, url, subtitle_id):
     payload = {
@@ -674,73 +639,16 @@ def get_subtitle(args, poolManager, url, id_subtitle):
         clear()
         print(get_translation('done'))
 
-def normalize_key_values(key_values):
-    title = key_values.get('title')
-    if title:
-        key_values['title'] = remove_punctuation(title)
-
-    source = key_values.get('source')
-    if source:
-        key_values['source'] = source.replace('Blu-ray', 'BluRay')
-
-    video_codec = key_values.get('video_codec')
-    if video_codec:
-        key_values['video_codec'] = video_codec.replace('H.', '')
-
-    size = key_values.get('size')
-    if size:
-        key_values['size'] = str(size)
-
-    edition = key_values.get('edition')
-    if edition:
-        key_values['edition'] = edition.replace('Director\'s', 'Directors')
-
-    alternative_title = key_values.get('alternative_title')
-    if alternative_title:
-        list_title = []
-
-        aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
-        try:
-            new_title = re.sub(aka_pattern, '', alternative_title, flags=re.IGNORECASE)
-        except(TypeError):
-            for title in alternative_title:
-                new_title = re.sub(aka_pattern, '', title, flags=re.IGNORECASE)
-                list_title.append(new_title)
-
-        if list_title:
-            key_values['alternative_title'] = list_title
-        else:
-            key_values['alternative_title'] = new_title.strip()
-
-    return key_values
-
-def extract_media_info(guessit_info):
-    media_info = {}
-
-    if guessit_info['type'] == 'episode':
-        try:
-            episode_number = f'E{guessit_info.get("episode"):02d}' if guessit_info.get('episode') is not None else ''
-        except TypeError:
-            pass
-        media_info['title'] = f'{guessit_info.get("title")} S{guessit_info.get("season"):02d}{episode_number}'
-        media_info['alternative_title'] = f'{guessit_info.get("episode_title")}' if guessit_info.get('episode_title') else media_info['title']
-    else:
-        media_info['title'] = f'{guessit_info.get("title")} ({guessit_info.get("year")})' if guessit_info.get('year') else guessit_info['title']
-        alternative_title = guessit_info.get('alternative_title', '')
-        media_info['alternative_title'] = (f'{alternative_title} ({guessit_info.get("year")})' if alternative_title else guessit_info.get('title'))
-
-    return media_info
-
 def are_titles_equal(media_info, subtitle_media_info):
     # Extract normalized titles
     titles1 = {
-        normalize_text(media_info.get('title')),
-        normalize_text(media_info.get('alternative_title'))
+        media_info.get('title').strip().lower(),
+        media_info.get('alternative_title').strip().lower()
     }
 
     titles2 = {
-        normalize_text(subtitle_media_info.get('title')),
-        normalize_text(subtitle_media_info.get('alternative_title'))
+        subtitle_media_info.get('title').strip().lower(),
+        subtitle_media_info.get('alternative_title').strip().lower()
     }
 
     # Check for any intersection between title sets
@@ -749,11 +657,7 @@ def are_titles_equal(media_info, subtitle_media_info):
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
-    key_values =  GuessitInfo(args.SEARCH).get_info()
-    normalized_key_values = normalize_key_values(key_values)
-
-    # Extract media info from user input
-    media_info = extract_media_info(key_values)
+    media_info = DictCache().get()
 
     weights = get_attribute_weights()
 
@@ -769,14 +673,11 @@ def get_best_match(args, search_data):
         # Extract title info only once
         if subtitle_title != previous_subtitle_title:
             previous_subtitle_title = subtitle_title
-
-            guessit_info = guessit(subtitle_title)
-            title_values = normalize_key_values(guessit_info)
-            subtitle_guessit_info = extract_media_info(title_values)
+            subtitle_guessit_info = GuessitInfo(subtitle_title).get_info()
 
         # Identify matches in the title field
         if are_titles_equal(media_info, subtitle_guessit_info):
-            if max_score == 0:
+            if max_score == 0 and not 'forzado' in subtitle['title'].lower():
                 id_subtitle = subtitle['id_subtitle']
 
             # Identify matches in the description field
@@ -786,7 +687,7 @@ def get_best_match(args, search_data):
             score = 0
             for key in weights.keys():
                 try:
-                    attribute = normalized_key_values[key].lower()
+                    attribute = media_info[key].lower()
 
                     if attribute in subtitle_description:
                         score += weights[key]
@@ -1196,17 +1097,104 @@ class TTLCache:
 
 # -- Class GuessitInfo -- #
 class GuessitInfo:
-    _instance = None
     _SHARED_INFO = None
-
-    def __new__(cls, search_term):
-        if not cls._instance:
-            cls._instance = super(GuessitInfo, cls).__new__(cls)
-        return cls._instance
 
     def __init__(self, search_term):
         if self._SHARED_INFO is None:
-            self._SHARED_INFO = guessit(search_term)
+            guessit_info = guessit(search_term)
+            self._SHARED_INFO = self._process_info(guessit_info)
+
+    def _parse_info(self, guessit_info):
+        title = guessit_info.get('title')
+        if title:
+            guessit_info['title'] = re.sub(r'[^\w\s]', '', title) # Remove special characters
+
+            # Extract title and alternative title if 'aka' is present
+            aka_index = title.lower().find('aka')
+            if aka_index != -1:
+                title_end_index = aka_index
+                alternative_title_start_index = aka_index + 4
+                guessit_info['title'] = title[:title_end_index]
+                guessit_info['alternative_title'] = title[alternative_title_start_index:]
+
+        source = guessit_info.get('source')
+        if source:
+            guessit_info['source'] = source.replace('Blu-ray', 'BluRay')
+
+        video_codec = guessit_info.get('video_codec')
+        if video_codec:
+            guessit_info['video_codec'] = video_codec.replace('H.', '')
+
+        size = guessit_info.get('size')
+        if size:
+            guessit_info['size'] = str(size)
+
+        edition = guessit_info.get('edition')
+        if edition:
+            guessit_info['edition'] = edition.replace('Director\'s', 'Directors')
+
+        alternative_title = guessit_info.get('alternative_title')
+        if alternative_title:
+            list_title = []
+
+            aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
+            try:
+                new_title = re.sub(aka_pattern, '', alternative_title, flags=re.IGNORECASE)
+            except(TypeError):
+                for title in alternative_title:
+                    new_title = re.sub(aka_pattern, '', title, flags=re.IGNORECASE)
+                    list_title.append(new_title)
+
+            if list_title:
+                guessit_info['alternative_title'] = list_title
+            else:
+                guessit_info['alternative_title'] = new_title.strip()
+
+        return guessit_info
+
+    def _format_name_media(self, guessit_info):
+        media_info = {}
+
+        if guessit_info['type'] == 'episode':
+            try:
+                episode_number = f'E{guessit_info.get("episode"):02d}' if guessit_info.get('episode') else ''
+            except TypeError:
+                episode_number = f'E{guessit_info.get("episode")[0]:02d}'
+            media_info['title'] = f'{guessit_info.get("title")} S{guessit_info.get("season"):02d}{episode_number}'
+            media_info['alternative_title'] = f'{guessit_info.get("episode_title")}' if guessit_info.get('episode_title') else media_info['title']
+        else:
+            media_info['title'] = f'{guessit_info.get("title")} ({guessit_info.get("year")})' if guessit_info.get('year') else guessit_info['title']
+            alternative_title = guessit_info.get('alternative_title', '')
+            media_info['alternative_title'] = (f'{alternative_title} ({guessit_info.get("year")})' if alternative_title else guessit_info.get('title'))
+
+        return media_info
+
+    def _process_info(self, guessit_info):
+        parsed_info = self._parse_info(guessit_info)
+        formatted_info = self._format_name_media(parsed_info)
+
+        white_list = ['edition', 'release_group', 'source', 'screen_size', 'video_codec', 'size']
+        for key, value in parsed_info.items():
+            if key in white_list:
+                formatted_info[key] = value
+
+        return formatted_info
 
     def get_info(self):
         return self._SHARED_INFO
+
+# -- Class DictCache -- #
+class DictCache:
+    _instance = None
+    _cache = {}
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(DictCache, cls).__new__(cls)
+        return cls._instance
+
+    def store(self, dictionary):
+        self._cache = dictionary
+
+    def get(self):
+        return self._cache
