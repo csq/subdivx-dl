@@ -1105,6 +1105,10 @@ class GuessitInfo:
             self._SHARED_INFO = self._process_info(guessit_info)
 
     def _parse_info(self, guessit_info):
+        film = guessit_info.get('film')
+        if film:
+            guessit_info['title'] = f'F{film} {guessit_info.get("title", "")}'
+
         title = guessit_info.get('title')
         if title:
             # Extract title and alternative title if 'aka' is present
