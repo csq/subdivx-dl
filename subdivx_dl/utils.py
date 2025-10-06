@@ -1107,8 +1107,6 @@ class GuessitInfo:
     def _parse_info(self, guessit_info):
         title = guessit_info.get('title')
         if title:
-            guessit_info['title'] = re.sub(r'[^\w\s]', '', title) # Remove special characters
-
             # Extract title and alternative title if 'aka' is present
             aka_index = title.lower().find('aka')
             if aka_index != -1:
