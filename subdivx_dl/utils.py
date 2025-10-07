@@ -673,6 +673,7 @@ def get_best_match(args, search_data):
         # Extract title info only once
         if subtitle_title != previous_subtitle_title:
             previous_subtitle_title = subtitle_title
+            subtitle_title = clean_text(subtitle_title)
             subtitle_guessit_info = GuessitInfo(subtitle_title).get_info()
 
         # Identify matches in the title field
@@ -1095,6 +1096,12 @@ class TTLCache:
             del self.cache[oldest]
             del self.timestamps[oldest]
 
+def clean_text(text):
+    aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
+    text = re.sub(aka_pattern, 'aka', text, flags=re.IGNORECASE)
+    text = text.replace(':', '')
+    return re.sub(r'\s+', ' ', text).strip()
+
 # -- Class GuessitInfo -- #
 class GuessitInfo:
     _SHARED_INFO = None
@@ -1109,18 +1116,14 @@ class GuessitInfo:
         if film:
             guessit_info['title'] = f'F{film} {guessit_info.get("title", "")}'
 
-        title = guessit_info.get('title')
+        title = clean_text(guessit_info.get('title'))
         if title:
             # Extract title and alternative title if 'aka' is present
-            aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
-            title = re.sub(aka_pattern, 'aka', title)
-
             aka_index = title.lower().find('aka')
             if aka_index != -1:
-                title_end_index = aka_index
                 alternative_title_start_index = aka_index + 4
-                guessit_info['title'] = title[:title_end_index]
-                guessit_info['alternative_title'] = title[alternative_title_start_index:]
+                guessit_info['title'] = clean_text(title[:aka_index])
+                guessit_info['alternative_title'] = clean_text(title[alternative_title_start_index:])
 
         source = guessit_info.get('source')
         if source:
@@ -1142,18 +1145,21 @@ class GuessitInfo:
         if alternative_title:
             list_title = []
 
-            aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
             try:
-                new_title = re.sub(aka_pattern, '', alternative_title, flags=re.IGNORECASE)
-            except(TypeError):
+                alternative_title = clean_text(alternative_title)
+                aka_index = alternative_title.lower().find('aka')
+            except(TypeError, AttributeError):
                 for title in alternative_title:
-                    new_title = re.sub(aka_pattern, '', title, flags=re.IGNORECASE)
-                    list_title.append(new_title)
-
-            if list_title:
+                    title = clean_text(title)
+                    aka_index = title.lower().find('aka')
+                    if aka_index != -1:
+                        alternative_title_start_index = aka_index + 4
+                        list_title.append(title[alternative_title_start_index:])
                 guessit_info['alternative_title'] = list_title
-            else:
-                guessit_info['alternative_title'] = new_title.strip()
+
+            if aka_index != -1:
+                alternative_title_start_index = aka_index + 4
+                guessit_info['alternative_title'] = alternative_title[alternative_title_start_index:]
 
         return guessit_info
 
