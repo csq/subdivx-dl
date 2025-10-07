@@ -1112,6 +1112,9 @@ class GuessitInfo:
         title = guessit_info.get('title')
         if title:
             # Extract title and alternative title if 'aka' is present
+            aka_pattern = r'\b(a\s*\.?\s*k\s*\.?\s*a\.?\.?|A\s*\.?\s*K\s*\.?\s*A\.?\.?)\b'
+            title = re.sub(aka_pattern, 'aka', title)
+
             aka_index = title.lower().find('aka')
             if aka_index != -1:
                 title_end_index = aka_index
