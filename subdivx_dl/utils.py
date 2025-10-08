@@ -654,6 +654,14 @@ def are_titles_equal(media_info_a, media_info_b):
     # Check for any intersection between title sets
     return bool(titles1 & titles2)
 
+def titles_have_common_word(title_1, title_2):
+    # Split strings into words
+    words1 = set(title_1.lower().split())
+    words2 = set(title_2.lower().split())
+
+    # Check if there's at least two words in common
+    return len(words1.intersection(words2)) >= 2
+
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
@@ -676,9 +684,13 @@ def get_best_match(args, search_data):
             subtitle_title = clean_text(subtitle_title)
             subtitle_guessit_info = GuessitInfo(subtitle_title).get_info()
 
-        # Identify matches in the title field
-        if are_titles_equal(media_info, subtitle_guessit_info):
-            if max_score == 0 and not 'forzado' in subtitle['title'].lower():
+        # Check for exact title matches or common words in the title
+        if (
+            are_titles_equal(media_info, subtitle_guessit_info)
+            or (max_score == 0 and titles_have_common_word(media_info['title'], subtitle_guessit_info['title']))
+        ):
+            # If there's no previous best match, take the first subtitle
+            if max_score == 0 and 'forzado' not in subtitle['title'].lower():
                 id_subtitle = subtitle['id_subtitle']
 
             # Identify matches in the description field
