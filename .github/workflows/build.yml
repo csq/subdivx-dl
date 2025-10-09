@@ -1,4 +1,4 @@
-name: Create wheel and executables
+name: Create wheel, executables and release
 
 on:
   push:
@@ -181,15 +181,42 @@ jobs:
     - name: Make checksums
       run: |
         cd artifact
-        find . -type f -exec sha512sum {} \; > SHA512SUM
+        find . -type f -not -name 'SHA512SUM' -exec sha512sum {} \; > SHA512SUM
 
     - name: Prepare checksums
       run: |
         mkdir dist
-        mv artifact/SHA512SUM dist
+        mv artifact/* dist
 
-    - name: Upload Executable as Artifact
+    - name: Upload files as Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.job }}
-        path: dist/SHA512SUM
+        path: dist/*
+
+  release:
+    needs: checksum
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true
+        omitBody: true
+        draft: true
