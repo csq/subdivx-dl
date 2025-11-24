@@ -111,8 +111,6 @@ style_group.add_argument(
 misc_group = parser.add_argument_group('Miscellaneous')
 misc_group.add_argument('-dh', '--disable-help', help='disable help messages', action='store_true')
 misc_group.add_argument('-ne', '--no-exit', help='disable automatic exit', action='store_true')
-misc_group.add_argument('-ns', '--new-session', help='create a new session', action='store_true')
-misc_group.add_argument('-ua', '--user-agent', help='specify a custom user agent', type=str)
 misc_group.add_argument(
         '-lcode', '--language-code',
         help='specify a custom language code',
