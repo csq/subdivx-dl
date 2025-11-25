@@ -7,6 +7,7 @@ import sys
 import json
 import time
 import shutil
+import zipfile
 import asyncio
 import tempfile
 import textwrap
@@ -50,13 +51,18 @@ async def download_file(page, selected_index, dest_path):
 def uncompress(compressed_path, dest_dir):
     try:
         helper.logger.info(f'Unpacking [{os.path.basename(compressed_path)}]')
-        patoolib.extract_archive(
-            archive=compressed_path,
-            outdir=dest_dir,
-            interactive=False,
-            verbosity=-1
-        )
-    except patoolib.util.PatoolError as e:
+
+        if compressed_path.endswith('.zip'):
+            with zipfile.ZipFile(compressed_path, 'r') as zip_file:
+                zip_file.extractall(dest_dir)
+        else:
+            patoolib.extract_archive(
+                archive=compressed_path,
+                outdir=dest_dir,
+                interactive=False,
+                verbosity=-1
+            )
+    except (zipfile.BadZipFile, patoolib.util.PatoolError) as e:
         helper.logger.error('Failed to unpack file')
         print(f'{get_translation("failed_to_unpack_file")} {e}')
         sys.exit(1)
