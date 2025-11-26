@@ -194,6 +194,9 @@ Para *MacOS y Linux*:
 
 # LEGAL
 ### Descargo de responsabilidad
+Esta herramienta es para **fines educativos únicamente**.
+El desarrollador **no se hace responsable** de ningún uso indebido, violaciones de los **Términos de Servicio** o posibles prohibiciones. Úsala bajo tu propio riesgo.
+
 subdivx.com no está involucrado en este desarrollo.
 
 ### Licencia

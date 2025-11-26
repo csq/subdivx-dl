@@ -194,6 +194,9 @@ For *MacOS & Linux*:
 
 ## LEGAL
 ### Disclaimer
+This tool is for **educational purposes only**.
+The developer is **not liable** for any misuse, violations of any **Terms of Service**, or potential bans. Use at your own risk.
+
 subdivx.com is not involved in this development.
 
 ### License
