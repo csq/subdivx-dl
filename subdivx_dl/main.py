@@ -42,7 +42,7 @@ async def main_loop():
     if args.fast:
         id_subtitle = get_best_match(args, search_data)
         await get_subtitle(args, page, id_subtitle)
-        await page.close()
+        await Browser().close_browser()
         sys.exit(0)
 
     # Size of the data
@@ -129,6 +129,7 @@ async def main_loop():
             continue
         elif selection == -1:
             clear()
+            await Browser().close_browser()
             sys.exit(0)
 
         clear()
@@ -170,10 +171,11 @@ async def main_loop():
             await get_subtitle(args, page, id_subtitle)
             if args.no_exit:
                 continue
+            await Browser().close_browser()
             sys.exit(0)
         elif select_action == 0:
             clear()
-            await page.close()
+            await Browser().close_browser()
             sys.exit(0)
 
 def main():
