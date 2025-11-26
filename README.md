@@ -30,12 +30,6 @@ You can install subdivx-dl by following these steps:
         pip install .
     ```
 
-## STANDALONE FILES
-File|Description
-:---|:---
-[subdvix-dl](https://github.com/csq/subdivx-dl/releases/latest/download/subdivx-dl_linux)|Linux (Ubuntu 24.04+) standalone x64 binary
-[subdvix-dl.exe](https://github.com/csq/subdivx-dl/releases/latest/download/subdivx-dl.exe)|Windows (Win8+) standalone x64 binary
-
 ## DEPENDENCIES
 Python versions 3.10+ are supported. Other versions and implementations may or may not work correctly.
 
