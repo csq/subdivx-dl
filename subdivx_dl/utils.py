@@ -8,7 +8,6 @@ import json
 import time
 import shutil
 import zipfile
-import asyncio
 import tempfile
 import textwrap
 import patoolib
@@ -285,14 +284,14 @@ async def get_data_page(args, page, search_term):
     await human_like_typing(search_box, query)
     await search_box.press("Enter")
 
-    await asyncio.sleep(3)
+    await page.wait_for_timeout(2000)
 
     # List all of results
     await page.locator("#dt-length-0").click()
     await page.select_option("#dt-length-0", "Todas")
     await page.locator("#dt-length-0").press("Escape")
 
-    await asyncio.sleep(1)
+    await page.wait_for_timeout(1000)
 
     # Save results in json file
     results_list = []
