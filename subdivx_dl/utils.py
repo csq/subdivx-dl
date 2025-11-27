@@ -1087,3 +1087,15 @@ class DictCache:
 
     def get(self):
         return self._cache
+
+# -- Class DataSession -- #
+class DataSession():
+    _PATH_DATA = os.path.join(tempfile.gettempdir(), 'subdivx-dl')
+
+    def delete_data(self):
+        if self.has_data():
+            helper.logger.info('Delete data session')
+            shutil.rmtree(self._PATH_DATA)
+
+    def has_data(self):
+        return os.path.exists(self._PATH_DATA)

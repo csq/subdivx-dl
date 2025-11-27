@@ -33,7 +33,14 @@ async def main_loop():
     # Get all data from search
     print(get_translation('init_browser'), end='\r')
     page = await Browser().open_page(SUBDIVX_URL)
-    search_data = await get_data_page(args, page, SEARCH_TERM)
+
+    try:
+        search_data = await get_data_page(args, page, SEARCH_TERM)
+    except Exception as e:
+        print(get_translation('error_retrieving_data'))
+        await Browser().close_browser()
+        DataSession().delete_data()
+        sys.exit(1)
 
     # Sorting data if needed
     search_data = sort_data(args, search_data)
