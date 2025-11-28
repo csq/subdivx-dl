@@ -287,7 +287,7 @@ async def get_data_page(args, page, search_term):
     await search_box.press("Enter")
 
     # List all of results
-    await page.wait_for_selector('table#resultados tbody tr.trMarcar')
+    await page.wait_for_selector('#dt-length-0', state='visible')
     await page.locator("#dt-length-0").click()
     await page.select_option("#dt-length-0", "Todas")
     await page.locator("#dt-length-0").press("Escape")
@@ -337,7 +337,7 @@ async def get_data_page(args, page, search_term):
         results_list.append(data_entry)
 
     if not results_list:
-        await page.close()
+        await Browser().close_browser()
         if not args.verbose:
             print(get_translation('no_subtitles_found'))
         helper.logger.info(f'No subtitles found for query: {search_term}')
