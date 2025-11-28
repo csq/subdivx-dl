@@ -6,7 +6,6 @@ import asyncio
 
 from subdivx_dl.utils import *
 from subdivx_dl.translations.load_translations import get_translation, set_language
-from subdivx_dl.web.Browser import Browser
 
 SUBDIVX_URL = 'https://www.subdivx.com/'
 
