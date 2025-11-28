@@ -35,23 +35,27 @@ class Browser:
         page = await browser.new_page()
         await page.goto(url)
 
-        for _ in range(15):
-            await asyncio.sleep(1)
+        try:
+            for _ in range(15):
+                await asyncio.sleep(1)
 
-            for frame in page.frames:
-                if frame.url.startswith('https://challenges.cloudflare.com'):
-                    frame_element = await frame.frame_element()
-                    bounding_box = await frame_element.bounding_box()
-                    coord_x = bounding_box['x']
-                    coord_y = bounding_box['y']
+                for frame in page.frames:
+                    if frame.url.startswith('https://challenges.cloudflare.com'):
+                        frame_element = await frame.frame_element()
+                        bounding_box = await frame_element.bounding_box()
+                        coord_x = bounding_box['x']
+                        coord_y = bounding_box['y']
 
-                    width = bounding_box['width']
-                    height = bounding_box['height']
+                        width = bounding_box['width']
+                        height = bounding_box['height']
 
-                    checkbox_x = coord_x + width / 9
-                    checkbox_y = coord_y + height / 2
+                        checkbox_x = coord_x + width / 9
+                        checkbox_y = coord_y + height / 2
 
-                    await page.mouse.click(x=checkbox_x, y=checkbox_y)
+                        await page.mouse.click(x=checkbox_x, y=checkbox_y)
+        except Exception as e:
+            helper.logger.error(f'Error bypassing Cloudflare: {e}')
+            return page
 
         helper.logger.info('Bypassed Cloudflare')
         return page
