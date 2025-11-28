@@ -284,14 +284,11 @@ async def get_data_page(args, page, search_term):
     await human_like_typing(search_box, query)
     await search_box.press("Enter")
 
-    await page.wait_for_timeout(2000)
-
     # List all of results
+    await page.wait_for_selector('table#resultados tbody tr.trMarcar')
     await page.locator("#dt-length-0").click()
     await page.select_option("#dt-length-0", "Todas")
     await page.locator("#dt-length-0").press("Escape")
-
-    await page.wait_for_timeout(1000)
 
     # Save results in json file
     results_list = []
@@ -380,7 +377,6 @@ async def get_comments(page, subtitle_id):
 
     # Wait for modal
     await page.wait_for_selector("#modalDetailDown", state='visible')
-    #await page.wait_for_timeout(2000)
 
     # List of all comments
     await page.wait_for_selector("#cardComentarios", state='visible')
@@ -405,7 +401,7 @@ async def get_comments(page, subtitle_id):
 
     comments = [comment["comment"] for comment in comments_data]
 
-    await page.wait_for_timeout(3000)
+    await page.wait_for_selector("#modalDetailDown .btn-close", state='visible')
     await page.locator("#modalDetailDown .btn-close").click()
 
     run_get_comments += 1
