@@ -125,7 +125,7 @@ def select_best_subtitle_from_list(args, data):
     helper.logger.info(f'The best matching subtitle has been selected with a score {max_score:.2f}')
     return file_name
 
-def print_menu_content_dir(args, directory):
+async def print_menu_content_dir(args, directory):
     header = [['N°', get_translation('file_name')]]
 
     file_names = [fname for fname in os.listdir(directory) if fname.endswith(SUBTITLE_EXTENSIONS)]
@@ -172,6 +172,7 @@ def print_menu_content_dir(args, directory):
                 except OSError as error:
                     helper.logger.error(error)
                 clear()
+                await Browser().close_browser()
                 sys.exit(0)
 
             # Return the file_name of the selected subtitle file
@@ -193,7 +194,7 @@ def rename_subtitle_file(source_file_path, dest_file_path):
         print(f'{get_translation("error_occurred")} {error}')
         sys.exit(0)
 
-def rename_and_move_subtitle(args, source_dir, dest_dir):
+async def rename_and_move_subtitle(args, source_dir, dest_dir):
     subtitle_files = [
         file for file in os.listdir(source_dir)
         if file.endswith(SUBTITLE_EXTENSIONS)
@@ -205,7 +206,7 @@ def rename_and_move_subtitle(args, source_dir, dest_dir):
 
         if args.no_rename and not args.season:
             if num_subtitles > 1:
-                selected_subtitle = print_menu_content_dir(args, source_dir)
+                selected_subtitle = await print_menu_content_dir(args, source_dir)
                 source_file_path = os.path.join(source_dir, selected_subtitle)
                 dest_file_path = os.path.join(dest_dir, selected_subtitle)
 
@@ -234,7 +235,7 @@ def rename_and_move_subtitle(args, source_dir, dest_dir):
             dest_file = os.path.splitext(args.SEARCH)[0].strip() + extension
 
             if num_subtitles > 1:
-                selected_subtitle = print_menu_content_dir(args, source_dir)
+                selected_subtitle = await print_menu_content_dir(args, source_dir)
                 source_file_path = os.path.join(source_dir, selected_subtitle)
 
                 # Get subtitle extension from selected subtitle
@@ -637,7 +638,7 @@ async def get_subtitle(args, page, selected_index):
         dest_dir = args.location or os.getcwd()
 
         # Rename and/or move subtitles
-        rename_and_move_subtitle(args, temp_dir, dest_dir)
+        await rename_and_move_subtitle(args, temp_dir, dest_dir)
 
     # Message for user
     helper.logger.info(f'Delete temporal directory {temp_dir}')
