@@ -17,7 +17,6 @@ from tabulate import tabulate, SEPARATING_LINE
 from guessit import guessit
 from subdivx_dl import helper
 from subdivx_dl.translations.load_translations import get_translation
-from subdivx_dl.web.human_typing import human_like_typing
 
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.ass', '.ssa', '.idx')
 
@@ -281,7 +280,7 @@ async def get_data_page(args, page, search_term):
     # Locate Search box
     search_box = page.locator("#buscar")
     await search_box.click()
-    await human_like_typing(search_box, query)
+    await search_box.page.fill('#buscar', query)
     await search_box.press("Enter")
 
     # List all of results
