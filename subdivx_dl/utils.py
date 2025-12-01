@@ -280,6 +280,7 @@ async def get_data_page(args, page, search_term):
     DictCache().store(guessit_info)
 
     query = guessit_info['title']
+    helper.logger.info(f'Searching subtitle for: {query}')
 
     # Locate Search box
     search_box = page.locator('#buscar')
