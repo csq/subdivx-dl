@@ -297,10 +297,10 @@ async def get_data_page(args, page, search_term):
     # Save results in json file
     results_list = []
 
+    await page.wait_for_selector('table#resultados tbody tr.trMarcar', state='visible')
     rows = await page.query_selector_all('table#resultados tbody tr.trMarcar')
 
-    id_entry = 0
-    for row in rows:
+    for index, row in enumerate(rows, start=0):
         title = await row.query_selector('td:nth-child(2) span')
         title_text = await title.inner_text() if title else ''
 
@@ -325,15 +325,13 @@ async def get_data_page(args, page, search_term):
 
         # Create JSON-like dictionary
         data_entry = {
-            'id_subtitle': id_entry,
+            'id_subtitle': index,
             'title': title_text.strip(),
             'description': description_text.strip(),
             'downloads': int(downloads_text.strip()),
             'uploader': user_text.strip(),
             'upload_date': date_text.strip()
         }
-
-        id_entry += 1
 
         # Append to the results list
         results_list.append(data_entry)
