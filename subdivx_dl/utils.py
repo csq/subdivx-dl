@@ -670,7 +670,7 @@ def titles_have_common_word(title_1, title_2):
 def get_best_match(args, search_data):
     helper.logger.info('Finding the best match subtitle')
 
-    media_info = guessit(args.SEARCH)#DictCache().get()
+    media_info = DictCache().get()
 
     weights = get_attribute_weights()
 
