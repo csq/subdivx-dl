@@ -41,7 +41,7 @@ async def download_file(page, selected_index, dest_path):
     await selected_row.click()
 
     # Click download button
-    download_selector = "button#btnDescargar"
+    download_selector = 'button#btnDescargar'
     async with page.expect_download() as download_info:
         await page.click(download_selector)
 
@@ -282,16 +282,16 @@ async def get_data_page(args, page, search_term):
     query = guessit_info['title']
 
     # Locate Search box
-    search_box = page.locator("#buscar")
+    search_box = page.locator('#buscar')
     await search_box.click()
     await search_box.page.fill('#buscar', query)
-    await search_box.press("Enter")
+    await search_box.press('Enter')
 
     # List all of results
     await page.wait_for_selector('#dt-length-0', state='visible')
-    await page.locator("#dt-length-0").click()
-    await page.select_option("#dt-length-0", "Todas")
-    await page.locator("#dt-length-0").press("Escape")
+    await page.locator('#dt-length-0').click()
+    await page.select_option('#dt-length-0', 'Todas')
+    await page.locator('#dt-length-0').press('Escape')
 
     # Save results in json file
     results_list = []
@@ -301,24 +301,24 @@ async def get_data_page(args, page, search_term):
     id_entry = 0
     for row in rows:
         title = await row.query_selector('td:nth-child(2) span')
-        title_text = await title.inner_text() if title else ""
+        title_text = await title.inner_text() if title else ''
 
         description = await row.query_selector('td:nth-child(3)')
-        description_text = await description.inner_text() if description else ""
+        description_text = await description.inner_text() if description else ''
 
         downloads = await row.query_selector('td:nth-child(4)')
-        downloads_text = await downloads.inner_text() if downloads else "0"
+        downloads_text = await downloads.inner_text() if downloads else '0'
 
         user = await row.query_selector('td:nth-child(8) a')
-        user_text = await user.inner_text() if user else ""
+        user_text = await user.inner_text() if user else ''
 
         # Retrieve the date
-        date_text = ""
-        child = await row.evaluate_handle("r => r.nextElementSibling")
+        date_text = ''
+        child = await row.evaluate_handle('r => r.nextElementSibling')
         if child:
             # child.inner_text() contains the whole block; extract the date with regex
             child_text = await child.as_element().inner_text()
-            m = re.search(r"\d{2}/\d{2}/\d{4}", child_text)
+            m = re.search(r'\d{2}/\d{2}/\d{4}', child_text)
             if m:
                 date_text = m.group(0)
 
@@ -379,20 +379,20 @@ async def get_comments(page, subtitle_id):
     await selected_row.click()
 
     # Wait for modal
-    await page.wait_for_selector("#modalDetailDown", state='visible')
+    await page.wait_for_selector('#modalDetailDown', state='visible')
 
     # List of all comments
-    await page.wait_for_selector("#cardComentarios", state='visible')
-    select = await page.wait_for_selector(f"#dt-length-{run_get_comments}")
+    await page.wait_for_selector('#cardComentarios', state='visible')
+    select = await page.wait_for_selector(f'#dt-length-{run_get_comments}')
     await select.click()
-    await page.select_option(f"#dt-length-{run_get_comments}", "100")
+    await page.select_option(f'#dt-length-{run_get_comments}', '100')
 
     # Select table comments
     comments_data = []
-    await page.wait_for_selector("#tblComentarios tbody tr")
-    rows = await page.query_selector_all("#tblComentarios tbody tr")
+    await page.wait_for_selector('#tblComentarios tbody tr')
+    rows = await page.query_selector_all('#tblComentarios tbody tr')
     for row in rows:
-        cells = await row.query_selector_all("td")
+        cells = await row.query_selector_all('td')
         if len(cells) != 3:
             continue
 
@@ -400,12 +400,12 @@ async def get_comments(page, subtitle_id):
         #nick = (await cells[1].inner_text()).strip()
         #date = (await cells[2].inner_text()).strip()
 
-        comments_data.append({"comment": comment})
+        comments_data.append({'comment': comment})
 
-    comments = [comment["comment"] for comment in comments_data]
+    comments = [comment['comment'] for comment in comments_data]
 
-    await page.wait_for_selector("#modalDetailDown .btn-close", state='visible')
-    await page.locator("#modalDetailDown .btn-close").click()
+    await page.wait_for_selector('#modalDetailDown .btn-close', state='visible')
+    await page.locator('#modalDetailDown .btn-close').click()
 
     run_get_comments += 1
 
@@ -1113,7 +1113,7 @@ class Browser:
         if self.browser is None:
             self.browser = AsyncCamoufox(
                 headless=True,
-                os=["macos"],
+                os=['macos'],
                 screen=Screen(max_width=1920, max_height=1080),
                 persistent_context=True,
                 user_data_dir=Browser._user_data_dir
