@@ -397,9 +397,6 @@ async def get_comments(page, subtitle_id):
             continue
 
         comment = (await cells[0].inner_text()).strip()
-        #nick = (await cells[1].inner_text()).strip()
-        #date = (await cells[2].inner_text()).strip()
-
         comments_data.append({'comment': comment})
 
     comments = [comment['comment'] for comment in comments_data]
