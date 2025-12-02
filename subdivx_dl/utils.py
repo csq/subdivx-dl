@@ -1136,8 +1136,8 @@ class Browser:
                         checkbox_y = coord_y + height / 2
 
                         await page.mouse.click(x=checkbox_x, y=checkbox_y)
-        except Exception as e:
-            helper.logger.error(f'Error bypassing Cloudflare: {e}')
+        except Exception:
+            helper.logger.error('Error bypassing Cloudflare')
             return page
 
         helper.logger.info('Bypassed Cloudflare')

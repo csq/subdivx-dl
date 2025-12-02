@@ -35,7 +35,7 @@ async def main_loop():
 
     try:
         search_data = await get_data_page(args, page, SEARCH_TERM)
-    except Exception as e:
+    except Exception:
         print(get_translation('error_retrieving_data'))
         await Browser().close_browser()
         DataSession().delete_data()
