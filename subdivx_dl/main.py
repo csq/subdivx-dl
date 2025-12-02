@@ -56,7 +56,7 @@ async def main_loop():
 
     # Initialize cache for comments
     if args.comments:
-        cache_comments = TTLCache(capacity=search_data_size, ttl=120)
+        cache_comments = TTLCache(capacity=search_data_size, ttl=300)
 
     # Reference to the original search data
     search_data_reference = search_data
