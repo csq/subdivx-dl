@@ -374,18 +374,14 @@ async def get_comments(page, subtitle_id):
     selected_row = await page.wait_for_selector(f'table#resultados tbody tr[data-dt-row="{subtitle_id}"]')
     await selected_row.click()
 
-    # Wait for modal
-    await page.wait_for_selector('#modalDetailDown', state='visible')
-
-    # List of all comments
-    await page.wait_for_selector('#cardComentarios', state='visible')
-    select = await page.wait_for_selector(f'#dt-length-{run_get_comments}')
+    # List all of comments
+    select = page.locator(f'#dt-length-{run_get_comments}')
+    await select.wait_for()
     await select.click()
-    await page.select_option(f'#dt-length-{run_get_comments}', '100')
+    await select.select_option('100')
 
     # Select table comments
     comments_data = []
-    await page.wait_for_selector('#tblComentarios tbody tr')
     rows = await page.query_selector_all('#tblComentarios tbody tr')
     for row in rows:
         cells = await row.query_selector_all('td')
@@ -397,8 +393,9 @@ async def get_comments(page, subtitle_id):
 
     comments = [comment['comment'] for comment in comments_data]
 
-    await page.wait_for_selector('#modalDetailDown .btn-close', state='visible')
-    await page.locator('#modalDetailDown .btn-close').click()
+    # Close modal
+    btn_close = page.locator('#modalDetailDown .btn-close')
+    await btn_close.click()
 
     run_get_comments += 1
 
