@@ -284,53 +284,50 @@ async def get_data_page(args, page, search_term):
 
     # Locate Search box
     search_box = page.locator('#buscar')
+    await search_box.wait_for()
     await search_box.click()
-    await search_box.page.fill('#buscar', query)
+    await search_box.fill(query)
     await search_box.press('Enter')
 
     # List all of results
-    await page.wait_for_selector('#dt-length-0', state='visible')
-    await page.locator('#dt-length-0').click()
-    await page.select_option('#dt-length-0', 'Todas')
-    await page.locator('#dt-length-0').press('Escape')
+    selector = page.locator('#dt-length-0')
+    await selector.wait_for()
+    await selector.click()
+    await selector.select_option('Todas')
+    await selector.press('Escape')
 
     # Save results in json file
     results_list = []
 
     await page.wait_for_selector('table#resultados tbody tr.trMarcar', state='visible')
-    rows = await page.query_selector_all('table#resultados tbody tr.trMarcar')
+    rows = await page.query_selector_all('table#resultados tbody tr.trMarcar.dt-hasChild.dtr-expanded')
 
     for index, row in enumerate(rows, start=0):
         title = await row.query_selector('td:nth-child(2) span')
-        title_text = await title.inner_text() if title else ''
+        title_text = await title.inner_text()
 
         description = await row.query_selector('td:nth-child(3)')
-        description_text = await description.inner_text() if description else ''
+        description_text = await description.inner_text()
 
         downloads = await row.query_selector('td:nth-child(4)')
-        downloads_text = await downloads.inner_text() if downloads else '0'
+        downloads_text = await downloads.inner_text()
 
         user = await row.query_selector('td:nth-child(8) a')
-        user_text = await user.inner_text() if user else ''
+        user_text = await user.inner_text()
 
-        # Retrieve the date
-        date_text = ''
-        child = await row.evaluate_handle('r => r.nextElementSibling')
-        if child:
-            # child.inner_text() contains the whole block; extract the date with regex
-            child_text = await child.as_element().inner_text()
-            m = re.search(r'\d{2}/\d{2}/\d{4}', child_text)
-            if m:
-                date_text = m.group(0)
+        date = await row.query_selector('td:nth-child(9)')
+        date_text = await date.inner_text()
+        match = re.search(r'\d{2}/\d{2}/\d{4}', date_text)
+        date_text = match.group(0) if match and match.group(0) != '00/00/0000' else '-'
 
         # Create JSON-like dictionary
         data_entry = {
             'id_subtitle': index,
-            'title': title_text.strip(),
-            'description': description_text.strip(),
-            'downloads': int(downloads_text.strip()),
-            'uploader': user_text.strip(),
-            'upload_date': date_text.strip()
+            'title': title_text,
+            'description': description_text,
+            'downloads': downloads_text,
+            'uploader': user_text,
+            'upload_date': date_text
         }
 
         # Append to the results list
