@@ -299,41 +299,42 @@ async def get_data_page(args, page, search_term):
     # Save results in json file
     results_list = []
 
-    await page.wait_for_selector('table#resultados tbody tr.trMarcar', state='visible')
-    rows = await page.query_selector_all('table#resultados tbody tr.trMarcar.dt-hasChild.dtr-expanded')
+    try:
+        await page.wait_for_selector('table#resultados tbody tr.trMarcar', state='visible', timeout=5000)
+        rows = await page.query_selector_all('table#resultados tbody tr.trMarcar.dt-hasChild.dtr-expanded')
 
-    for index, row in enumerate(rows, start=0):
-        title = await row.query_selector('td:nth-child(2) span')
-        title_text = await title.inner_text()
+        for index, row in enumerate(rows, start=0):
+            title = await row.query_selector('td:nth-child(2) span')
+            title_text = await title.inner_text()
 
-        description = await row.query_selector('td:nth-child(3)')
-        description_text = await description.inner_text()
+            description = await row.query_selector('td:nth-child(3)')
+            description_text = await description.inner_text()
 
-        downloads = await row.query_selector('td:nth-child(4)')
-        downloads_text = await downloads.inner_text()
+            downloads = await row.query_selector('td:nth-child(4)')
+            downloads_text = await downloads.inner_text()
 
-        user = await row.query_selector('td:nth-child(8) a')
-        user_text = await user.inner_text()
+            user = await row.query_selector('td:nth-child(8) a')
+            user_text = await user.inner_text()
 
-        date = await row.query_selector('td:nth-child(9)')
-        date_text = await date.inner_text()
-        match = re.search(r'\d{2}/\d{2}/\d{4}', date_text)
-        date_text = match.group(0) if match and match.group(0) != '00/00/0000' else '-'
+            date = await row.query_selector('td:nth-child(9)')
+            date_text = await date.inner_text()
+            match = re.search(r'\d{2}/\d{2}/\d{4}', date_text)
+            date_text = match.group(0) if match and match.group(0) != '00/00/0000' else '-'
 
-        # Create JSON-like dictionary
-        data_entry = {
-            'id_subtitle': index,
-            'title': title_text,
-            'description': description_text,
-            'downloads': downloads_text,
-            'uploader': user_text,
-            'upload_date': date_text
-        }
+            # Create JSON-like dictionary
+            data_entry = {
+                'id_subtitle': index,
+                'title': title_text,
+                'description': description_text,
+                'downloads': downloads_text,
+                'uploader': user_text,
+                'upload_date': date_text
+            }
 
-        # Append to the results list
-        results_list.append(data_entry)
+            # Append to the results list
+            results_list.append(data_entry)
 
-    if not results_list:
+    except Exception:
         await Browser().close_browser()
         if not args.verbose:
             print(get_translation('no_subtitles_found'))
