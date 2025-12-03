@@ -184,9 +184,17 @@ async def main_loop():
             await Browser().close_browser()
             sys.exit(0)
 
+async def run():
+    try:
+        await main_loop()
+    except Exception as e:
+        helper.logger.error(f'Unexpected error: {e}')
+        await Browser().close_browser()
+        sys.exit(1)
+
 def main():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main_loop())
+    loop.run_until_complete(run())
 
 if __name__ == '__main__':
     main()
