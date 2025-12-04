@@ -1110,7 +1110,6 @@ class Browser:
                 user_data_dir=Browser._user_data_dir
             )
             await self.browser.start()
-            helper.logger.info('Started browser')
         return self.browser.browser
 
     # See: https://github.com/MaestroOfAutomation/turnstile_bypass
@@ -1145,13 +1144,19 @@ class Browser:
         return page
 
     async def open_page(self, url: str):
-        if os.path.exists(Browser._user_data_dir) is False:
-            page = await self._cloudflare_bypass(url)
-            return page
+        try:
+            if os.path.exists(Browser._user_data_dir) is False:
+                page = await self._cloudflare_bypass(url)
+            else:
+                browser = await self._get_browser()
+                page = await browser.new_page()
+                await page.goto(url)
+        except Exception:
+            print(get_translation('error_starting_browser'))
+            helper.logger.error('Not started browser')
+            sys.exit(1)
         else:
-            browser = await self._get_browser()
-            page = await browser.new_page()
-            await page.goto(url)
+            helper.logger.info('Started browser')
             return page
 
     async def close_browser(self):
