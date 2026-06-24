@@ -40,6 +40,22 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
 * **Tabulate**: Formatea y muestra datos en tablas para una mejor legibilidad.
 * **Patool**: Gestor de archivos comprimidos que admite varios formatos de archivo.
 
+## CONFIGURACION
+Configure las cookies, tome estos datos desde Herramientas de desarrollador de su navegador.
+
+Ejemplo en Firefox
+Abrir Herramientas de desarrollador (**Ctrl+May+I**)
+
+**Importante**: Realizar una consulta y buscar en la sección **Red** el archivo ``ajax.php``
+
+* Copiar el valor de ``cf_clearance`` y de ``sdx``
+
+<img src="img/config_cookies.png" width="800" height="400"/>
+
+<br>
+
+Tambien es necesario conocer el user-agent del navegador utilizado, webs como [whatmyuseragent](https://whatmyuseragent.com/) permiten hacerlo de forma simple.
+
 ## USO Y OPCIONES
 ```bash
     subdivx-dl [OPCIONES] [BUSQUEDA]

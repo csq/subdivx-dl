@@ -40,6 +40,22 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
 * **Tabulate**: Formats and displays data in tables for better readability.
 * **Patool**: Archive file manager that supports various archive formats.
 
+## FIRST USE
+Configure cookies, take this data from Developer Tools of your browser.
+
+Example in Firefox
+Open Developer Tools (**Ctrl+Shift+I**)
+
+**Important**: Make a query and search into section **Network** the file ``ajax.php``
+
+* Copy ``cf_clearance`` and ``sdx`` values
+
+<img src="img/config_cookies.png" width="800" height="400"/>
+
+<br>
+
+You also need to know the user-agent of the browser you're using. Websites like [whatmyuseragent](https://whatmyuseragent.com/) make it simple to find out.
+
 ## USAGE AND OPTIONS
 ```bash
     subdivx-dl [OPTIONS] [SEARCH]
