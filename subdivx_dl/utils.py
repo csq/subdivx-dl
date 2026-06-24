@@ -916,7 +916,7 @@ class DataClient():
     def get_cookies(self):
         clear()
 
-        print('Enter your cookies data\n')
+        print(get_translation('cookies_enter_data') + '\n')
         sdx_cookie = input('sdx: ').strip().replace('sdx=', '')
         cf_clearance = input('cf_clearance: ').strip().replace('cf_clearance=', '')
         user_agent = input('User-Agent: ').strip().replace('User-Agent=', '')
