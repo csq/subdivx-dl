@@ -892,11 +892,30 @@ class Token:
 
 # -- Class DataClient -- #
 class DataClient():
-    _PATH_DATA = os.path.join(tempfile.gettempdir(), 'sdx-dl.json')
+    _DATA_FILE_NAME = 'sdx-dl.json'
 
     def __init__(self, poolManager=None, url=None):
+        self.config_directory = self._create_config_directory()
+        self.data_path = os.path.join(self.config_directory, self._DATA_FILE_NAME)
         self.poolManager = poolManager
         self.url = url
+
+    def _create_config_directory(self):
+        import platform
+        platform_name = platform.system()
+
+        local_appdata = os.getenv('LOCALAPPDATA')
+
+        directory_paths = {
+            'Linux': '~/.config/subdivx-dl/',
+            'Darwin': '~/Library/Application Support/subdivx-dl/',
+            'Windows': f'{local_appdata}\\subdivx-dl\\'
+        }
+
+        config_directory = os.path.expanduser(directory_paths[platform_name])
+        os.makedirs(config_directory, exist_ok=True)
+
+        return config_directory
 
     def _get_web_version(self, poolManager, url):
         response = https_request(poolManager, 'GET', url)
@@ -947,12 +966,12 @@ class DataClient():
             'expiration_date': self.token_data['expiration_date']
         }
 
-        with open(self._PATH_DATA, 'w') as file:
+        with open(self.data_path, 'w') as file:
             json.dump(data, file, indent=4)
             file.close()
 
     def _read_data(self):
-        with open(self._PATH_DATA, 'r') as file:
+        with open(self.data_path, 'r') as file:
             self._data = json.load(file)
             file.close()
 
@@ -968,14 +987,14 @@ class DataClient():
     def delete_data(self):
         if self.has_data():
             helper.logger.info('Delete data session')
-            os.remove(self._PATH_DATA)
+            os.remove(self.data_path)
 
     def has_data(self):
-        return os.path.exists(self._PATH_DATA)
+        return os.path.exists(self.data_path)
 
     def renew_token(self):
         self.token_data = Token(self.poolManager, self.url).get_token_data()
-        data_file = self._PATH_DATA
+        data_file = self.data_path
 
         with open(data_file, 'r') as file:
             data = json.load(file)
