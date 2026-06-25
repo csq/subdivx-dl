@@ -909,7 +909,8 @@ class DataClient():
         directory_paths = {
             'Linux': '~/.config/subdivx-dl/',
             'Darwin': '~/Library/Application Support/subdivx-dl/',
-            'Windows': f'{local_appdata}\\subdivx-dl\\'
+            'Windows': f'{local_appdata}\\subdivx-dl\\',
+            'Android': '/data/data/com.termux/files/home/.config/subdivx-dl/'
         }
 
         config_directory = os.path.expanduser(directory_paths[platform_name])
@@ -1061,7 +1062,8 @@ class Config():
         directory_paths = {
             'Linux': '~/.config/subdivx-dl/',
             'Darwin': '~/Library/Application Support/subdivx-dl/',
-            'Windows': f'{local_appdata}\\subdivx-dl\\'
+            'Windows': f'{local_appdata}\\subdivx-dl\\',
+            'Android': '/data/data/com.termux/files/home/.config/subdivx-dl/'
         }
 
         config_directory = os.path.expanduser(directory_paths[platform_name])

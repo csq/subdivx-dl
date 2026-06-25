@@ -31,7 +31,8 @@ class DumpConfigAction(argparse.Action):
         directory_paths = {
             'Linux': f'~/.config/subdivx-dl/{config_filename}',
             'Darwin': f'~/Library/Application Support/subdivx-dl/{config_filename}',
-            'Windows': f'{local_appdata}\\subdivx-dl\\{config_filename}'
+            'Windows': f'{local_appdata}\\subdivx-dl\\{config_filename}',
+            'Android': f'/data/data/com.termux/files/home/.config/subdivx-dl/{config_filename}'
         }
 
         path = os.path.expanduser(directory_paths[platform_name])
