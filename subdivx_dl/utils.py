@@ -973,6 +973,22 @@ class DataClient():
     def has_data(self):
         return os.path.exists(self._PATH_DATA)
 
+    def renew_token(self):
+        self.token_data = Token(self.poolManager, self.url).get_token_data()
+        data_file = self._PATH_DATA
+
+        with open(data_file, 'r') as file:
+            data = json.load(file)
+            data['token'] = self.token_data['token']
+            data['expiration_date'] = self.token_data['expiration_date']
+            file.close()
+
+        with open(data_file, 'w') as file:
+            json.dump(data, file, indent=4)
+            file.close()
+
+        helper.logger.info('Renew token')
+
     def is_data_expired(self):
         if self.has_data():
             self._read_data()

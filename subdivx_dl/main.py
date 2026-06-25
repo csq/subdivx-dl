@@ -41,11 +41,16 @@ if args.new_session:
 	data_client.delete_data()
 
 # Load or generate data session
-if not data_client.has_data() or data_client.is_data_expired():
+if not data_client.has_data():
     data_client.generate_data()
     data_client.save_data()
 
 data_session = data_client.get_data_session()
+
+# Check if data is expired
+if data_client.is_data_expired():
+    data_client.renew_token()
+    data_session = data_client.get_data_session()
 
 # Parse user input
 SEARCH_TERM = parse_user_input(args.SEARCH)
