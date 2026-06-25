@@ -838,17 +838,7 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
 
 def https_request(https, method, url, **kwargs):
     try:
-        max_retries = 20
-        retry_count = 0
-        while retry_count < max_retries:
-            response = https.request(method, url, **kwargs)
-            if 400 <= response.status < 600 and 'www.subdivx.com/sub' not in url:
-                retry_count += 1
-                if retry_count == max_retries:
-                    raise Exception(f'HTTP Error: {response.status}')
-                time.sleep(1)
-            else:
-                break
+        response = https.request(method, url, **kwargs)
     except TimeoutError:
         print(get_translation('timeout_error_check_connection'))
         helper.logger.error('Timeout error')
@@ -856,11 +846,6 @@ def https_request(https, method, url, **kwargs):
     except MaxRetryError:
         print(get_translation('connection_error_check_connection'))
         helper.logger.error('Connection error')
-        sys.exit(1)
-    except Exception as e:
-        print(f'{get_translation("error_occurred")} {e}')
-        helper.logger.error(f'{e}')
-        DataClient().delete_data()
         sys.exit(1)
 
     return response
