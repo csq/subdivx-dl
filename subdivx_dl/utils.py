@@ -930,9 +930,6 @@ class DataClient():
         return data_session
 
     def generate_data(self):
-        print(get_translation('generating_data_session'), end='\r')
-        helper.logger.info('Generate data session')
-
         data_session = self.get_cookies()
 
         self.poolManager.headers['User-Agent'] = data_session['User-Agent']
