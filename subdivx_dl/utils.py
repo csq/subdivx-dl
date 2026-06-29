@@ -852,7 +852,7 @@ def https_request(https, method, url, **kwargs):
 
 # -- Class Token -- #
 class Token:
-    _TIMEDELTA = timedelta(hours=1)
+    _TIMEDELTA = timedelta(hours=3)
 
     def __init__(self, poolManager, url):
         self.poolManager = poolManager
@@ -860,7 +860,6 @@ class Token:
         self._generate_token()
 
     def _generate_token(self):
-
         response = https_request(self.poolManager, 'GET', f'{self.url}inc/gt.php?gt=1')
         data = response.data
 
