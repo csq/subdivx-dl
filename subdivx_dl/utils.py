@@ -919,12 +919,13 @@ class DataClient():
         return version
 
     def get_cookies(self):
+        helper.logger.info('Entering cookies data manually')
         clear()
 
-        print(get_translation('cookies_enter_data') + '\n')
-        sdx_cookie = input('sdx: ').strip().replace('sdx=', '')
+        print(get_translation('cookies_enter_data'))
+        sdx_cookie = input('\nsdx: ').strip().replace('sdx=', '')
         cf_clearance = input('cf_clearance: ').strip().replace('cf_clearance=', '')
-        user_agent = input('User-Agent: ').strip().replace('User-Agent=', '')
+        user_agent = input('\nUser-Agent: ').strip().replace('User-Agent=', '')
 
         data_session = {'User-Agent': user_agent, 'sdx': sdx_cookie, 'cf_clearance': cf_clearance}
         return data_session
