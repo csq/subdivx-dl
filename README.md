@@ -7,13 +7,14 @@
 </p>
 
 ## OVERVIEW
-SUBDIVX-DL is a fast command-line interface (CLI) tool for searching and downloading subtitles, optimized to retrieve the best results.
+SUBDIVX-DL is a fast command-line interface (CLI) tool for searching and downloading subtitles, optimized to retrieve the best results with minimal external library usage.
 
 ## FEATURES
 - **Fast Search**: Quickly find subtitles for your favorite movies and shows.
 - **Efficient Downloads**: Download subtitles with ease and speed.
 - **Automatic File Renaming**: Automatically rename your downloaded subtitles.
 - **Customizable Display**: Adjust the layout and style of search results to suit your preferences.
+- **Minimal Dependencies**: Built with a focus on reducing bloat by limiting external library usage.
 
 ## AVAILABLE LANGUAGES
 - [Español](README-es.md)
@@ -34,9 +35,10 @@ You can install subdivx-dl by following these steps:
 Python versions 3.10+ are supported. Other versions and implementations may or may not work correctly.
 
 * **Guessit**: Extracts metadata from media filenames.
+* **Certifi**: Collection of root certificates for SSL/TLS validation.
+* **Urllib3**: HTTP client for making requests and handling responses.
 * **Tabulate**: Formats and displays data in tables for better readability.
 * **Patool**: Archive file manager that supports various archive formats.
-* **Camoufox**: Custom build of Firefox for web scraping.
 
 ## USAGE AND OPTIONS
 ```bash
@@ -77,6 +79,7 @@ Python versions 3.10+ are supported. Other versions and implementations may or m
     Miscellaneous:
         -dh, --disable-help                 Disable help messages
         -ne, --no-exit                      Disable automatic exit
+        -ns, --new-session                  Create a new session
         -lcode, --language-code CODE        Specify a custom language code
 
     Configuration:
@@ -179,18 +182,6 @@ Having these tools will allow for the extraction of the corresponding file forma
 ### Valid IMDb ID returns no results
 
 A valid IMDb ID may not return results due to an external issue with subdivx.com. The solution is to search by file name or keywords.
-
-### Install Camoufox browser
-Download the Camoufox browser
-
-For *Windows*:
-```bash
-    camoufox fetch
-```
-For *MacOS & Linux*:
-```bash
-    python3 -m camoufox fetch
-```
 
 ## LEGAL
 ### Disclaimer

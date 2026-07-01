@@ -2,7 +2,8 @@
 # GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 import sys
-import asyncio
+import urllib3
+import certifi
 
 from subdivx_dl.utils import *
 from subdivx_dl.translations.load_translations import get_translation, set_language
@@ -24,22 +25,34 @@ Config().save_config(args) if args.save_config else None
 
 helper.logger.info(f'Arguments used: {args.get_args()}')
 
+# Create a PoolManager instance for HTTPS requests
+https = urllib3.PoolManager(
+    cert_reqs='CERT_REQUIRED',
+    ca_certs=certifi.where(),
+    timeout=60,
+    retries=5
+)
+
+# Create a DataClient instance
+data_client = DataClient(https, SUBDIVX_URL)
+
+# Delete data session if flag is set
+if args.new_session:
+	data_client.delete_data()
+
+# Load or generate data session
+if not data_client.has_data() or data_client.is_data_expired():
+    data_client.generate_data()
+    data_client.save_data()
+
+data_session = data_client.get_data_session()
+
 # Parse user input
 SEARCH_TERM = parse_user_input(args.SEARCH)
 
-async def main_loop():
-
+def main():
     # Get all data from search
-    print(get_translation('init_browser'), end='\r')
-    page = await Browser().open_page(SUBDIVX_URL)
-
-    try:
-        search_data = await get_data_page(args, page, SEARCH_TERM)
-    except Exception:
-        print(get_translation('error_retrieving_data'))
-        await Browser().close_browser()
-        DataSession().delete_data()
-        sys.exit(1)
+    search_data = get_data_page(args, https, SUBDIVX_URL, data_session, SEARCH_TERM)
 
     # Sorting data if needed
     search_data = sort_data(args, search_data)
@@ -47,8 +60,7 @@ async def main_loop():
     # Checking flag for switch to fast download mode
     if args.fast:
         id_subtitle = get_best_match(args, search_data)
-        await get_subtitle(args, page, id_subtitle)
-        await Browser().close_browser()
+        get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
         sys.exit(0)
 
     # Size of the data
@@ -135,7 +147,6 @@ async def main_loop():
             continue
         elif selection == -1:
             clear()
-            await Browser().close_browser()
             sys.exit(0)
 
         clear()
@@ -154,7 +165,7 @@ async def main_loop():
             if comment_from_cache and comment_from_cache != -1:
                 comments_selection = paginate_comments(args, comment_from_cache, block_size, selection, search_data)
             else:
-                comment_list = await get_comments(page, id_subtitle)
+                comment_list = get_comments(https, SUBDIVX_URL, id_subtitle)
                 cache_comments.put(id_subtitle, comment_list)
 
                 if comment_list:
@@ -174,27 +185,13 @@ async def main_loop():
             continue
         elif select_action == 1:
             clear()
-            await get_subtitle(args, page, id_subtitle)
+            get_subtitle(args, https, SUBDIVX_URL, id_subtitle)
             if args.no_exit:
                 continue
-            await Browser().close_browser()
             sys.exit(0)
         elif select_action == 0:
             clear()
-            await Browser().close_browser()
             sys.exit(0)
-
-async def run():
-    try:
-        await main_loop()
-    except Exception as e:
-        helper.logger.error(f'Unexpected error: {e}')
-        await Browser().close_browser()
-        sys.exit(1)
-
-def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
 
 if __name__ == '__main__':
     main()

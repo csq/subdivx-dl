@@ -7,13 +7,14 @@
 </p>
 
 ## DESCRIPCIÓN GENERAL
-SUBDIVX-DL es una herramienta de interfaz de línea de comandos (CLI) rápida para buscar y descargar subtítulos, optimizada para obtener los mejores resultados.
+SUBDIVX-DL es una herramienta de interfaz de línea de comandos (CLI) rápida para buscar y descargar subtítulos, optimizada para obtener los mejores resultados con un uso mínimo de bibliotecas externas.
 
 ## CARACTERÍSTICAS
 - **Búsqueda Rápida**: Encuentra rápidamente subtítulos para tus películas y programas favoritos.
 - **Descargas Eficientes**: Descarga subtítulos con facilidad y rapidez.
 - **Renombrado Automático de Archivos**: Renombra automáticamente tus subtítulos descargados.
 - **Visualización Personalizable**: Ajusta el diseño y estilo de los resultados de búsqueda según tus preferencias.
+- **Dependencias Mínimas**: Diseñado para ser ligero, limitando el uso de bibliotecas externas.
 
 ## IDIOMAS DISPONIBLES
 - [English](README.md)
@@ -34,9 +35,10 @@ Puedes instalar subdivx-dl siguiendo estos pasos:
 Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funcionar correctamente o no.
 
 * **Guessit**: Extrae metadatos de los nombres de archivos multimedia.
+* **Certifi**: Colección de certificados raíz para la validación de SSL/TLS.
+* **Urllib3**: Cliente HTTP para realizar solicitudes y manejar respuestas.
 * **Tabulate**: Formatea y muestra datos en tablas para una mejor legibilidad.
 * **Patool**: Gestor de archivos comprimidos que admite varios formatos de archivo.
-* **Camoufox**: Build personalizada de Firefox para web scraping.
 
 ## USO Y OPCIONES
 ```bash
@@ -77,6 +79,7 @@ Python 3.10+ son compatibles. Otras versiones e implementaciones pueden funciona
     Misceláneos:
         -dh, --disable-help                 Desactivar los mensajes de ayuda
         -ne, --no-exit                      Desactivar salida automática
+        -ns, --new-session                  Crea una nueva session
         -lcode, --language-code CODIGO      Especificar lenguaje predeterminado
 
     Configuración:
@@ -179,18 +182,6 @@ Contar con estas herramientas permitirá la extracción de los formatos de archi
 ### ID IMDb válido sin resultados
 
 Un ID de IMDb válido puede no devolver resultados debido a un problema externo con subdivx.com. La solución es buscar por nombre de archivo o palabras clave.
-
-### Instalar Camoufox
-Descargar el navegador Camoufox
-
-Para *Windows*:
-```bash
-    camoufox fetch
-```
-Para *MacOS y Linux*:
-```bash
-    python3 -m camoufox fetch
-```
 
 # LEGAL
 ### Descargo de responsabilidad

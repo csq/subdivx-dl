@@ -7,16 +7,14 @@ import sys
 import json
 import time
 import shutil
-import asyncio
-import zipfile
 import tempfile
 import textwrap
 import patoolib
 
-from datetime import datetime
+from urllib3.exceptions import MaxRetryError, TimeoutError
+from datetime import datetime, timedelta
+from tempfile import NamedTemporaryFile
 from tabulate import tabulate, SEPARATING_LINE
-from browserforge.fingerprints import Screen
-from camoufox.async_api import AsyncCamoufox
 from guessit import guessit
 from subdivx_dl import helper
 from subdivx_dl.translations.load_translations import get_translation
@@ -34,36 +32,59 @@ def get_terminal_size():
     except OSError:
         return 80, 25
 
-async def download_file(page, selected_index, dest_path):
-    helper.logger.info('Downloading archive')
+def get_file_extension(file_path):
+    with open(file_path, 'rb') as file:
+        header = file.read(4)
 
-    selected_row = await page.wait_for_selector(f'table#resultados tbody tr[data-dt-row="{selected_index}"]')
-    await selected_row.click()
+    file_signatures = {
+        b'\x50\x4B\x03\x04': '.zip',
+        b'\x52\x61\x72\x21': '.rar',
+        b'\x37\x7A\xBC\xAF': '.7z'
+    }
 
-    # Click download button
-    download_selector = 'button#btnDescargar'
-    async with page.expect_download() as download_info:
-        await page.click(download_selector)
+    for signature, extension in file_signatures.items():
+        if header.startswith(signature):
+            return extension
 
-    download = await download_info.value
+    return '.bin' # For unknown file
 
-    await download.save_as(os.path.join(dest_path, download.suggested_filename))
+def download_file(poolManager, url, id_subtitle, location):
+    helper.logger.info(f'Downloading archive from: {url}{id_subtitle} in {location}')
+
+    with NamedTemporaryFile(dir=location, delete=False) as temp_file:
+        for i in range(9, 0, -1):
+            server_address = f'{url}sub{i}/{id_subtitle}'
+            helper.logger.info(f'Attempt on server N°{i} with url {server_address}')
+
+            response = https_request(poolManager, 'GET', server_address)
+
+            temp_file.write(response.data)
+            temp_file.seek(0)
+
+            file_extension = get_file_extension(temp_file.name)
+
+            if file_extension != '.bin':
+                helper.logger.info('Download complete')
+                temp_file.close()
+
+                temp_file_new_name = f'{temp_file.name}{file_extension}'
+                os.rename(temp_file.name, temp_file_new_name)
+                break
+            elif i == 1:
+                print(get_translation('no_subtitles_downloaded_broken_link'))
+                helper.logger.error(f'Subtitles not downloaded, link broken: {url}{id_subtitle}')
+                sys.exit(1)
 
 def uncompress(compressed_path, dest_dir):
     try:
         helper.logger.info(f'Unpacking [{os.path.basename(compressed_path)}]')
-
-        if compressed_path.endswith('.zip'):
-            with zipfile.ZipFile(compressed_path, 'r') as zip_file:
-                zip_file.extractall(dest_dir)
-        else:
-            patoolib.extract_archive(
-                archive=compressed_path,
-                outdir=dest_dir,
-                interactive=False,
-                verbosity=-1
-            )
-    except (zipfile.BadZipFile, patoolib.util.PatoolError) as e:
+        patoolib.extract_archive(
+            archive=compressed_path,
+            outdir=dest_dir,
+            interactive=False,
+            verbosity=-1
+        )
+    except patoolib.util.PatoolError as e:
         helper.logger.error('Failed to unpack file')
         print(f'{get_translation("failed_to_unpack_file")} {e}')
         sys.exit(1)
@@ -125,7 +146,7 @@ def select_best_subtitle_from_list(args, data):
     helper.logger.info(f'The best matching subtitle has been selected with a score {max_score:.2f}')
     return file_name
 
-async def print_menu_content_dir(args, directory):
+def print_menu_content_dir(args, directory):
     header = [['N°', get_translation('file_name')]]
 
     file_names = [fname for fname in os.listdir(directory) if fname.endswith(SUBTITLE_EXTENSIONS)]
@@ -172,7 +193,6 @@ async def print_menu_content_dir(args, directory):
                 except OSError as error:
                     helper.logger.error(error)
                 clear()
-                await Browser().close_browser()
                 sys.exit(0)
 
             # Return the file_name of the selected subtitle file
@@ -194,7 +214,7 @@ def rename_subtitle_file(source_file_path, dest_file_path):
         print(f'{get_translation("error_occurred")} {error}')
         sys.exit(0)
 
-async def rename_and_move_subtitle(args, source_dir, dest_dir):
+def rename_and_move_subtitle(args, source_dir, dest_dir):
     subtitle_files = [
         file for file in os.listdir(source_dir)
         if file.endswith(SUBTITLE_EXTENSIONS)
@@ -206,7 +226,7 @@ async def rename_and_move_subtitle(args, source_dir, dest_dir):
 
         if args.no_rename and not args.season:
             if num_subtitles > 1:
-                selected_subtitle = await print_menu_content_dir(args, source_dir)
+                selected_subtitle = print_menu_content_dir(args, source_dir)
                 source_file_path = os.path.join(source_dir, selected_subtitle)
                 dest_file_path = os.path.join(dest_dir, selected_subtitle)
 
@@ -235,7 +255,7 @@ async def rename_and_move_subtitle(args, source_dir, dest_dir):
             dest_file = os.path.splitext(args.SEARCH)[0].strip() + extension
 
             if num_subtitles > 1:
-                selected_subtitle = await print_menu_content_dir(args, source_dir)
+                selected_subtitle = print_menu_content_dir(args, source_dir)
                 source_file_path = os.path.join(source_dir, selected_subtitle)
 
                 # Get subtitle extension from selected subtitle
@@ -271,78 +291,55 @@ def rename_file_extension(directory):
                 new_filename = f'{name}{ext.lower()}'
                 os.rename(os.path.join(directory, filename), os.path.join(directory, new_filename))
 
-async def get_data_page(args, page, search_term):
+def get_data_page(args, poolManager, url, data_session, search):
     clear()
     print(get_translation('searching'), end='\r')
 
     # Save guessit info to cache
-    guessit_info = GuessitInfo(search_term).get_info()
+    guessit_info = GuessitInfo(search).get_info()
     DictCache().store(guessit_info)
 
     query = guessit_info['title']
-    helper.logger.info(f'Searching subtitle for: {query}')
 
-    # Locate Search box
-    search_box = page.locator('#buscar')
-    await search_box.wait_for()
-    await search_box.click()
-    await search_box.fill(query)
-    await search_box.press('Enter')
+    payload = {
+        'tabla': 'resultados',
+        'filtros': '',
+        f'buscar{data_session["web_version"]}': query,
+        'token': data_session['token']
+    }
 
-    # List all of results
-    selector = page.locator('#dt-length-0')
-    await selector.wait_for()
-    await selector.click()
-    await selector.select_option('Todas')
-    await selector.press('Escape')
-
-    # Save results in json file
-    results_list = []
+    helper.logger.info(f'Starting request to subdivx.com with search: {search} parsed as: {query}')
+    response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
 
     try:
-        await page.wait_for_selector('table#resultados tbody tr.trMarcar', state='visible', timeout=5000)
-        rows = await page.query_selector_all('table#resultados tbody tr.trMarcar.dt-hasChild.dtr-expanded')
+        data = json.loads(response.data).get('aaData')
+    except json.JSONDecodeError:
+        helper.logger.error('Failed to decode JSON due to an expired data session')
+        print(get_translation('expired_data_session_try_again'))
+        DataClient().delete_data()
+        sys.exit(1)
 
-        for index, row in enumerate(rows, start=0):
-            title = await row.query_selector('td:nth-child(2) span')
-            title_text = await title.inner_text()
+    search_results = []
 
-            description = await row.query_selector('td:nth-child(3)')
-            description_text = await description.inner_text()
+    for result in data:
+        subtitle = {
+            'id_subtitle': result['id'],
+            'title': filter_text(result['titulo']),
+            'description': filter_text(result['descripcion']),
+            'downloads': result['descargas'],
+            'uploader': result['nick'],
+            'upload_date': parse_date(result['fecha_subida']) if result['fecha_subida'] else '-'
+        }
+        search_results.append(subtitle)
 
-            downloads = await row.query_selector('td:nth-child(4)')
-            downloads_text = await downloads.inner_text()
-
-            user = await row.query_selector('td:nth-child(8) a')
-            user_text = await user.inner_text()
-
-            date = await row.query_selector('td:nth-child(9)')
-            date_text = await date.inner_text()
-            match = re.search(r'\d{2}/\d{2}/\d{4}', date_text)
-            date_text = match.group(0) if match and match.group(0) != '00/00/0000' else '-'
-
-            # Create JSON-like dictionary
-            data_entry = {
-                'id_subtitle': index,
-                'title': title_text,
-                'description': description_text,
-                'downloads': downloads_text,
-                'uploader': user_text,
-                'upload_date': date_text
-            }
-
-            # Append to the results list
-            results_list.append(data_entry)
-
-    except Exception:
-        await Browser().close_browser()
+    if not search_results:
         if not args.verbose:
             print(get_translation('no_subtitles_found'))
-        helper.logger.info(f'No subtitles found for query: {search_term}')
+        helper.logger.info(f'No subtitles found for query: {query}')
         sys.exit(0)
 
-    helper.logger.info(f'Found subtitles for query: {search_term}')
-    return results_list
+    helper.logger.info(f'Found subtitles for query: {query}')
+    return search_results
 
 def sort_data(args, data):
     if args.order_by_downloads:
@@ -359,6 +356,12 @@ def sort_data(args, data):
     else:
         return data
 
+def parse_date(date):
+    try:
+        return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y')
+    except ValueError:
+        return None
+
 def parse_user_input(input):
     search = input.strip()
     if search == '':
@@ -367,38 +370,15 @@ def parse_user_input(input):
         sys.exit(0)
     return search
 
-run_get_comments = 1
-async def get_comments(page, subtitle_id):
-    global run_get_comments
+def get_comments(poolManager, url, subtitle_id):
+    payload = {
+        'getComentarios': subtitle_id
+    }
 
-    # Select subtitle
-    selected_row = await page.wait_for_selector(f'table#resultados tbody tr[data-dt-row="{subtitle_id}"]')
-    await selected_row.click()
+    response = https_request(poolManager, 'POST', url=f'{url}inc/ajax.php', fields=payload)
+    comments_data = json.loads(response.data).get('aaData', [])
 
-    # List all of comments
-    select = page.locator(f'#dt-length-{run_get_comments}')
-    await select.wait_for()
-    await select.click()
-    await select.select_option('100')
-
-    # Select table comments
-    comments_data = []
-    rows = await page.query_selector_all('#tblComentarios tbody tr')
-    for row in rows:
-        cells = await row.query_selector_all('td')
-        if len(cells) != 3:
-            continue
-
-        comment = (await cells[0].inner_text()).strip()
-        comments_data.append({'comment': comment})
-
-    comments = [comment['comment'] for comment in comments_data]
-
-    # Close modal
-    btn_close = page.locator('#modalDetailDown .btn-close')
-    await btn_close.click()
-
-    run_get_comments += 1
+    comments = [filter_text(comment['comentario']) for comment in comments_data]
 
     return comments
 
@@ -554,6 +534,27 @@ def print_center_text(text):
     print(padding + text.center(terminal_width))
     time.sleep(0.8)
 
+def filter_text(text):
+    # Remove HTML tags from the text
+    text = re.sub(r'<[^>]+>', '', text)
+
+    # Replace multiple consecutive spaces with a single space
+    text = re.sub(r'(?<=\S) {2,}(?=\S)', ' ', text)
+
+    # Replace &amp; with &
+    text = text.replace('&amp;', '&')
+
+    # Replace &quot; with "
+    text = text.replace('&quot;', '"')
+
+    # Replace \" or \\\" with "
+    text = re.sub(r'\\{1,3}"', '"', text)
+
+    # Remove \´
+    text = text.replace('\´', '')
+
+    return text
+
 def print_description(args, selection, search_data):
     terminal_width, _ = get_terminal_size()
     description = search_data[selection]['description'].strip()
@@ -593,7 +594,7 @@ def print_summary(args, selection, search_data):
         ), end=('\n\n' if args.style in ['presto', 'simple', 'pipe', 'orgtbl'] else '\n')
     )
 
-async def get_subtitle(args, page, selected_index):
+def get_subtitle(args, poolManager, url, id_subtitle):
     if not args.verbose:
         print(get_translation('working'), end='\r')
 
@@ -602,7 +603,7 @@ async def get_subtitle(args, page, selected_index):
         helper.logger.info(f'Create temporal directory {temp_dir}')
 
         # Download file compressed in temporal directory
-        await download_file(page, selected_index, temp_dir)
+        download_file(poolManager, url, id_subtitle, temp_dir)
 
         # Extract files, including nested archives, up to depth 2
         excluded_file_names = set()
@@ -629,7 +630,7 @@ async def get_subtitle(args, page, selected_index):
         dest_dir = args.location or os.getcwd()
 
         # Rename and/or move subtitles
-        await rename_and_move_subtitle(args, temp_dir, dest_dir)
+        rename_and_move_subtitle(args, temp_dir, dest_dir)
 
     # Message for user
     helper.logger.info(f'Delete temporal directory {temp_dir}')
@@ -641,13 +642,13 @@ async def get_subtitle(args, page, selected_index):
 def are_titles_equal(media_info_a, media_info_b):
     # Extract normalized titles
     titles1 = {
-        media_info_a.get('title'),
-        media_info_a.get('alternative_title')
+        media_info_a.get('title').strip().lower(),
+        media_info_a.get('alternative_title').strip().lower()
     }
 
     titles2 = {
-        media_info_b.get('title'),
-        media_info_b.get('alternative_title')
+        media_info_b.get('title').strip().lower(),
+        media_info_b.get('alternative_title').strip().lower()
     }
 
     # Check for any intersection between title sets
@@ -730,8 +731,8 @@ def print_comments(args, comments):
     comment_label = comment_text.center(terminal_width - base_padding)[label_width:]
 
     table = [['N°', comment_label]]
-    for index, comment in enumerate(comments, start=1):
-        table.append([index, comment])
+    for index, comment_text in enumerate(comments, start=1):
+        table.append([index, comment_text.strip()])
 
     tablefmt = args.style or DEFAULT_STYLE
     colalign = ['center', 'left']
@@ -834,6 +835,154 @@ def prompt_user_selection(args, menu_name: str, options: list = ['subtitle', 'do
         sys.exit(1)
 
     return user_input
+
+def https_request(https, method, url, **kwargs):
+    try:
+        max_retries = 20
+        retry_count = 0
+        while retry_count < max_retries:
+            response = https.request(method, url, **kwargs)
+            if 400 <= response.status < 600 and 'www.subdivx.com/sub' not in url:
+                retry_count += 1
+                if retry_count == max_retries:
+                    raise Exception(f'HTTP Error: {response.status}')
+                time.sleep(1)
+            else:
+                break
+    except TimeoutError:
+        print(get_translation('timeout_error_check_connection'))
+        helper.logger.error('Timeout error')
+        sys.exit(1)
+    except MaxRetryError:
+        print(get_translation('connection_error_check_connection'))
+        helper.logger.error('Connection error')
+        sys.exit(1)
+    except Exception as e:
+        print(f'{get_translation("error_occurred")} {e}')
+        helper.logger.error(f'{e}')
+        DataClient().delete_data()
+        sys.exit(1)
+
+    return response
+
+# -- Class Token -- #
+class Token:
+    _TIMEDELTA = timedelta(hours=1)
+
+    def __init__(self, poolManager, url):
+        self.poolManager = poolManager
+        self.url = url
+        self._generate_token()
+
+    def _generate_token(self):
+
+        response = https_request(self.poolManager, 'GET', f'{self.url}inc/gt.php?gt=1')
+        data = response.data
+
+        self._TOKEN_VALUE = json.loads(data)['token']
+        self._expiration_date = datetime.now() + self._TIMEDELTA
+
+    def get_token_data(self):
+        data = {
+            'token': self._TOKEN_VALUE,
+            'expiration_date': self._expiration_date.isoformat().replace('+00:00', '')
+        }
+
+        return data
+
+# -- Class DataClient -- #
+class DataClient():
+    _PATH_DATA = os.path.join(tempfile.gettempdir(), 'sdx-dl.json')
+
+    def __init__(self, poolManager=None, url=None):
+        self.poolManager = poolManager
+        self.url = url
+
+    def _get_web_version(self, poolManager, url):
+        response = https_request(poolManager, 'GET', url)
+        response_data = response.data.decode('utf-8')
+
+        label = 'id="vs">'
+
+        version_start_index = response_data.find(label) + len(label)
+        version_end_index = response_data.find('</div>', version_start_index)
+
+        version_text = response_data[version_start_index:version_end_index]
+
+        version = version_text.replace('v', '').replace('.', '')
+
+        return version
+
+    def get_cookies(self):
+        clear()
+
+        print('Enter your cookies data\n')
+        sdx_cookie = input('sdx: ').strip().replace('sdx=', '')
+        cf_clearance = input('cf_clearance: ').strip().replace('cf_clearance=', '')
+        user_agent = input('User-Agent: ').strip().replace('User-Agent=', '')
+
+        data_session = {'User-Agent': user_agent, 'sdx': sdx_cookie, 'cf_clearance': cf_clearance}
+        return data_session
+
+    def generate_data(self):
+        print(get_translation('generating_data_session'), end='\r')
+        helper.logger.info('Generate data session')
+
+        data_session = self.get_cookies()
+
+        self.poolManager.headers['User-Agent'] = data_session['User-Agent']
+        self.poolManager.headers['Cookie'] = f'cf_clearance={data_session["cf_clearance"]};sdx={data_session["sdx"]}'
+        self.web_version = self._get_web_version(self.poolManager, self.url)
+        self.sdx_cookie = data_session['sdx']
+        self.cf_clearance = data_session['cf_clearance']
+        self.token_data = Token(self.poolManager, self.url).get_token_data()
+
+    def save_data(self):
+        data = {
+            'web_version': self.web_version,
+            'user_agent': self.poolManager.headers['User-Agent'],
+            'cf_clearance': self.cf_clearance,
+            'sdx_cookie': self.sdx_cookie,
+            'token': self.token_data['token'],
+            'expiration_date': self.token_data['expiration_date']
+        }
+
+        with open(self._PATH_DATA, 'w') as file:
+            json.dump(data, file, indent=4)
+            file.close()
+
+    def _read_data(self):
+        with open(self._PATH_DATA, 'r') as file:
+            self._data = json.load(file)
+            file.close()
+
+    def get_data_session(self):
+        if self.has_data():
+            helper.logger.info('Load data session')
+            self._read_data()
+            self.poolManager.headers['User-Agent'] = self._data['user_agent']
+            cookie_value = f"cf_clearance={self._data['cf_clearance']};sdx={self._data['sdx_cookie']}"
+            self.poolManager.headers['Cookie'] = cookie_value
+            return self._data
+
+    def delete_data(self):
+        if self.has_data():
+            helper.logger.info('Delete data session')
+            os.remove(self._PATH_DATA)
+
+    def has_data(self):
+        return os.path.exists(self._PATH_DATA)
+
+    def is_data_expired(self):
+        if self.has_data():
+            self._read_data()
+
+            expiration_date = datetime.fromisoformat(self._data['expiration_date'])
+
+            if datetime.now() > expiration_date:
+                return True
+
+            return False
 
 # -- Class Args -- #
 class Args():
@@ -1076,91 +1225,3 @@ class DictCache:
 
     def get(self):
         return self._cache
-
-# -- Class DataSession -- #
-class DataSession():
-    _PATH_DATA = os.path.join(tempfile.gettempdir(), 'subdivx-dl')
-
-    def delete_data(self):
-        if self.has_data():
-            helper.logger.info('Delete data session')
-            shutil.rmtree(self._PATH_DATA)
-
-    def has_data(self):
-        return os.path.exists(self._PATH_DATA)
-
-# -- Class Browser -- #
-class Browser:
-    _instance = None
-    _user_data_dir = os.path.join(tempfile.gettempdir(), 'subdivx-dl', 'user_data')
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(Browser, cls).__new__(cls)
-            cls._instance.browser = None
-        return cls._instance
-
-    async def _get_browser(self):
-        if self.browser is None:
-            self.browser = AsyncCamoufox(
-                headless=True,
-                os=['macos'],
-                screen=Screen(max_width=1920, max_height=1080),
-                persistent_context=True,
-                user_data_dir=Browser._user_data_dir
-            )
-            await self.browser.start()
-        return self.browser.browser
-
-    # See: https://github.com/MaestroOfAutomation/turnstile_bypass
-    async def _cloudflare_bypass(self, url: str):
-        browser = await self._get_browser()
-        page = await browser.new_page()
-        await page.goto(url)
-
-        try:
-            for _ in range(15):
-                await asyncio.sleep(1)
-
-                for frame in page.frames:
-                    if frame.url.startswith('https://challenges.cloudflare.com'):
-                        frame_element = await frame.frame_element()
-                        bounding_box = await frame_element.bounding_box()
-                        coord_x = bounding_box['x']
-                        coord_y = bounding_box['y']
-
-                        width = bounding_box['width']
-                        height = bounding_box['height']
-
-                        checkbox_x = coord_x + width / 9
-                        checkbox_y = coord_y + height / 2
-
-                        await page.mouse.click(x=checkbox_x, y=checkbox_y)
-        except Exception:
-            helper.logger.error('Error bypassing Cloudflare')
-            return page
-
-        helper.logger.info('Bypassed Cloudflare')
-        return page
-
-    async def open_page(self, url: str):
-        try:
-            if os.path.exists(Browser._user_data_dir) is False:
-                page = await self._cloudflare_bypass(url)
-            else:
-                browser = await self._get_browser()
-                page = await browser.new_page()
-                await page.goto(url)
-        except Exception:
-            print(get_translation('error_starting_browser'))
-            helper.logger.error('Not started browser')
-            sys.exit(1)
-        else:
-            helper.logger.info('Started browser')
-            return page
-
-    async def close_browser(self):
-        if self.browser is not None:
-            await self.browser.browser.close()
-            self.browser = None
-            helper.logger.info('Closed browser')
