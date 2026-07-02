@@ -863,7 +863,14 @@ class Token:
         response = https_request(self.poolManager, 'GET', f'{self.url}inc/gt.php?gt=1')
         data = response.data
 
-        self._TOKEN_VALUE = json.loads(data)['token']
+        try:
+            self._TOKEN_VALUE = json.loads(data)['token']
+        except json.JSONDecodeError:
+            helper.logger.error('Failed to decode JSON due to an expired data session')
+            print(get_translation('expired_data_session_try_again'))
+            DataClient().delete_data()
+            sys.exit(1)
+
         self._expiration_date = datetime.now() + self._TIMEDELTA
 
     def get_token_data(self):
