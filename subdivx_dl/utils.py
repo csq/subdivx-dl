@@ -913,14 +913,10 @@ class DataClient():
         response = https_request(poolManager, 'GET', url)
         response_data = response.data.decode('utf-8')
 
-        label = 'id="vs">'
+        version_pattern = r"(?:index-min\.js|sdx-min\.css)\?v=([0-9.]+)"
 
-        version_start_index = response_data.find(label) + len(label)
-        version_end_index = response_data.find('</div>', version_start_index)
-
-        version_text = response_data[version_start_index:version_end_index]
-
-        version = version_text.replace('v', '').replace('.', '')
+        match = re.search(version_pattern, response_data)
+        version = match.group(1).replace(".", "")
 
         return version
 
