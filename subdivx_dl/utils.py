@@ -920,6 +920,25 @@ class DataClient():
 
         return version
 
+    def get_user_agent(self):
+        current_ua = None
+
+        if self.has_data:
+            try:
+                with open(self.data_path, 'r') as file:
+                    current_ua = json.load(file).get('user_agent')
+            except (FileNotFoundError, json.JSONDecodeError):
+                pass
+
+        if current_ua:
+            print(f'\nUA: {current_ua}')
+            msg = f'User-Agent [{get_translation("keep_current_ua")}]: '
+            user_input = input(msg).strip()
+        else:
+            user_input = input('\nUser-Agent: ').strip()
+
+        return user_input if user_input else current_ua
+
     def get_cookies(self):
         helper.logger.info('Entering cookies data manually')
         clear()
@@ -927,7 +946,7 @@ class DataClient():
         print(get_translation('cookies_enter_data'))
         sdx_cookie = input('\nsdx: ').strip().replace('sdx=', '')
         cf_clearance = input('cf_clearance: ').strip().replace('cf_clearance=', '')
-        user_agent = input('\nUser-Agent: ').strip().replace('User-Agent=', '')
+        user_agent = self.get_user_agent()
 
         data_session = {'User-Agent': user_agent, 'sdx': sdx_cookie, 'cf_clearance': cf_clearance}
         return data_session
@@ -973,10 +992,34 @@ class DataClient():
     def delete_data(self):
         if self.has_data():
             helper.logger.info('Delete data session')
-            os.remove(self.data_path)
+
+            try:
+                with open(self.data_path, 'r+') as file:
+                    data = json.load(file)
+                    data['web_version'] = ''
+                    data['cf_clearance'] = ''
+                    data['sdx_cookie'] = ''
+
+                    file.seek(0)
+                    file.truncate()
+                    json.dump(data, file, indent=4)
+
+            except (IOError, json.JSONDecodeError) as e:
+                helper.logger.error(f'Failed to delete data: {e}')
 
     def has_data(self):
-        return os.path.exists(self.data_path)
+        try:
+            with open(self.data_path, 'r') as file:
+                data = json.load(file)
+                cf_value = data.get('cf_clearance')
+                sdx_value = data.get('sdx_cookie')
+
+                if len(cf_value) > 0 and len(sdx_value) > 0:
+                    return True
+            return False
+
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            return False
 
     def renew_token(self):
         self.token_data = Token(self.poolManager, self.url).get_token_data()
