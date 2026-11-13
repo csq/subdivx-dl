@@ -6,6 +6,7 @@ import re
 import sys
 import json
 import time
+import html
 import shutil
 import tempfile
 import textwrap
@@ -541,17 +542,14 @@ def filter_text(text):
     # Replace multiple consecutive spaces with a single space
     text = re.sub(r'(?<=\S) {2,}(?=\S)', ' ', text)
 
-    # Replace &amp; with &
-    text = text.replace('&amp;', '&')
-
-    # Replace &quot; with "
-    text = text.replace('&quot;', '"')
+    # Decode all HTML entities (&amp;, &quot;, &lt;, &#39;, &nbsp;, etc.)
+    text = html.unescape(text)
 
     # Replace \" or \\\" with "
     text = re.sub(r'\\{1,3}"', '"', text)
 
     # Remove \´
-    text = text.replace('\´', '')
+    text = text.replace(r'\´', '')
 
     return text
 
