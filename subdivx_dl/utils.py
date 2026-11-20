@@ -882,6 +882,7 @@ class Token:
 # -- Class DataClient -- #
 class DataClient():
     _DATA_FILE_NAME = 'sdx-dl.json'
+    delete_UA = False
 
     def __init__(self, poolManager=None, url=None):
         self.config_directory = self._create_config_directory()
@@ -954,7 +955,16 @@ class DataClient():
 
         self.poolManager.headers['User-Agent'] = data_session['User-Agent']
         self.poolManager.headers['Cookie'] = f'cf_clearance={data_session["cf_clearance"]};sdx={data_session["sdx"]}'
-        self.web_version = self._get_web_version(self.poolManager, self.url)
+
+        try:
+            self.web_version = self._get_web_version(self.poolManager, self.url)
+        except AttributeError:
+            clear()
+            print(get_translation('user_agent_mismatch'))
+            DataClient.delete_UA = True
+            self.delete_data()
+            sys.exit(0)
+
         self.sdx_cookie = data_session['sdx']
         self.cf_clearance = data_session['cf_clearance']
         self.token_data = Token(self.poolManager, self.url).get_token_data()
@@ -988,7 +998,7 @@ class DataClient():
             return self._data
 
     def delete_data(self):
-        if self.has_data():
+        if self.has_data() or DataClient.delete_UA:
             helper.logger.info('Delete data session')
 
             try:
@@ -997,7 +1007,8 @@ class DataClient():
                     data['web_version'] = ''
                     data['cf_clearance'] = ''
                     data['sdx_cookie'] = ''
-
+                    if DataClient.delete_UA:
+                        data['user_agent'] = ''
                     file.seek(0)
                     file.truncate()
                     json.dump(data, file, indent=4)
